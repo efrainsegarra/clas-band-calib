@@ -38,20 +38,36 @@ public class BANDMipApp extends FCApplication {
         H1F h;
         String alab;
         String otab[]={" L PMT "," R PMT "};
-        String lab4[]={" ADC"," TDC","GMEAN PMT "};      
+        String lab4[]={" ADC"," TDC"," OVERFLOW"};      
         String tit = "SEC "+is+" LAY "+(ilm+1);
        
         for(int iip=min;iip<max;iip++) {
             alab = tit+otab[lr-1]+(iip+1)+lab4[0];
-            c.cd(iip-min);                           
+            c.cd(iip-min);           
+            
+            // Draw one including overflow samples
+            h = bandPix[ilm].strips.hmap2.get("H2_a_Hist").get(is,lr,7).sliceY(iip); 
+            h.setOptStat(Integer.parseInt("1000100")); 
+            h.setTitleX(alab); h.setTitle(""); h.setFillColor(34); c.draw(h);
+            
+            // Draw one without overflow samples
             h = bandPix[ilm].strips.hmap2.get("H2_a_Hist").get(is,lr,0).sliceY(iip); 
             h.setOptStat(Integer.parseInt("1000100")); 
-            h.setTitleX(alab); h.setTitle(""); h.setFillColor(32); c.draw(h);
+            h.setTitleX(alab); h.setTitle(""); h.setFillColor(32); c.draw(h,"same");
+            
+            
+            
             //h = bandPix[ilm].strips.hmap2.get("H2_a_Hist").get(is,0,0).sliceY(iip);
             //h.setFillColor(34); c.draw(h,"same");  
             
 //            if (h.getEntries()>100) {h.fit(f1,"REQ");}
         }
+        
+        c.cd(max);
+        alab = tit+otab[lr-1]+lab4[2];
+        h = bandPix[ilm].strips.hmap1.get("H1_o_Hist").get(is, lr, 0);
+        h.setOptStat(Integer.parseInt("1000100")); 
+        h.setTitleX(alab); h.setTitle(""); h.setFillColor(32); c.draw(h);
 /*
         c.cd(ic-min); 
         h = bandPix[ilm].strips.hmap2.get("H2_a_Hist").get(is,0,0).sliceY(ic); 

@@ -22,7 +22,7 @@ public class BANDPixels {
     double band_xpix[][][] = new double[4][14][5];
     double band_ypix[][][] = new double[4][14][5];
     
-    public double        amax[]= {40000.,40000.,40000.,40000.,40000.};
+    public double        amax[]= {80000.,80000.,80000.,80000.,80000.};
     public double        tmax[] = {10000.,10000.,10000.,10000.,10000.};
     
     int        nha[][] = new    int[6][2];
@@ -132,6 +132,7 @@ public class BANDPixels {
         DetectorCollection<H2F> H2_t_Hist = new DetectorCollection<H2F>();
         DetectorCollection<H2F> H2_a_Sevd = new DetectorCollection<H2F>();
         DetectorCollection<H2F> H2_t_Sevd = new DetectorCollection<H2F>();
+        DetectorCollection<H1F> H1_o_Hist = new DetectorCollection<H1F>();
         
         //Histograms stored as:
         //	H2_a_hist.get(sector,l/r,idx) where idx specifies which 2D histogram is being saved here
@@ -145,17 +146,22 @@ public class BANDPixels {
         	double nend = nstr[is-1]+1;	// find how many bars are in a sector
             int ill=0; iid="s"+Integer.toString(is)+"_l"+Integer.toString(ill)+"_c";
             
-            H2_a_Hist.add(is, 0, 0, new H2F("a_gmean_"+iid+0, 100,   0., amax[id],nstr[is-1], 1., nend));	// histogram for each sector where y axis is which bar in that sector
+            H2_a_Hist.add(is, 0, 0, new H2F("a_gmean_"+iid+0, 200,   0., amax[id],nstr[is-1], 1., nend));	// histogram for each sector where y axis is which bar in that sector
             																								// and x axis is ADC value of some sory of gmean between the two l/r pmts?
-            H2_t_Hist.add(is, 0, 0, new H2F("a_tdif_"+iid+0,  100, -35.,      35.,nstr[is-1], 1., nend));
-            for (int ip=1; ip<nstr[is-1]+1; ip++) {
-                H2_t_Hist.add(is, ip, 2, new H2F("c_tdif_"+iid+1+ip,   50, -15., 5.,50,-0.2, 0.4));
+            H2_t_Hist.add(is, 0, 0, new H2F("a_tdif_"+iid+0,  200, -35.,      35.,nstr[is-1], 1., nend));
+            
+          
+            
+            for (int ip=1; ip<nstr[is-1]+1; ip++) { // loop over bars in sector
+                H2_t_Hist.add(is, ip, 2, new H2F("c_tdif_"+iid+1+ip,   150, -25., 25.,50,-0.2, 0.4));
             }            
+            
             for (int il=1 ; il<3 ; il++){ // loop for left side and then right side
                 iid="s"+Integer.toString(is)+"_l"+Integer.toString(il)+"_c";
-                H2_a_Hist.add(is, il, 0, new H2F("a_raw_"+iid+0,      200,   0., amax[id],nstr[is-1], 1., nend));
+                H2_a_Hist.add(is, il, 0, new H2F("a_raw_"+iid+0,      400,   0., amax[id],nstr[is-1], 1., nend));
+                H2_a_Hist.add(is, il, 7, new H2F("a_raw_overflowInc_"+iid+0,      400,   0., amax[id],nstr[is-1], 1., nend));
                 H2_t_Hist.add(is, il, 0, new H2F("a_raw_"+iid+0,      100,   0., tmax[id], nstr[is-1], 1., nend));
-                H2_a_Hist.add(is, il, 1, new H2F("a_raw_"+iid+1,      200,   0., amax[id],100, 0.,tmax[id]));
+                H2_a_Hist.add(is, il, 1, new H2F("a_raw_"+iid+1,      300,   0., amax[id],100, 0.,tmax[id]));
                 H2_a_Hist.add(is, il, 3, new H2F("a_ped_"+iid+3,      1000, -500.,  500., nstr[is-1], 1., nend)); 
                 H2_a_Hist.add(is, il, 5, new H2F("a_fadc_"+iid+5,     1000,   0., 1000., nstr[is-1], 1., nend));			// this is used for mode1:sum 2D graph where x axis is samples(4ns/ch)
                 																										// and y-axis is which PMT in the sector/layer for left and right side
@@ -166,6 +172,11 @@ public class BANDPixels {
                 H2_a_Sevd.add(is, il, 0, new H2F("a_sed_fadc_"+iid+0, 100,   0., 100., nstr[is-1], 1., nend));
                 H2_a_Sevd.add(is, il, 1, new H2F("a_sed_fadc_"+iid+1, 100,   0., 100., nstr[is-1], 1., nend));
                 H2_t_Sevd.add(is, il, 0, new H2F("a_sed_fadc_"+iid+0, 200,   0., 100., nstr[is-1], 1., nend));
+                
+                iid="s"+Integer.toString(is)+"_l"+Integer.toString(il);
+                H1_o_Hist.add(is,il,0,	new H1F("overflow_"+iid,	nstr[is-1],1.,nend) );
+                H1F d = null;
+                
             }
         }       
 
@@ -177,6 +188,7 @@ public class BANDPixels {
         }         
         
         strips.addH1DMap("H1_a_Sevd",  H1_a_Sevd);
+        strips.addH1DMap("H1_o_Hist",  H1_o_Hist);
         strips.addH1DMap("H1_t_Sevd",  H1_t_Sevd);
         strips.addH2DMap("H2_a_Hist",  H2_a_Hist);
         strips.addH2DMap("H2_t_Hist",  H2_t_Hist);

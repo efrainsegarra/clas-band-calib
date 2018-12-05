@@ -107,7 +107,7 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
             this.is2=is2;
             
             calib = new CalibrationConstants(3,
-                    "MIP_left/F:MIP_right/F");
+                    "Left_Mean/F:Left_Sigma/F:Right_Mean/F:Right_Sigma/F");
             calib.setName("/calibration/band/gain_balance");
             calib.setPrecision(3);
 
@@ -160,33 +160,48 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
         
         @Override
         public void fit(int layer, int sector, int paddle, int lr, double minRange, double maxRange){ 
-        	
-           
-           
+
            H1F h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,lr,0).sliceY(paddle);
-           if( h.getIntegral() < 100) return;
+           if( h.getIntegral() < 5000) {
+        	   F1D f1 = null;
+        	   if( lr == 1) adcFitL.add(layer, sector,paddle, f1);
+        	   if( lr == 2) adcFitR.add(layer, sector,paddle, f1);
+        	   return;
+           };
            
            //F1D  f1 = new F1D("f1","[amp]*gaus(x,[mean],[sigma])", 0,40000);
-           F1D  f1 = new F1D("f1","[amp]*landau(x,[mean],[sigma])",0,40000);
+           F1D  f1 = new F1D("f1","[amp]*landau(x,[mean],[sigma])+[const]",0,40000);
            f1.setParameter(0, h.getMax() );
            f1.setParameter(1, h.getMean() );
-           f1.setParameter(2, 2000 );
+           f1.setParameter(2, 1000 );
+           f1.setParameter(3, 20 );
            DataFitter.fit(f1, h, "REQ");
            h.getFunction().show();
 
+           double amp = h.getFunction().getParameter(0);
            double mean = h.getFunction().getParameter(1);
+           double sigma = h.getFunction().getParameter(2);
+           double offset = h.getFunction().getParameter(3);
            
+           if( amp < 0 || sigma < 0 ) {
+        	   if( lr == 1) adcFitL.add(layer, sector,paddle, null);
+        	   if( lr == 2) adcFitR.add(layer, sector,paddle, null);
+        	   return; 
+           }
            
            int lidx = (layer+1);
            int pidx = (paddle+1);
            
            if( lr == 1) {
         	   adcFitL.add(layer, sector,paddle, f1);
-        	   calib.setDoubleValue(mean, "MIP_left", sector, lidx, pidx);
+        	   calib.setDoubleValue(mean, "Left_Mean", sector, lidx, pidx);
+        	   calib.setDoubleValue(sigma, "Left_Sigma", sector, lidx, pidx);
            }
            if( lr == 2) {
         	   adcFitR.add(layer, sector,paddle, f1);
-        	   calib.setDoubleValue(mean, "MIP_right", sector, lidx, pidx);
+        	   calib.setDoubleValue(mean, "Right_Mean", sector, lidx, pidx);
+        	   calib.setDoubleValue(sigma, "Right_Sigma", sector, lidx, pidx);
+
            }
         }
         
@@ -218,8 +233,8 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
         	System.out.println("BANDStatusEventListener.init");
         	
             calib = new CalibrationConstants(3,"stat_left/I:stat_right/I");
-            calib.setName("/calibration/band/status");
-            calib.setPrecision(3);
+            calib.setName("/calibration/band/LR_tdiff");
+            calib.setPrecision(1);
             
             //for (int i=0 ; i<3; i++) {
             //    calib.addConstraint(3, EXPECTED_STATUS[i]-ALLOWED_STATUS_DIFF,
@@ -271,14 +286,14 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
 
 public void updateCanvas(DetectorDescriptor dd) {
         
-        this.getDetIndices(dd);   
-        int  lr = dd.getOrder()+1;
-        int ilm = ilmap;
+        this.getDetIndices(dd); 
         
-        int nstr = bandPix[ilm].nstr[is-1];
-        int min=0, max=nstr;
+        int lr = dd.getOrder()+1;
+        int sector = dd.getSector();
+        int component = dd.getComponent();   
+        int layer = ilmap;
         
-        canvas.clear(); canvas.divide(2, 4);
+        canvas.clear(); canvas.divide(2, 2);
         canvas.setAxisFontSize(12);
         
 //      canvas.setAxisTitleFontSize(12);
@@ -288,43 +303,55 @@ public void updateCanvas(DetectorDescriptor dd) {
         H1F h;
         String alab;
         String otab[]={" L PMT "," R PMT "};
-        String lab4[]={" ADC"," TDC","GMEAN PMT "};      
-        String tit = "SEC "+is+" LAY "+(ilm+1);
+        String calTitles[]={" ADC"," TDC"};      
+        String tit = "SEC "+sector+" LAY "+(layer+1);
        
-        for(int iip=min;iip<max;iip++) {	// For every bar in this selected sector
-            alab = tit+otab[lr-1]+(iip+1)+lab4[0];
-            canvas.cd(iip-min);                           
-            h = bandPix[ilm].strips.hmap2.get("H2_a_Hist").get(is,lr,0).sliceY(iip); 
+        // We will loop here for all the calibration plots we want to make for
+        // selected pmt
+        	alab = tit+otab[lr-1]+(component+1)+calTitles[0];
+            canvas.cd(0);          
+            // Pull the ADC histogram for 1st canvas plot
+            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,lr,0).sliceY(component);
             h.setOptStat(Integer.parseInt("1000100")); 
-            h.setTitleX(alab); h.setTitle(""); h.setFillColor(32); canvas.draw(h);
+            h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); canvas.draw(h);
             
-            if( h.getIntegral() >= 100) {
-	            F1D f1 = adcFitL.get(ilm,is,iip);
-	            F1D f2 = adcFitR.get(ilm,is,iip);
-
+            F1D f1 = adcFitL.get(layer,is,component);
+            F1D f2 = adcFitR.get(layer,is,component);
+        	
+            if( f1 != null && f2 != null) {
 	            if( lr == 1) {
 	            	f1.setLineColor(2);
-	            	f2.setLineColor(1);
+	            	f2.setLineColor(1);	
 	            }
 	            if( lr == 2) {
 	            	f1.setLineColor(1);
 	            	f2.setLineColor(2);
 	            }
-	            
 	            f1.setLineWidth(2);
 	            f2.setLineWidth(2);
-	            canvas.draw(f1,"same");
-	            canvas.draw(f2,"same");
+            	canvas.draw(f1,"same");
+            	canvas.draw(f2,"same");
+ 
+            }
+            else if( lr == 1 && f1 != null) {
+            	f1.setLineColor(2);
+            	f1.setLineWidth(2);
+            	canvas.draw(f1,"same");
+            }
+            else if( lr == 2 && f2 != null) {
+            	f2.setLineColor(2);
+            	f2.setLineWidth(2);
+            	canvas.draw(f2,"same");
             }
             
-//            if (h.getEntries()>100) {h.fit(f1,"REQ");}
-        }
-/*
-        c.cd(ic-min); 
-        h = bandPix[ilm].strips.hmap2.get("H2_a_Hist").get(is,0,0).sliceY(ic); 
-        h.setOptStat(Integer.parseInt("1000100")); 
-        alab = tit+" BAR "+(ic+1)+" GMEAN"; h.setTitleX(alab); h.setTitle(""); h.setFillColor(2); c.draw(h); 
-*/        
+        // For L-R time plot
+        canvas.cd(1);
+        H1F h2 = bandPix[layer].strips.hmap2.get("H2_t_Hist").get(is,component+1,2).projectionX();
+	    h2.setTitleX(tit+" BAR "+(component+1)+" TL-TR (ns)"); h2.setTitleY("Entries"); h2.setFillColor(32);
+	    canvas.draw(h2);            
+
+            
+            
         canvas.repaint();
 
     }

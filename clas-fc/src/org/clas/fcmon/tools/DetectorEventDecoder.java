@@ -253,6 +253,7 @@ public class DetectorEventDecoder {
                                 if(adc.getPulseSize()>0){
                                     try {
                                         extendedFitter.fit(nsa, nsb, tet, ped, adc.getPulseArray());
+                                        
                                     } catch (Exception e) {
                                         System.out.println(">>>> error : fitting pulse "
                                                             +  crate + " / " + slot + " / " + channel);
