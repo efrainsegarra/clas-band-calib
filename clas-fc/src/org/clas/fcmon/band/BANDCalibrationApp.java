@@ -147,12 +147,10 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
         		        for( int lr = 1 ; lr < 3 ; lr++) {									// loop over left/right PMT in paddle
 	        				fit(layer, sector, paddle, lr, 0., 0.);
 	        			}
-        			}
-        		}
-        	}
-    
-        	
-        	
+        		        System.out.println("Done with Layer "+ lidx + ", Sector "+ sector + " , Component " + pidx);
+                	} 
+        		}        		
+            }   	
         	
             calib.fireTableDataChanged();
         }
@@ -170,7 +168,7 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
            };
            
            //F1D  f1 = new F1D("f1","[amp]*gaus(x,[mean],[sigma])", 0,40000);
-           F1D  f1 = new F1D("f1","[amp]*landau(x,[mean],[sigma])+[const]",0,40000);
+           F1D  f1 = new F1D("f1","[amp]*landau(x,[mean],[sigma])+[const]",500,40000);
            f1.setParameter(0, h.getMax() );
            f1.setParameter(1, h.getMean() );
            f1.setParameter(2, 1000 );
