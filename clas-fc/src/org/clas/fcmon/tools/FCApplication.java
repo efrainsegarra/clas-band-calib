@@ -26,7 +26,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.clas.fcmon.band.BANDPixels;
-import org.clas.fcmon.cc.CCPixels;
 import org.clas.fcmon.cnd.CNDPixels;
 import org.clas.fcmon.detector.view.DetectorShape2D;
 import org.clas.fcmon.ec.ECPixels;
@@ -68,7 +67,6 @@ public class FCApplication implements ActionListener  {
 //    private List<FCParameter>                    parameters = new ArrayList<FCParameter>();
     
     public ECPixels[]                                   ecPix = new ECPixels[2];
-    public CCPixels                                     ccPix = null;
     public CTOFPixels[]                               ctofPix = null;
     public CNDPixels[]                                 cndPix = null;
     public BANDPixels[]                               bandPix = null;
@@ -117,13 +115,8 @@ public class FCApplication implements ActionListener  {
         this.ecPix = ecPix;       
         this.initCanvas();
     }
-    
-    public FCApplication(CCPixels ccPix) {
-        this.ccPix = ccPix;  
-        this.initCanvas();
-    }
-    
-    
+   
+ 
     public FCApplication(String name) {
         this.appName = name;
         this.addCanvas(name);
@@ -135,14 +128,7 @@ public class FCApplication implements ActionListener  {
         this.addCanvas(name);
         this.pixlength = ecPix.length;
     }
-    
-    
-    public FCApplication(String name, CCPixels ccPix) {
-        this.appName = name;
-        this.ccPix = ccPix;   
-        this.addCanvas(name);
-    }
-    
+  
    
     public FCApplication(String name, BANDPixels[] bandPix) {
         this.appName = name;

@@ -72,44 +72,26 @@ public class DetectorEventDecoder {
       
     public DetectorEventDecoder(){
         this.initDecoder();
-        /*
-        keysTrans = Arrays.asList(new String[]{
-            "FTCAL","FTHODO","LTCC","EC","FTOF","DC"
-        });
         
-        tablesTrans = Arrays.asList(new String[]{
-            "/daq/tt/ftcal","/daq/tt/fthodo","/daq/tt/ltcc",
-            "/daq/tt/ec","/daq/tt/ftof","/daq/tt/dc"
-        });
-        
-        translationManager.init(keysTrans,tablesTrans);
-        
-        keysFitter   = Arrays.asList(new String[]{"FTCAL","FTOF","LTCC","EC"});
-        tablesFitter = Arrays.asList(new String[]{
-            "/daq/fadc/ftcal","/daq/fadc/ftof","/daq/fadc/ltcc","/daq/fadc/ec",
-            
-        });
-        fitterManager.init(keysFitter, tablesFitter);
-        */
     }
     
     
     public final void initDecoder(){
         keysTrans = Arrays.asList(new String[]{
-		"FTCAL","FTHODO","FTTRK","LTCC","ECAL","FTOF","DC","CTOF","CND","BST","RF","BMT","FMT","RICH","HEL","BAND"
+		"FTCAL","FTHODO","FTTRK","ECAL","FTOF","DC","CTOF","CND","BST","RF","BMT","FMT","RICH","HEL","BAND"
         });
         
         tablesTrans = Arrays.asList(new String[]{
-            "/daq/tt/ftcal","/daq/tt/fthodo","/daq/tt/fttrk","/daq/tt/ltcc",
+            "/daq/tt/ftcal","/daq/tt/fthodo","/daq/tt/fttrk",
             "/daq/tt/ec","/daq/tt/ftof","/daq/tt/dc","/daq/tt/ctof","/daq/tt/cnd","/daq/tt/svt",
             "/daq/tt/rf","/daq/tt/bmt","/daq/tt/fmt","/daq/tt/clasdev/richcosmic","/daq/tt/hel","/daq/tt/band"
         });
         
         translationManager.init(keysTrans,tablesTrans);
         
-        keysFitter   = Arrays.asList(new String[]{"FTCAL","FTOF","FTTRK","LTCC","ECAL","CTOF","CND","BMT","FMT","HEL","RF","BAND"});
+        keysFitter   = Arrays.asList(new String[]{"FTCAL","FTOF","FTTRK","ECAL","CTOF","CND","BMT","FMT","HEL","RF","BAND"});
         tablesFitter = Arrays.asList(new String[]{
-            "/daq/fadc/ftcal","/daq/fadc/ftof","/daq/config/fttrk","/daq/fadc/ltcc","/daq/fadc/ec",
+            "/daq/fadc/ftcal","/daq/fadc/ftof","/daq/config/fttrk","/daq/fadc/ec",
             "/daq/fadc/ctof","/daq/fadc/cnd","/daq/config/bmt","/daq/config/fmt","/daq/fadc/hel","/daq/fadc/rf","/daq/fadc/band"
         });
         fitterManager.init(keysFitter, tablesFitter);

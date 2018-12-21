@@ -49,13 +49,11 @@ public class FCEpics  {
     String ca_2H01  = "hallb_IPM2H01_CUR";
     
     String   grps[] = {"HV","DISC","FADC"};
-    String   ltcc[] = {"L","R"};
     String   ftof[] = {"PANEL1A_L","PANEL1A_R","PANEL1B_L","PANEL1B_R","PANEL2_L","PANEL2_R"};
     String   ctof[] = {"U","D"};
     String    cnd[] = {"Inner","Middle","Outer"};
     String   band[] = {"1L","1R","2L","2R","3L","3R","4L","4R","5L","5R"};
     String     ec[] = {"U","V","W","UI","VI","WI","UO","VO","WO"};
-    int     nltcc[] = {18,18};
     int     nftof[] = {23,23,62,62,5,5};
     int     nctof[] = {48,48};
     int      ncnd[] = {2,2,2};
@@ -70,7 +68,6 @@ public class FCEpics  {
 	    System.out.println("FCEpics: Initializing detector "+det);
 	    this.appName = name;
 	    this.detName = det;
-        this.layMap.put("LTCC",ltcc); this.nlayMap.put("LTCC", nltcc);
         this.layMap.put("FTOF",ftof); this.nlayMap.put("FTOF", nftof);
         this.layMap.put("CTOF",ctof); this.nlayMap.put("CTOF", nctof);
         this.layMap.put("BAND",band); this.nlayMap.put("BAND", nband);
@@ -257,7 +254,6 @@ public class FCEpics  {
 	
 	public String detAlias(String det, int layer) {
 	    switch (det) {
-	    case "LTCC": return det;
 	    case "FTOF": return det;
 	    case "BAND": return det;
 	    case "CTOF": return det;

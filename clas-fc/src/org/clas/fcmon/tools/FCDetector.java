@@ -13,7 +13,6 @@ import java.util.TreeMap;
 import javax.swing.JPanel;
 
 import org.clas.fcmon.band.BANDPixels;
-import org.clas.fcmon.cc.CCPixels;
 import org.clas.fcmon.cnd.CNDPixels;
 import org.clas.fcmon.detector.view.DetectorPane2D;
 import org.clas.fcmon.detector.view.DetectorShape2D;
@@ -36,8 +35,7 @@ public class FCDetector {
 
     private String                 appName = null;
     
-    public ECPixels[]                ecPix = null;   
-    public CCPixels                  ccPix = null; 
+    public ECPixels[]                ecPix = null;  
     public FTOFPixels[]            ftofPix = null; 
     public CTOFPixels[]            ctofPix = null; 
     public CNDPixels[]              cndPix = null; 
@@ -61,10 +59,7 @@ public class FCDetector {
     public FCDetector(ECPixels[] ecPix) {
         this.ecPix = ecPix;    
     }  
-    
-    public FCDetector(CCPixels ccPix) {
-        this.ccPix = ccPix;     
-    }
+   
     
     public FCDetector(FTOFPixels[] ftofPix) {
         this.ftofPix = ftofPix;     
@@ -81,12 +76,6 @@ public class FCDetector {
         this.nStrips[5] = ecPix[0].ec_nstr[2];
     }
     
-    public FCDetector(String name, CCPixels ccPix) {
-        this.appName = name;
-        this.ccPix = ccPix;   
-        this.nStrips[0] = ccPix.nstr[0];
-        this.nStrips[1] = ccPix.nstr[0];
-    }
     
     public FCDetector(String name, FTOFPixels[] ftofPix) {
         this.appName = name;
@@ -233,9 +222,7 @@ public class FCDetector {
                         if( useTDC) {dc = ctofPix[ilmap].Lmap_t; mapz=ctofPix[ilmap].Lmap_t_z;}  
                         layer = dd.getOrder()+1; layz=layer;
                         break;     
-        case   "CCDet": if(!useTDC) {dc = ccPix.Lmap_a;  mapz=ccPix.Lmap_a_z;}
-                        layer = dd.getLayer(); layz=layer;
-                        //if( useTDC) dc = ccPix.Lmap_t;
+       
         }
         
         // Update shape color map depending on process status and layer
