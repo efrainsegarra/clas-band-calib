@@ -60,7 +60,7 @@ public class ECTriggerApp extends FCApplication{
     IndexedList<List<Integer>>       ltpmt = new IndexedList<List<Integer>>(1);
     
     
-    String tbit = "Trigger Bits: ECAL.PCAL.HTCC(0)    ECAL.PCAL.HTCC(1-6)    HTCC(7-12)    PCAL(13-18)    ECAL(19-24)   HT.PC(25)   HT.EC(26) "
+    String tbit = "Trigger Bits:    PCAL(13-18)    ECAL(19-24)   HT.PC(25)   HT.EC(26) "
                   + "  PC.EC(27)   FTOF.PC(28)    1K Pulser(31)";
     double Dalitz_ECout_max = 0.0833333;
     double Dalitz_ECout_min = -0.0555556;
@@ -252,18 +252,7 @@ public class ECTriggerApp extends FCApplication{
         this.getDataGroup().add(dgPCClustXY,7,0,0);        
         this.getDataGroup().add(dgECPeakXY ,8,0,0);        
         this.getDataGroup().add(dgPCPeakXY, 9,0,0);        
-
-/*
-    	    H1F h_HTCC_time1     = new H1F("h_HTCC_time1", "", 101, -0.5, 100.5);
-    	    H1F h_n_HTCC_masks   = new H1F("h_n_HTCC_masks", "", 11, -0.5, 10.5);
-    	    H1F h_n_HTCC_hits    = new H1F("h_n_HTCC_hits", "", 50, -0.5, 49.5);
-    	    H1F h_HTCC_hit_chan1 = new H1F("h_HTCC_hit_chan1", "", 50, -0.5, 49.5);
-
-    	    H2F h_FTOF_time1     = new H2F("h_FTOF_time1", "", 51, -0.5, 50.5, 7, -0.5, 6.5);
-    	    H2F h_n_FTOF_masks   = new H2F("h_n_FTOF_masks", "", 11, -0.5, 10.5, 7, -0.5, 6.5);
-    	    H2F h_n_FTOF_hits    = new H2F("h_n_FTOF_hits", "", 64, -0.5, 63.5, 7, -0.5, 6.5);
-    	    H2F h_FTOF_hit_chan1 = new H2F("h_FTOF_hit_chan1", "", 64, -0.5, 63.5, 7, -0.5, 6.5);    	    
- */   	        	    
+   	        	    
      }
      public void createHistos( ) {
     	 
@@ -376,17 +365,7 @@ public class ECTriggerApp extends FCApplication{
          }
         
          this.getDataGroup().add(dg,  2,0,0);        
- /*
-     	    H1F h_HTCC_time1     = new H1F("h_HTCC_time1", "", 101, -0.5, 100.5);
-     	    H1F h_n_HTCC_masks   = new H1F("h_n_HTCC_masks", "", 11, -0.5, 10.5);
-     	    H1F h_n_HTCC_hits    = new H1F("h_n_HTCC_hits", "", 50, -0.5, 49.5);
-     	    H1F h_HTCC_hit_chan1 = new H1F("h_HTCC_hit_chan1", "", 50, -0.5, 49.5);
-
-     	    H2F h_FTOF_time1     = new H2F("h_FTOF_time1", "", 51, -0.5, 50.5, 7, -0.5, 6.5);
-     	    H2F h_n_FTOF_masks   = new H2F("h_n_FTOF_masks", "", 11, -0.5, 10.5, 7, -0.5, 6.5);
-     	    H2F h_n_FTOF_hits    = new H2F("h_n_FTOF_hits", "", 64, -0.5, 63.5, 7, -0.5, 6.5);
-     	    H2F h_FTOF_hit_chan1 = new H2F("h_FTOF_hit_chan1", "", 64, -0.5, 63.5, 7, -0.5, 6.5);    	    
-  */   	        	    
+ 	        	    
      }
      
      public void clearHistograms() {

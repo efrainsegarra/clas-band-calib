@@ -38,11 +38,6 @@ public class FCTrigger {
 		public int time;
 	} 
 
-	public class THTCC_mask{
-		public int[] chan;          // Vector of channels that are fired 
-		public int time;            // time shows the channel in the readout window
-	} 
-
 	public class TFTOF_mask{
 		public int[] chan;         // Vector of channels that are fired 
 		public int time;           // time shows the channel in the readout window
@@ -111,8 +106,6 @@ public class FCTrigger {
                     break;
                 case type_trigger:     ReadTrigger();
                     break;
-                case type_HTCC_clust:  ReadHTCCTrigMask();
-                    break;
                 case type_FTOF_clust:  ReadFTOFTrigMask();
                     break;
                 }		            
@@ -127,8 +120,7 @@ public class FCTrigger {
                 fnAllPeaks+=fnPeaks[i][j];
             }
         }
-        
-        fnHTCC_Masks = fv_HTCCMasks.size();
+       
         fnFTOF_Masks = fv_FTOFMasks.size();	
         
         return true;
@@ -152,7 +144,6 @@ public class FCTrigger {
 	public int GetBlockLevel()       {return has_BlockHeader ? fblock_level: UNDEF; }
 	public int GetNAllPeaks()        {return fnAllPeaks;}
 	public int GetNAllClust()        {return fnAllClusters;}
-	public int GetNHTCCMasks()       {return fnHTCC_Masks;}   // Return number of THTCC_Hits objects
 	public int GetNFTOFMasks()       {return fnFTOF_Masks;}   // Return number of THTCC_Hits objects
 	
 	public int GetNTrig()            {return fnTrigWords;};   // Return number of triggers in the VTP Bank
@@ -162,12 +153,10 @@ public class FCTrigger {
 	
 	static int n_inst = 2;
 	static int n_view = 3;
-	static int n_HTCC_chan = 48;                              // Number of HTCC channels;
 	static int n_FTOF_chan = 62;                              // Number of Max FTOF channels per sector/panel;
 	 
 	TEC_Peak     cur_peak = null;
 	TEC_Cluster cur_clust = null;
-	THTCC_mask   cur_mask = null;
 	Trig_word     cur_trg = null;
 	
 	int fECVTP_tag;
@@ -183,7 +172,6 @@ public class FCTrigger {
 	public IndexedList<List<TEC_Peak>>      fv_ECAllPeaks    = new IndexedList<List<TEC_Peak>>(2); 
 	public IndexedList<List<TEC_Cluster>>   fv_ECAllClusters = new IndexedList<List<TEC_Cluster>>(1); 
 	
-	List<THTCC_mask> fv_HTCCMasks = new ArrayList<THTCC_mask>();
 	List<TFTOF_mask> fv_FTOFMasks = new ArrayList<TFTOF_mask>();
 	List<Trig_word>  fv_TrigWords = new ArrayList<Trig_word>();
    	      
@@ -194,7 +182,6 @@ public class FCTrigger {
    	
    	int fnTrigWords;  
    	
-   	int fnHTCC_Masks;
    	int fnFTOF_Masks;
 
    	int ftrig_inst;
@@ -280,47 +267,6 @@ public class FCTrigger {
             fv_ECAllClusters.getItem(cur_clust.inst).add(cur_clust); 
     }    
     
-    void ReadHTCCTrigMask() {
-    	
-        has_HTCCMask = true;
-        cur_mask = new THTCC_mask();
-        cur_mask.time = fit_data.range(26, 16);
-
- /*
-        // std::cout << "1st Word of HTCC " << (bitset<32>(*fit_data)) << endl;
-
-        // Go to the next word
-        fit_data.next();
-
-        // HTCC mask is a 48 bit word, each bit tells whether that channel is fired
-        // Highst 17 bits of the mask are in one word (16, 0),
-        // and the rest 31 are in another word
-        
-        ap_int<n_HTCC_chan> HTCC_mask;
-
-        //std::cout << "2nd Word " << (bitset<32>(*fit_data)) << endl;
-
-        HTCC_mask(47, 31) = fit_data->range(16, 0);
-
-        // Go to the next word
-        fit_data = std::next(fit_data, 1);
-
-        //std::cout << "3rd Word " << (bitset<32>(*fit_data)) << endl;
-
-        HTCC_mask(30, 0) = fit_data->range(30, 0);
-
-        // std::cout << "HTCC Mask is " << (bitset<48>(HTCC_mask)) << endl;
-
-        // Now lets check which channels are fired
-        for (int i = 0; i < n_HTCC_chan; i++) {
-            if (HTCC_mask(i, i)) {
-                cur_mask.chan.push_back(n_HTCC_chan - i - 1);
-            }
-        }
-
-        fv_HTCCMasks.push_back(cur_mask);
-        */
-    }   
     
     void ReadFTOFTrigMask() {};                   // This will read FTOF Trigger mask
    
@@ -398,7 +344,6 @@ public class FCTrigger {
     boolean has_TrigPeak;
     boolean has_TrigClust;
     boolean has_Trigger;
-    boolean has_HTCCMask;
     boolean has_FTOFMask;   	
     
     static final int type_blk_head = 0;
@@ -407,7 +352,6 @@ public class FCTrigger {
     static final int type_trig_time = 3;
     static final int type_ECtrig_peak = 4;
     static final int type_ECTrig_clust = 5;
-    static final int type_HTCC_clust = 6;
     static final int type_FT_clust = 7;
     static final int type_FTOF_clust = 8;
     
@@ -488,7 +432,6 @@ public class FCTrigger {
             }
         }
 
-//        fv_HTCCMasks.clear();
 //        fv_FTOFMasks.clear();
 
         ftrg_time = 0;
@@ -500,7 +443,7 @@ public class FCTrigger {
         
         fnAllPeaks = 0;
         fnAllClusters = 0;
-        fnHTCC_Masks = 0;
+    
         fnTrigWords = 0;
 
         has_BlockHeader = false;
@@ -510,6 +453,6 @@ public class FCTrigger {
         has_TrigPeak = false;
         has_TrigClust = false;
         has_Trigger = false;
-        has_HTCCMask = false;
+       
     }   
 }

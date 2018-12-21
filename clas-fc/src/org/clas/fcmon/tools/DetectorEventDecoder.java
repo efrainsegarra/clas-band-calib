@@ -44,11 +44,7 @@ public class DetectorEventDecoder {
     private  int                            nsb  = 0;    
     
     public DetectorEventDecoder(boolean development){
-        if(development==true){
-            this.initDecoderDev();
-        } else {
             this.initDecoder();
-        }
     }
     
     public void setRunNumber(int run){
@@ -78,52 +74,43 @@ public class DetectorEventDecoder {
         this.initDecoder();
         /*
         keysTrans = Arrays.asList(new String[]{
-            "FTCAL","FTHODO","LTCC","EC","FTOF","HTCC","DC"
+            "FTCAL","FTHODO","LTCC","EC","FTOF","DC"
         });
         
         tablesTrans = Arrays.asList(new String[]{
             "/daq/tt/ftcal","/daq/tt/fthodo","/daq/tt/ltcc",
-            "/daq/tt/ec","/daq/tt/ftof","/daq/tt/htcc","/daq/tt/dc"
+            "/daq/tt/ec","/daq/tt/ftof","/daq/tt/dc"
         });
         
         translationManager.init(keysTrans,tablesTrans);
         
-        keysFitter   = Arrays.asList(new String[]{"FTCAL","FTOF","LTCC","EC","HTCC"});
+        keysFitter   = Arrays.asList(new String[]{"FTCAL","FTOF","LTCC","EC"});
         tablesFitter = Arrays.asList(new String[]{
             "/daq/fadc/ftcal","/daq/fadc/ftof","/daq/fadc/ltcc","/daq/fadc/ec",
-            "/daq/fadc/htcc"
+            
         });
         fitterManager.init(keysFitter, tablesFitter);
         */
     }
     
-    public final void initDecoderDev(){
-        keysTrans = Arrays.asList(new String[]{ "HTCC","BST"} );
-        tablesTrans = Arrays.asList(new String[]{ "/daq/tt/clasdev/htcc","/daq/tt/clasdev/svt" });
-        
-        keysFitter   = Arrays.asList(new String[]{"HTCC"});
-        tablesFitter = Arrays.asList(new String[]{"/daq/fadc/clasdev/htcc"});
-        translationManager.init(keysTrans,tablesTrans);
-        fitterManager.init(keysFitter, tablesFitter);
-    }
     
     public final void initDecoder(){
         keysTrans = Arrays.asList(new String[]{
-		"FTCAL","FTHODO","FTTRK","LTCC","ECAL","FTOF","HTCC","DC","CTOF","CND","BST","RF","BMT","FMT","RICH","HEL","BAND"
+		"FTCAL","FTHODO","FTTRK","LTCC","ECAL","FTOF","DC","CTOF","CND","BST","RF","BMT","FMT","RICH","HEL","BAND"
         });
         
         tablesTrans = Arrays.asList(new String[]{
             "/daq/tt/ftcal","/daq/tt/fthodo","/daq/tt/fttrk","/daq/tt/ltcc",
-            "/daq/tt/ec","/daq/tt/ftof","/daq/tt/htcc","/daq/tt/dc","/daq/tt/ctof","/daq/tt/cnd","/daq/tt/svt",
+            "/daq/tt/ec","/daq/tt/ftof","/daq/tt/dc","/daq/tt/ctof","/daq/tt/cnd","/daq/tt/svt",
             "/daq/tt/rf","/daq/tt/bmt","/daq/tt/fmt","/daq/tt/clasdev/richcosmic","/daq/tt/hel","/daq/tt/band"
         });
         
         translationManager.init(keysTrans,tablesTrans);
         
-        keysFitter   = Arrays.asList(new String[]{"FTCAL","FTOF","FTTRK","LTCC","ECAL","HTCC","CTOF","CND","BMT","FMT","HEL","RF","BAND"});
+        keysFitter   = Arrays.asList(new String[]{"FTCAL","FTOF","FTTRK","LTCC","ECAL","CTOF","CND","BMT","FMT","HEL","RF","BAND"});
         tablesFitter = Arrays.asList(new String[]{
             "/daq/fadc/ftcal","/daq/fadc/ftof","/daq/config/fttrk","/daq/fadc/ltcc","/daq/fadc/ec",
-            "/daq/fadc/htcc","/daq/fadc/ctof","/daq/fadc/cnd","/daq/config/bmt","/daq/config/fmt","/daq/fadc/hel","/daq/fadc/rf","/daq/fadc/band"
+            "/daq/fadc/ctof","/daq/fadc/cnd","/daq/config/bmt","/daq/config/fmt","/daq/fadc/hel","/daq/fadc/rf","/daq/fadc/band"
         });
         fitterManager.init(keysFitter, tablesFitter);
     }
@@ -157,6 +144,16 @@ public class DetectorEventDecoder {
             for(String table : keysTrans){
                 IndexedTable  tt = translationManager.getConstants(runNumber, table);
                 DetectorType  type = DetectorType.getType(table);
+                
+                //FIX ME: temporarily add BAND channel 410_R without modification of ccdb F.H. 12/11/18
+               if((crate==66 || crate==67) && slot==10 && channel==15) {
+                	data.getDescriptor().setSectorLayerComponent(2, 4, 7);
+                	data.getDescriptor().setOrder(1);
+                	data.getDescriptor().setType(type);
+                	for(int i = 0; i < data.getADCSize(); i++) {
+                        data.getADCData(i).setOrder(1);
+                    }   
+                }
 
                 if(tt.hasEntry(crate,slot,channel)==true){
                     int sector    = tt.getIntValue("sector", crate,slot,channel);

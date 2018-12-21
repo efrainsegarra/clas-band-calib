@@ -55,7 +55,6 @@ public class ECEngineApp extends FCApplication implements ActionListener {
     EmbeddedCanvasTabbed        mc = new EmbeddedCanvasTabbed("MC");
     EmbeddedCanvas               c = new EmbeddedCanvas();
     
-//    HTCCReconstructionService engineHTCC = new HTCCReconstructionService();
     
     JTextField                  sf = new JTextField(4);  
     JComboBox                   cb = null;
@@ -84,7 +83,7 @@ public class ECEngineApp extends FCApplication implements ActionListener {
       is2 = ECConstants.IS2;
 //	  ebe.init();
 //      eb = new EventBuilder(new EBCCDBConstants(10,ebe.getConstantsManager()));    	
-//      engineHTCC.init();
+
    }
    
    public JPanel getPanel() {        
@@ -416,30 +415,7 @@ public class ECEngineApp extends FCApplication implements ActionListener {
               if(energy*1e3>10) {esum[is-1]+=energy*1e3; nesum[idet][is-1]++;}
           }
       }
-      int  htcc[] = new int[6];
-      
-      if(event.hasBank("HTCC::adc")){
-    	     DataBank rawbank = event.getBank("HTCC::adc");    
-             for(int i=0; i < rawbank.rows(); i++) {
-            	     int is = rawbank.getByte("sector", i);
-            	     int ia = rawbank.getInt("ADC", i);
-            	     if (ia>400)  htcc[is-1]+=ia;
-             } 
-/*             
-             engineHTCC.processDataEvent(event); 
-             
-             if(event.hasBank("HTCC::rec")){
-        	     DataBank bank = event.getBank("HTCC::rec");    
-                 for(int i=0; i < bank.rows(); i++) {
-                	   int id = bank.getShort("id", i);
-                	   int nphe = bank.getShort("nphe", i);
-                	   int adc = rawbank.getInt("ADC", id);
-                	   System.out.println("id,adc,nphe,);
-                	   
-                 }
-             }
-*/
-      }
+    
       
       if(event.hasBank("MIP::event")){          
           DataBank bank = event.getBank("MIP::event");
@@ -479,9 +455,6 @@ public class ECEngineApp extends FCApplication implements ActionListener {
           if(nesum[0][is-1]==1) { 
               ecPix[0].strips.hmap2.get("H2_a_Hist").get(is,4,0).fill(esum[is-1],8,1.);                         // Total Single Cluster Energy PC=1                     
               ecPix[0].strips.hmap2.get("H2_a_Hist").get(is,4,3).fill(1e-3*esum[is-1],1e-3*esum[is-1]/refE,1.); // S.F. vs. meas.photon energy  
-              if(htcc[is-1]>1500) ecPix[0].strips.hmap2.get("H2_a_Hist").get(is,4,0).fill(esum[is-1],5,1.);   // Total Cluster Energy PC>0
-              if(htcc[is-1]>3000) ecPix[0].strips.hmap2.get("H2_a_Hist").get(is,4,0).fill(esum[is-1],7,1.);   // Total Cluster Energy            
-              if(htcc[is-1]>3000&&pcalE[is-1]>50) ecPix[0].strips.hmap2.get("H2_a_Hist").get(is,4,0).fill(esum[is-1],6,1.);   // Total Cluster Energy            
 
           }
 
