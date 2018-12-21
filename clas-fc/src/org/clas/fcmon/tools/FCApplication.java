@@ -15,7 +15,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import org.clas.fcmon.band.BANDPixels;
-import org.clas.fcmon.ec.ECPixels;
 import org.jlab.detector.base.DetectorCollection;
 import org.jlab.detector.base.DetectorDescriptor;
 import org.jlab.detector.calib.tasks.CalibrationEngineView;
@@ -42,7 +41,6 @@ public class FCApplication implements ActionListener  {
     private List<String>                               fields = new ArrayList<String>();
 //    private List<FCParameter>                    parameters = new ArrayList<FCParameter>();
     
-    public ECPixels[]                                   ecPix = new ECPixels[2];
     public BANDPixels[]                               bandPix = null;
     
 	public DetectorCollection<TreeMap<Integer,Object>> Lmap_a = new  DetectorCollection<TreeMap<Integer,Object>>();
@@ -84,26 +82,12 @@ public class FCApplication implements ActionListener  {
     public boolean isEvioDataEvent = false;
     
     TriggerDataDgtz         trig = null;
-    
-    public FCApplication(ECPixels[] ecPix) {
-        this.ecPix = ecPix;       
-        this.initCanvas();
-    }
-   
  
     public FCApplication(String name) {
         this.appName = name;
         this.addCanvas(name);
     }
-     
-    public FCApplication(String name, ECPixels[] ecPix) {
-        this.appName = name;
-        this.ecPix = ecPix;   
-        this.addCanvas(name);
-        this.pixlength = ecPix.length;
-    }
-  
-   
+       
     public FCApplication(String name, BANDPixels[] bandPix) {
         this.appName = name;
         this.bandPix = bandPix;   

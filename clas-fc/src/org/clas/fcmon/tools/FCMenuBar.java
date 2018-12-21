@@ -50,14 +50,7 @@ public class FCMenuBar extends JMenuBar  {
         JMenu          ET_open = new JMenu("Attach to ET");
         JMenu          XM_open = new JMenu("xMsg Ring");
         JMenuItem    file_open = new JMenuItem("Load EVIO or HIPO File");    
-        JMenuItem           s1 = new JMenuItem("Sector 1");
-        JMenuItem           s2 = new JMenuItem("Sector 2");
-        JMenuItem           s3 = new JMenuItem("Sector 3");
-        JMenuItem           s4 = new JMenuItem("Sector 4");
-        JMenuItem           s5 = new JMenuItem("Sector 5");
-        JMenuItem           s6 = new JMenuItem("Sector 6");
         JMenuItem         band = new JMenuItem("BAND");
-        JMenuItem          svt = new JMenuItem("SVT");
         JMenuItem          sd3 = new JMenuItem("clondaq3");
         JMenuItem          sd4 = new JMenuItem("clondaq4");
         JMenuItem          sd5 = new JMenuItem("clondaq5");
@@ -83,14 +76,8 @@ public class FCMenuBar extends JMenuBar  {
             menu.add(ET_open);
             menu.add(XM_open);
            
-            ET_open.add(s1);
-            ET_open.add(s2);
-            ET_open.add(s3);
-            ET_open.add(s4);
-            ET_open.add(s5);
-            ET_open.add(s6);
+
             ET_open.add(band);
-            ET_open.add(svt);
             ET_open.add(sd3);
             ET_open.add(sd4);
             ET_open.add(sd5);
@@ -101,14 +88,7 @@ public class FCMenuBar extends JMenuBar  {
    
             file_open.addActionListener(this);   
         
-            s1.addActionListener(this);
-            s2.addActionListener(this);
-            s3.addActionListener(this);
-            s4.addActionListener(this);
-            s5.addActionListener(this);
-            s6.addActionListener(this);
           band.addActionListener(this);
-           svt.addActionListener(this);
            sd3.addActionListener(this);     
            sd4.addActionListener(this);     
            sd5.addActionListener(this);     
@@ -121,14 +101,7 @@ public class FCMenuBar extends JMenuBar  {
 	@Override
 	    public void actionPerformed(ActionEvent e) {
 		    int port=11111;
-    	    if(e.getActionCommand().compareTo("Sector 1")==0) {ethost="adcecal1";etfile="/tmp/et_sys_clasprod";}
-    	    if(e.getActionCommand().compareTo("Sector 2")==0) {ethost="adcecal2";etfile="/tmp/et_sys_clasprod";}
-    	    if(e.getActionCommand().compareTo("Sector 3")==0) {ethost="adcecal3";etfile="/tmp/et_sys_clasprod";}
-    	    if(e.getActionCommand().compareTo("Sector 4")==0) {ethost="adcecal4";etfile="/tmp/et_sys_clasprod";}
-    	    if(e.getActionCommand().compareTo("Sector 5")==0) {ethost="adcecal5";etfile="/tmp/et_sys_clasprod";}
-            if(e.getActionCommand().compareTo("Sector 6")==0) {ethost="adcecal6";etfile="/tmp/et_sys_clasprod";}           
-            if(e.getActionCommand().compareTo("BAND")==0)     {ethost="tdcband1";etfile="/et/bandtest";port=11112;}      
-            if(e.getActionCommand().compareTo("SVT")==0)      {ethost="svt1";    etfile="/et/clasprod";port=11112;}      
+    	    if(e.getActionCommand().compareTo("BAND")==0)     {ethost="tdcband1";etfile="/et/bandtest";port=11112;}      
             if(e.getActionCommand().compareTo("clondaq3")==0) {ethost="clondaq3";etfile="/tmp/et_sys_clasprod";}       
             if(e.getActionCommand().compareTo("clondaq4")==0) {ethost="clondaq4";etfile="/tmp/et_sys_clasprod";}       
             if(e.getActionCommand().compareTo("clondaq5")==0) {ethost="clondaq5";etfile="/et/clasprod";}       

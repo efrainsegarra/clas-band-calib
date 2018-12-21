@@ -10,22 +10,7 @@ import org.jlab.detector.calib.utils.DatabaseConstantProvider;
  * @author gavalian
  */
 public class DataBaseLoader {
-    
-   
-    public static ConstantProvider getCalorimeterConstants(){
-        DatabaseConstantProvider provider = new DatabaseConstantProvider("mysql://clas12reader@clasdb.jlab.org/clas12");
-        provider.loadTable("/geometry/pcal/pcal");
-        provider.loadTable("/geometry/pcal/Uview");
-        provider.loadTable("/geometry/pcal/Vview");
-        provider.loadTable("/geometry/pcal/Wview");
-        provider.loadTable("/geometry/ec/ec");
-        provider.loadTable("/geometry/ec/uview");
-        provider.loadTable("/geometry/ec/vview");
-        provider.loadTable("/geometry/ec/wview");
-        return provider;
-    }
-    
-    
+     
     public static ConstantProvider  getGeometryConstants(DetectorType type){
         return DataBaseLoader.getGeometryConstants(type, 10, "default");
     }
@@ -65,46 +50,22 @@ public class DataBaseLoader {
 //            provider.loadTable("/calibration/band/timing_offset");
 //            provider.disconnect();
 //            return provider;
-//        }
-//    	
-       	
+//        }   	
         return null;
     }
     
     
     public static ConstantProvider  getGeometryConstants(DetectorType type, int run, String variation){
 
-        
-        if(type==DetectorType.ECAL){
-            DatabaseConstantProvider provider = new DatabaseConstantProvider(run,variation);
-            provider.loadTable("/geometry/pcal/pcal");
-            provider.loadTable("/geometry/pcal/Uview");
-            provider.loadTable("/geometry/pcal/Vview");
-            provider.loadTable("/geometry/pcal/Wview");
-            provider.loadTable("/geometry/ec/ec");
-            provider.loadTable("/geometry/ec/uview");
-            provider.loadTable("/geometry/ec/vview");
-            provider.loadTable("/geometry/ec/wview");
-            provider.disconnect();
-            return provider;
-        }
-        
-        
+        //Implement BAND if necessary like 
+//        if(type==DetectorType.BAND){
+//            DatabaseConstantProvider provider = new DatabaseConstantProvider(run,variation);
+//            provider.loadTable("/geometry/band/band");
+//            provider.disconnect();
+//            return provider;
+//        }   
         return null;
     }
-    
-    
-  public static ConstantProvider getConstantsEC(){
-        DatabaseConstantProvider provider = new DatabaseConstantProvider("mysql://clas12reader@clasdb.jlab.org/clas12");
-        provider.loadTable("/geometry/pcal/pcal");
-        provider.loadTable("/geometry/pcal/UView");
-        provider.loadTable("/geometry/pcal/VView");
-        provider.loadTable("/geometry/pcal/WView");
-        provider.loadTable("/geometry/ec/ec");
-        provider.loadTable("/geometry/ec/uview");
-        provider.loadTable("/geometry/ec/vview");
-        provider.loadTable("/geometry/ec/wview");
-        return provider;
-    }
+   
     
 }

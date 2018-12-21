@@ -79,19 +79,17 @@ public class DetectorEventDecoder {
     public final void initDecoder(){
     	  
         keysTrans = Arrays.asList(new String[]{
-		"ECAL","RF","BAND"
+		"RF","BAND"
         });
         
         tablesTrans = Arrays.asList(new String[]{
-            "/daq/tt/ec",
             "/daq/tt/rf","/daq/tt/band"
         });
         
         translationManager.init(keysTrans,tablesTrans);
         
         tablesFitter = Arrays.asList(new String[]{
-            "/daq/fadc/ec",
-           "/daq/fadc/rf","/daq/fadc/band"
+            "/daq/fadc/rf","/daq/fadc/band"
         });
         fitterManager.init(keysFitter, tablesFitter);
     }
@@ -156,37 +154,7 @@ public class DetectorEventDecoder {
         }
     }
     
-/*    
-    public void translate(List<DetectorDataDgtz>  detectorData){
-        
-        for(DetectorDataDgtz data : detectorData){
-        	
-         	String table = data.getDescriptor().getType().getName();
-         	IndexedTable  tt = translationManager.getConstants(runNumber, table);
-         	
-            int crate    = data.getDescriptor().getCrate();
-            int slot     = data.getDescriptor().getSlot();
-            int channel  = data.getDescriptor().getChannel();
 
-            DetectorType  type = DetectorType.getType(table);
-
-            if(tt.hasEntry(crate,slot,channel)==true){
-                int sector    = tt.getIntValue("sector", crate,slot,channel);
-                int layer     = tt.getIntValue("layer", crate,slot,channel);
-                int component = tt.getIntValue("component", crate,slot,channel);
-                int order     = tt.getIntValue("order", crate,slot,channel);
-
-                data.getDescriptor().setSectorLayerComponent(sector, layer, component);
-                data.getDescriptor().setOrder(order);
-                data.getDescriptor().setType(type);
-                
-                for(int i = 0; i < data.getADCSize(); i++) data.getADCData(i).setOrder(order);                
-                for(int i = 0; i < data.getTDCSize(); i++) data.getTDCData(i).setOrder(order);                
-            }            
-        }
-
-    } 
-    */   
         public void fitPulses(List<DetectorDataDgtz>  detectorData){
         	
         for(DetectorDataDgtz data : detectorData){            

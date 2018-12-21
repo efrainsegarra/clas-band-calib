@@ -50,9 +50,8 @@ public class FCEpics  {
     
     String   grps[] = {"HV","DISC","FADC"};
     String   band[] = {"1L","1R","2L","2R","3L","3R","4L","4R","5L","5R"};
-    String     ec[] = {"U","V","W","UI","VI","WI","UO","VO","WO"};
     int     nband[] = {24,24,24,24,24,24,24,24,20,20};
-    int       nec[] = {68,62,62,36,36,36,36,36,36};
+ 
     
     public int is1,is2;
     public int sectorSelected, layerSelected, channelSelected, orderSelected;
@@ -63,7 +62,7 @@ public class FCEpics  {
 	    this.appName = name;
 	    this.detName = det;
         this.layMap.put("BAND",band); this.nlayMap.put("BAND", nband);
-        this.layMap.put("EC",ec);     this.nlayMap.put("EC",   nec);
+      
 	}
     
 	public void clearMaps() {

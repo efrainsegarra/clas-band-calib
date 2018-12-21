@@ -15,7 +15,6 @@ import javax.swing.JPanel;
 import org.clas.fcmon.band.BANDPixels;
 import org.clas.fcmon.detector.view.DetectorPane2D;
 import org.clas.fcmon.detector.view.DetectorShape2D;
-import org.clas.fcmon.ec.ECPixels;
 import org.jlab.detector.base.DetectorCollection;
 import org.jlab.detector.base.DetectorDescriptor;
 import org.jlab.utils.groups.IndexedList;
@@ -32,7 +31,7 @@ public class FCDetector {
 
     private String                 appName = null;
     
-    public ECPixels[]                ecPix = null;  
+  
     public BANDPixels[]            bandPix = null; 
     public MonitorApp                  app = null;
     public DetectorMonitor             mon = null;
@@ -49,24 +48,7 @@ public class FCDetector {
     double PCMon_zmin = 0;
     double PCMon_zmax = 0;
     double zmin,zmax,zavg;
-    
-    public FCDetector(ECPixels[] ecPix) {
-        this.ecPix = ecPix;    
-    }  
-   
-    
-
-    
-    public FCDetector(String name, ECPixels[] ecPix) {
-        this.appName = name;
-        this.ecPix = ecPix;  
-        this.nStrips[0] = ecPix[0].ec_nstr[0];
-        this.nStrips[1] = ecPix[0].ec_nstr[1];
-        this.nStrips[2] = ecPix[0].ec_nstr[2];
-        this.nStrips[3] = ecPix[0].ec_nstr[0];
-        this.nStrips[4] = ecPix[0].ec_nstr[1];
-        this.nStrips[5] = ecPix[0].ec_nstr[2];
-    }
+ 
   
     public FCDetector(String name, BANDPixels[] bandPix) {
         this.appName = name;
@@ -172,10 +154,6 @@ public class FCDetector {
         Boolean peakShapes = (opt==0&&layer==0);
        
         switch (appName) {
-        case   "ECDet": if(!useTDC) {dc = ecPix[ilmap].Lmap_a; mapz=ecPix[ilmap].Lmap_a_z ;}
-                        if( useTDC) {dc = ecPix[ilmap].Lmap_t; mapz=ecPix[ilmap].Lmap_t_z ;} 
-                        break;
-       
         case "BANDDet": if(!useTDC) {dc = bandPix[ilmap].Lmap_a; mapz=bandPix[ilmap].Lmap_a_z;}
                         if( useTDC) {dc = bandPix[ilmap].Lmap_t; mapz=bandPix[ilmap].Lmap_t_z;}  
                         layer = dd.getOrder()+1; layz=layer;
@@ -198,15 +176,7 @@ public class FCDetector {
                 
         if (colorfraction<0.05) colorfraction = 0.05;
         pal = palette3;
-        if (appName=="ECDet" && app.isSingleEvent() && !peakShapes) {
-            shape.reset();
-            pal=palette4;            
-            List<double[]> clusterList = ecPix[ilmap].clusterXY.get(is);
-            for(int i=0; i<clusterList.size(); i++) {
-               double dum[] = clusterList.get(i);
-               if(shape.isContained(dum[0],dum[1])) shape.setCounter(i+1, dum[0], dum[1]);
-            }   
-        }
+        
         if (app.isSingleEvent()&&peakShapes) colorfraction=0.7;
         
         Color col = pal.getRange(colorfraction);
