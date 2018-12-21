@@ -28,7 +28,6 @@ import org.jlab.rec.tof.banks.BaseHit;
 import org.jlab.rec.tof.banks.BaseHitReader;
 import org.jlab.rec.tof.banks.BaseHitReader.DetectorLocation;
 
-//import org.clas.fcmon.jroot.*;
 
 public class BANDReconstructionApp extends FCApplication {
     
