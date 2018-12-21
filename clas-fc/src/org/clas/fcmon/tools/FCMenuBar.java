@@ -59,7 +59,6 @@ public class FCMenuBar extends JMenuBar  {
         JMenuItem         ctof = new JMenuItem("CTOF");
         JMenuItem          cnd = new JMenuItem("CND");
         JMenuItem         band = new JMenuItem("BAND");
-        JMenuItem         htcc = new JMenuItem("HTCC");
         JMenuItem          svt = new JMenuItem("SVT");
         JMenuItem          sd3 = new JMenuItem("clondaq3");
         JMenuItem          sd4 = new JMenuItem("clondaq4");
@@ -95,7 +94,6 @@ public class FCMenuBar extends JMenuBar  {
             ET_open.add(ctof);
             ET_open.add(cnd);
             ET_open.add(band);
-            ET_open.add(htcc);
             ET_open.add(svt);
             ET_open.add(sd3);
             ET_open.add(sd4);
@@ -116,7 +114,6 @@ public class FCMenuBar extends JMenuBar  {
           ctof.addActionListener(this);
           cnd.addActionListener(this);
           band.addActionListener(this);
-          htcc.addActionListener(this);
            svt.addActionListener(this);
            sd3.addActionListener(this);     
            sd4.addActionListener(this);     
@@ -135,11 +132,10 @@ public class FCMenuBar extends JMenuBar  {
     	    if(e.getActionCommand().compareTo("Sector 3")==0) {ethost="adcecal3";etfile="/tmp/et_sys_clasprod";}
     	    if(e.getActionCommand().compareTo("Sector 4")==0) {ethost="adcecal4";etfile="/tmp/et_sys_clasprod";}
     	    if(e.getActionCommand().compareTo("Sector 5")==0) {ethost="adcecal5";etfile="/tmp/et_sys_clasprod";}
-            if(e.getActionCommand().compareTo("Sector 6")==0) {ethost="adcecal6";etfile="/tmp/et_sys_clasprod";}      
-            if(e.getActionCommand().compareTo("HTCC")==0)     {ethost="adcctof1";etfile="/et/clasltcc";port=11112;}      
+            if(e.getActionCommand().compareTo("Sector 6")==0) {ethost="adcecal6";etfile="/tmp/et_sys_clasprod";}           
             if(e.getActionCommand().compareTo("CTOF")==0)     {ethost="adcctof1";etfile="/et/clasltcc";port=11112;}      
             if(e.getActionCommand().compareTo("CND")==0)      {ethost="adccnd1" ;etfile="/et/cndtest"; port=11112;}      
-            if(e.getActionCommand().compareTo("BAND")==0)     {ethost="adcband1";etfile="/et/bandtest";port=11112;}      
+            if(e.getActionCommand().compareTo("BAND")==0)     {ethost="tdcband1";etfile="/et/bandtest";port=11112;}      
             if(e.getActionCommand().compareTo("SVT")==0)      {ethost="svt1";    etfile="/et/clasprod";port=11112;}      
             if(e.getActionCommand().compareTo("clondaq3")==0) {ethost="clondaq3";etfile="/tmp/et_sys_clasprod";}       
             if(e.getActionCommand().compareTo("clondaq4")==0) {ethost="clondaq4";etfile="/tmp/et_sys_clasprod";}       

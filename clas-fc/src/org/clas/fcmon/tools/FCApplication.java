@@ -32,8 +32,6 @@ import org.clas.fcmon.detector.view.DetectorShape2D;
 import org.clas.fcmon.ec.ECPixels;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import org.clas.fcmon.ftof.FTOFPixels;
-import org.clas.fcmon.htcc.HTCCPixels;
 import org.clas.fcmon.ctof.CTOFPixels;
 import org.jlab.coda.jevio.ByteDataTransformer;
 import org.jlab.coda.jevio.EvioNode;
@@ -70,9 +68,7 @@ public class FCApplication implements ActionListener  {
 //    private List<FCParameter>                    parameters = new ArrayList<FCParameter>();
     
     public ECPixels[]                                   ecPix = new ECPixels[2];
-    public HTCCPixels[]                               htccPix = null;
     public CCPixels                                     ccPix = null;
-    public FTOFPixels[]                               ftofPix = null;
     public CTOFPixels[]                               ctofPix = null;
     public CNDPixels[]                                 cndPix = null;
     public BANDPixels[]                               bandPix = null;
@@ -127,10 +123,6 @@ public class FCApplication implements ActionListener  {
         this.initCanvas();
     }
     
-    public FCApplication(FTOFPixels[] ftofPix) {
-        this.ftofPix = ftofPix;   
-        this.initCanvas();
-    }
     
     public FCApplication(String name) {
         this.appName = name;
@@ -144,11 +136,6 @@ public class FCApplication implements ActionListener  {
         this.pixlength = ecPix.length;
     }
     
-    public FCApplication(String name, HTCCPixels[] htccPix) {
-        this.appName = name;
-        this.htccPix = htccPix;   
-        this.addCanvas(name);
-    }  
     
     public FCApplication(String name, CCPixels ccPix) {
         this.appName = name;
@@ -156,11 +143,7 @@ public class FCApplication implements ActionListener  {
         this.addCanvas(name);
     }
     
-    public FCApplication(String name, FTOFPixels[] ftofPix) {
-        this.appName = name;
-        this.ftofPix = ftofPix;   
-        this.addCanvas(name);
-    }
+   
     public FCApplication(String name, BANDPixels[] bandPix) {
         this.appName = name;
         this.bandPix = bandPix;   
@@ -568,7 +551,6 @@ public class FCApplication implements ActionListener  {
     
     public int     getECALTriggerSector()    {return (int) (isGoodFD() ? Math.log10(getFDTrigger()>>19)/0.301+1:0);}       
     public int     getPCALTriggerSector()    {return (int) (isGoodFD() ? Math.log10(getFDTrigger()>>13)/0.301+1:0);}       
-    public int     getHTCCTriggerSector()    {return (int) (isGoodFD() ? Math.log10(getFDTrigger()>>7)/0.301+1:0);} 
     
     public int      getTriggerMask()      {return app.triggerMask;}
     public boolean testTriggerMask()      {return app.triggerMask!=0 ? isTrigMaskSet(app.triggerMask):true;}

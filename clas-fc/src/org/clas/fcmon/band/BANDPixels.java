@@ -3,7 +3,6 @@ package org.clas.fcmon.band;
 import java.util.Arrays;
 import java.util.TreeMap;
 
-import org.clas.fcmon.ctof.CTOFConstants;
 import org.clas.fcmon.tools.FCCalibrationData;
 import org.clas.fcmon.tools.Strips;
 import org.jlab.detector.base.DetectorCollection;

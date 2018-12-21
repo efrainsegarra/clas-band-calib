@@ -72,7 +72,7 @@ public class BANDDet extends FCDetector {
     public DetectorShape2D getPaddle(int det, int sector, int layer, int paddle, int order) {
         
         DetectorShape2D shape = new DetectorShape2D(DetectorType.BAND,sector,layer,paddle,order);   
-        //System.out.println("creating shape: "+DetectorType.CND+" "+sector+" "+layer+" "+paddle+" "+order);
+        //System.out.println("creating shape: "+DetectorType.BAND+" "+sector+" "+layer+" "+paddle+" "+order);
         Path3D shapePath = shape.getShapePath();
         
 //        int off = (layer-1)*ftofPix[det].nstr;

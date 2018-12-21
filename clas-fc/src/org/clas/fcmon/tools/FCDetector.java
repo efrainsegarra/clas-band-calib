@@ -19,7 +19,6 @@ import org.clas.fcmon.detector.view.DetectorPane2D;
 import org.clas.fcmon.detector.view.DetectorShape2D;
 import org.clas.fcmon.ec.ECPixels;
 import org.clas.fcmon.ftof.FTOFPixels;
-import org.clas.fcmon.htcc.HTCCPixels;
 import org.clas.fcmon.ctof.CTOFPixels;
 import org.jlab.detector.base.DetectorCollection;
 import org.jlab.detector.base.DetectorDescriptor;
@@ -37,8 +36,7 @@ public class FCDetector {
 
     private String                 appName = null;
     
-    public ECPixels[]                ecPix = null;  
-    public HTCCPixels[]            htccPix = null;  
+    public ECPixels[]                ecPix = null;   
     public CCPixels                  ccPix = null; 
     public FTOFPixels[]            ftofPix = null; 
     public CTOFPixels[]            ctofPix = null; 
@@ -62,11 +60,7 @@ public class FCDetector {
     
     public FCDetector(ECPixels[] ecPix) {
         this.ecPix = ecPix;    
-    }
-    
-    public FCDetector(HTCCPixels[] htccPix) {
-        this.htccPix = htccPix;    
-    }   
+    }  
     
     public FCDetector(CCPixels ccPix) {
         this.ccPix = ccPix;     
@@ -106,13 +100,6 @@ public class FCDetector {
         this.appName = name;
         this.ctofPix = ctofPix;   
         this.nStrips[0] = ctofPix[0].nstr;
-//        this.nStrips[1] = ctofPix[1].nstr;
-    }  
-    
-    public FCDetector(String name, HTCCPixels[] htccPix) {
-        this.appName = name;
-        this.htccPix = htccPix;   
-        this.nStrips[0] = htccPix[0].nstr;
 //        this.nStrips[1] = ctofPix[1].nstr;
     }  
     
@@ -245,10 +232,6 @@ public class FCDetector {
         case "CTOFDet": if(!useTDC) {dc = ctofPix[ilmap].Lmap_a; mapz=ctofPix[ilmap].Lmap_a_z;}
                         if( useTDC) {dc = ctofPix[ilmap].Lmap_t; mapz=ctofPix[ilmap].Lmap_t_z;}  
                         layer = dd.getOrder()+1; layz=layer;
-                        break;     
-        case "HTCCDet": if(!useTDC) {dc = htccPix[ilmap].Lmap_a; mapz=htccPix[ilmap].Lmap_a_z;}
-                        if( useTDC) {dc = htccPix[ilmap].Lmap_t; mapz=htccPix[ilmap].Lmap_t_z;}  
-                        layer = dd.getLayer(); layz=layer;
                         break;     
         case   "CCDet": if(!useTDC) {dc = ccPix.Lmap_a;  mapz=ccPix.Lmap_a_z;}
                         layer = dd.getLayer(); layz=layer;

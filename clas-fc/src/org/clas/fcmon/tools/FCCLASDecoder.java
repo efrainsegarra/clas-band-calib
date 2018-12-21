@@ -116,15 +116,15 @@ public class FCCLASDecoder {
 	                detectorDecoder.fitPulses(dataList);
 	                
 	                //System.out.println("size of dataList: " + dataList.size());
-	                /*
-	                if( dataList.size() > 6){
 	                
-	                    System.out.println("\n>>>>>>>>> TRANSLATED data");
-	                    for(DetectorDataDgtz data : dataList){
-	                        System.out.println(data);
-	                    }
-	                }
-	                */
+	                //if( dataList.size() > 6){
+	                
+	                 //   System.out.println("\n>>>>>>>>> TRANSLATED data");
+	                 //   for(DetectorDataDgtz data : dataList){
+	                 //       System.out.println(data);
+	                  //  }
+	               // }
+	                //
                 //}
             } catch (Exception e) {
                 e.printStackTrace();
@@ -311,7 +311,7 @@ public class FCCLASDecoder {
             scalerBANK.setShort("channel", i, (short) scalerDGTZ.get(i).getDescriptor().getChannel());
             scalerBANK.setByte("helicity", i, (byte) scalerDGTZ.get(i).getSCALERData(0).getHelicity());
             scalerBANK.setByte("quartet", i, (byte) scalerDGTZ.get(i).getSCALERData(0).getQuartet());
-            scalerBANK.setInt("value", i, scalerDGTZ.get(i).getSCALERData(0).getValue());
+         //   scalerBANK.setInt("value", i, scalerDGTZ.get(i).getSCALERData(0).getValue());
         }
         return scalerBANK;
     }  
