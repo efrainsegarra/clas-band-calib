@@ -94,14 +94,7 @@ public class DataBaseLoader {
             provider.disconnect();
             return provider;
         }
-        
-        if(type==DetectorType.CND){
-            DatabaseConstantProvider provider = new DatabaseConstantProvider(run,variation);
-            provider.loadTable("/geometry/cnd/cnd");
-            provider.loadTable("/geometry/cnd/layer");
-            provider.disconnect();
-            return provider;
-        }
+       
         
         if(type==DetectorType.FTCAL){
             DatabaseConstantProvider provider = new DatabaseConstantProvider(run,variation);
@@ -136,13 +129,7 @@ public class DataBaseLoader {
             return provider;
         }
         
-        if(type==DetectorType.CND){
-            DatabaseConstantProvider provider = new DatabaseConstantProvider(run,variation);
-            provider.loadTable("/geometry/cnd/cnd");
-            provider.loadTable("/geometry/cnd/layer");
-            provider.disconnect();
-            return provider;
-        }
+  
         
         if(type==DetectorType.DC){
             DatabaseConstantProvider provider = new DatabaseConstantProvider(run,variation);
@@ -228,12 +215,7 @@ public class DataBaseLoader {
         return provider;
     }
     
-    public static ConstantProvider getConstantsCND(){
-        DatabaseConstantProvider provider = new DatabaseConstantProvider("mysql://clas12reader@clasdb.jlab.org/clas12");
-        provider.loadTable("/geometry/cnd/cnd");
-        provider.loadTable("/geometry/cnd/layer");
-        return provider;
-    }
+   
     
     public static ConstantProvider getConstantsFTCAL(){
         DatabaseConstantProvider provider = new DatabaseConstantProvider("mysql://clas12reader@clasdb.jlab.org/clas12");

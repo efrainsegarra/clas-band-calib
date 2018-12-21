@@ -44,7 +44,6 @@ public class CTOFPixels {
 	
     public CTOFPixels(String det) {
         if (det.equals("CTOF")) id=0;
-        if (det.equals("CND"))  id=1;
         nstr = ctof_nstr[id];
         detName = det;
         pixdef();

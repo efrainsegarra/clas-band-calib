@@ -104,32 +104,15 @@ public class TOFPaddle {
 
     public double veff() {
         double veff = 16.0;
-        if (tof == "FTOF") {
+       
             veff = TOFCalibrationEngine.veffValues.getDoubleValue("veff_left",
                     desc.getSector(), desc.getLayer(), desc.getComponent());
             //System.out.println("veff "+desc.getSector()+desc.getLayer()+desc.getComponent()+" "+veff);
-        } else {
-//          veff = CNDCalibrationEngine.veffValues.getItem(desc.getSector(),
-//                  desc.getLayer(), desc.getComponent());
-        }
+      
 
         return veff;
     }
 
-//  public double p2p() {
-//      double p2p = 0.0;
-//      if (tof == "FTOF") {
-//          p2p = TOFCalibrationEngine.p2pValues.getDoubleValue("paddle2paddle",
-//                  desc.getSector(), desc.getLayer(), desc.getComponent())
-//              + TOFCalibrationEngine.rfpadValues.getDoubleValue("rfpad", desc.getSector(), desc.getLayer(), desc.getComponent());
-//          //System.out.println("p2p "+desc.getSector()+desc.getLayer()+desc.getComponent()+" "+p2p);
-//      } else {
-//          p2p = 0.0;
-//          //p2p = CNDCalibrationEngine.p2pValues.getItem(desc.getSector(), desc.getLayer(), desc.getComponent());
-//      }
-//
-//      return p2p;
-//  }
     
     public double rfpad() {
         double rfpad = 0.0;
@@ -349,8 +332,7 @@ public class TOFPaddle {
             //System.out.println("lr "+desc.getSector()+desc.getLayer()+desc.getComponent()+" "+lr);
 
         } else {
-            //lr = CNDCalibrationEngine.leftRightValues.getItem(sector, layer,
-            //      paddle);
+           
             lr = -25.0;
         }
 

@@ -57,7 +57,6 @@ public class FCMenuBar extends JMenuBar  {
         JMenuItem           s5 = new JMenuItem("Sector 5");
         JMenuItem           s6 = new JMenuItem("Sector 6");
         JMenuItem         ctof = new JMenuItem("CTOF");
-        JMenuItem          cnd = new JMenuItem("CND");
         JMenuItem         band = new JMenuItem("BAND");
         JMenuItem          svt = new JMenuItem("SVT");
         JMenuItem          sd3 = new JMenuItem("clondaq3");
@@ -92,7 +91,6 @@ public class FCMenuBar extends JMenuBar  {
             ET_open.add(s5);
             ET_open.add(s6);
             ET_open.add(ctof);
-            ET_open.add(cnd);
             ET_open.add(band);
             ET_open.add(svt);
             ET_open.add(sd3);
@@ -112,7 +110,6 @@ public class FCMenuBar extends JMenuBar  {
             s5.addActionListener(this);
             s6.addActionListener(this);   
           ctof.addActionListener(this);
-          cnd.addActionListener(this);
           band.addActionListener(this);
            svt.addActionListener(this);
            sd3.addActionListener(this);     
@@ -134,7 +131,6 @@ public class FCMenuBar extends JMenuBar  {
     	    if(e.getActionCommand().compareTo("Sector 5")==0) {ethost="adcecal5";etfile="/tmp/et_sys_clasprod";}
             if(e.getActionCommand().compareTo("Sector 6")==0) {ethost="adcecal6";etfile="/tmp/et_sys_clasprod";}           
             if(e.getActionCommand().compareTo("CTOF")==0)     {ethost="adcctof1";etfile="/et/clasltcc";port=11112;}      
-            if(e.getActionCommand().compareTo("CND")==0)      {ethost="adccnd1" ;etfile="/et/cndtest"; port=11112;}      
             if(e.getActionCommand().compareTo("BAND")==0)     {ethost="tdcband1";etfile="/et/bandtest";port=11112;}      
             if(e.getActionCommand().compareTo("SVT")==0)      {ethost="svt1";    etfile="/et/clasprod";port=11112;}      
             if(e.getActionCommand().compareTo("clondaq3")==0) {ethost="clondaq3";etfile="/tmp/et_sys_clasprod";}       
@@ -294,10 +290,10 @@ public class FCMenuBar extends JMenuBar  {
 		
         String TriggerDef[] = { "Electron",
 		        "Electron S1","Electron S2","Electron S3","Electron S4","Electron S5","Electron S6",
-		        "ElectronOR noDC>300","PCALxECAL>10","","","","","","","","","","",
+		        "ElectronOR noDC>300","PCALxECAL>10","",
 		        "FTOFxPCALxECAL(1-4)","FTOFxPCALxECAL(2-5)","FTOFxPCALxECAL(3-6)","","",
 		        "FTxHDxFTOFxPCALxCTOF",
-		        "FTxHDx(FTOFxPCAL)^2","FTxHD>100","FT>100","","","",
+		        "FTxHDx(FTOFxPCAL)^2","FTxHD>100","FT>100","",
 		        "1K Pulser"};
         
         public JMenu getMenu() {

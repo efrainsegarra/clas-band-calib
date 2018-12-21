@@ -13,7 +13,6 @@ import java.util.TreeMap;
 import javax.swing.JPanel;
 
 import org.clas.fcmon.band.BANDPixels;
-import org.clas.fcmon.cnd.CNDPixels;
 import org.clas.fcmon.detector.view.DetectorPane2D;
 import org.clas.fcmon.detector.view.DetectorShape2D;
 import org.clas.fcmon.ec.ECPixels;
@@ -37,8 +36,7 @@ public class FCDetector {
     
     public ECPixels[]                ecPix = null;  
     public FTOFPixels[]            ftofPix = null; 
-    public CTOFPixels[]            ctofPix = null; 
-    public CNDPixels[]              cndPix = null; 
+    public CTOFPixels[]            ctofPix = null;  
     public BANDPixels[]            bandPix = null; 
     public MonitorApp                  app = null;
     public DetectorMonitor             mon = null;
@@ -90,14 +88,7 @@ public class FCDetector {
         this.ctofPix = ctofPix;   
         this.nStrips[0] = ctofPix[0].nstr;
 //        this.nStrips[1] = ctofPix[1].nstr;
-    }  
-    
-    public FCDetector(String name, CNDPixels[] cndPix) {
-        this.appName = name;
-        this.cndPix = cndPix;   
-        this.nStrips[0] = cndPix[0].nstr;
-//        this.nStrips[1] = ctofPix[1].nstr;
-    }  
+    }   
     
     public FCDetector(String name, BANDPixels[] bandPix) {
         this.appName = name;
@@ -213,11 +204,7 @@ public class FCDetector {
         case "BANDDet": if(!useTDC) {dc = bandPix[ilmap].Lmap_a; mapz=bandPix[ilmap].Lmap_a_z;}
                         if( useTDC) {dc = bandPix[ilmap].Lmap_t; mapz=bandPix[ilmap].Lmap_t_z;}  
                         layer = dd.getOrder()+1; layz=layer;
-                        break;     
-        case "CNDDet":  if(!useTDC) {dc = cndPix[ilmap].Lmap_a; mapz=cndPix[ilmap].Lmap_a_z;}
-                        if( useTDC) {dc = cndPix[ilmap].Lmap_t; mapz=cndPix[ilmap].Lmap_t_z;}  
-                        layer = dd.getOrder()+1; layz=0;
-                        break;     
+                        break;          
         case "CTOFDet": if(!useTDC) {dc = ctofPix[ilmap].Lmap_a; mapz=ctofPix[ilmap].Lmap_a_z;}
                         if( useTDC) {dc = ctofPix[ilmap].Lmap_t; mapz=ctofPix[ilmap].Lmap_t_z;}  
                         layer = dd.getOrder()+1; layz=layer;
