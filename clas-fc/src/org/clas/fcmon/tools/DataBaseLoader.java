@@ -11,16 +11,7 @@ import org.jlab.detector.calib.utils.DatabaseConstantProvider;
  */
 public class DataBaseLoader {
     
-    public static ConstantProvider getDriftChamberConstants(){
-        
-        DatabaseConstantProvider provider = new DatabaseConstantProvider("mysql://clas12reader@clasdb.jlab.org/clas12");
-        provider.loadTable("/geometry/dc/dc");
-        provider.loadTable("/geometry/dc/region");
-        provider.loadTable("/geometry/dc/superlayer");
-        provider.loadTable("/geometry/dc/layer");
-        return provider;
-    }
-    
+   
     public static ConstantProvider getCalorimeterConstants(){
         DatabaseConstantProvider provider = new DatabaseConstantProvider("mysql://clas12reader@clasdb.jlab.org/clas12");
         provider.loadTable("/geometry/pcal/pcal");
@@ -84,24 +75,9 @@ public class DataBaseLoader {
             provider.disconnect();
             return provider;
         }
+  
         
-        if(type==DetectorType.DC){
-            DatabaseConstantProvider provider = new DatabaseConstantProvider(run,variation);
-            provider.loadTable("/geometry/dc/dc");
-            provider.loadTable("/geometry/dc/region");
-            provider.loadTable("/geometry/dc/superlayer");
-            provider.loadTable("/geometry/dc/layer");
-            provider.disconnect();
-            return provider;
-        }
-       
-        
-        if(type==DetectorType.FTCAL){
-            DatabaseConstantProvider provider = new DatabaseConstantProvider(run,variation);
-            provider.loadTable("/geometry/ft/ftcal");
-            provider.disconnect();
-            return provider;
-        }
+ 
         return null;
     }
     
@@ -121,25 +97,7 @@ public class DataBaseLoader {
     
     
     public static ConstantProvider  getGeometryConstants(DetectorType type, int run, String variation){
-        
-        if(type==DetectorType.FTCAL){
-            DatabaseConstantProvider provider = new DatabaseConstantProvider(run,variation);
-            provider.loadTable("/geometry/ft/ftcal");
-            provider.disconnect();
-            return provider;
-        }
-        
-  
-        
-        if(type==DetectorType.DC){
-            DatabaseConstantProvider provider = new DatabaseConstantProvider(run,variation);
-            provider.loadTable("/geometry/dc/dc");
-            provider.loadTable("/geometry/dc/region");
-            provider.loadTable("/geometry/dc/superlayer");
-            provider.loadTable("/geometry/dc/layer");
-            provider.disconnect();
-            return provider;
-        }
+
         
         if(type==DetectorType.ECAL){
             DatabaseConstantProvider provider = new DatabaseConstantProvider(run,variation);
@@ -181,16 +139,7 @@ public class DataBaseLoader {
         return provider;
     }
     
-    public static ConstantProvider getConstantsDC(int run, String variation){
-        DatabaseConstantProvider provider = new DatabaseConstantProvider("mysql://clas12reader@clasdb.jlab.org/clas12");
-        provider.loadTable("/geometry/dc/dc");
-        provider.loadTable("/geometry/dc/region");
-        provider.loadTable("/geometry/dc/superlayer");
-        provider.loadTable("/geometry/dc/layer");
-        return provider;
-    }
-    
-    public static ConstantProvider getConstantsEC(){
+  public static ConstantProvider getConstantsEC(){
         DatabaseConstantProvider provider = new DatabaseConstantProvider("mysql://clas12reader@clasdb.jlab.org/clas12");
         provider.loadTable("/geometry/pcal/pcal");
         provider.loadTable("/geometry/pcal/UView");
@@ -216,19 +165,7 @@ public class DataBaseLoader {
     }
     
    
-    
-    public static ConstantProvider getConstantsFTCAL(){
-        DatabaseConstantProvider provider = new DatabaseConstantProvider("mysql://clas12reader@clasdb.jlab.org/clas12");
-        provider.loadTable("/geometry/ft/ftcal");
-        return provider;
-    }
 
-    public static ConstantProvider getConstantsBST(){
-        DatabaseConstantProvider provider = new DatabaseConstantProvider("mysql://clas12reader@clasdb.jlab.org/clas12");
-        provider.loadTable("/geometry/bst/region");
-        provider.loadTable("/geometry/bst/sector");
-        provider.loadTable("/geometry/bst/bst");
-        return provider;
-    }
-    
+
+   
 }

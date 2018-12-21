@@ -176,7 +176,7 @@ public class CodaEventDecoder {
             	    isMode7 = true;
                 //  This is regular integrated pulse mode, used for FTOF
                 // FTCAL and EC/PCAL
-                //return this.getDataEntries_57602(crate, node, event);
+               
                 return this.getDataEntries_57602(crate, node, event);
                 //return this.getDataEntriesMode_7(crate,node, event);
             }
