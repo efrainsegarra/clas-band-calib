@@ -79,18 +79,15 @@ public class DetectorEventDecoder {
     public final void initDecoder(){
     	  
         keysTrans = Arrays.asList(new String[]{
-		"RF","BAND"
-        });
+		"FTOF","RF","BAND"});
         
         tablesTrans = Arrays.asList(new String[]{
-            "/daq/tt/rf","/daq/tt/band"
-        });
+            "daq/tt/ftof","/daq/tt/rf","/daq/tt/band" });
         
         translationManager.init(keysTrans,tablesTrans);
         
         tablesFitter = Arrays.asList(new String[]{
-            "/daq/fadc/rf","/daq/fadc/band"
-        });
+            "daq/fadc/ftof","/daq/fadc/rf","/daq/fadc/band" });
         fitterManager.init(keysFitter, tablesFitter);
     }
     /**

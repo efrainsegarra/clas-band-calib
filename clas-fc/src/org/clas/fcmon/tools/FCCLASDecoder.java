@@ -36,7 +36,7 @@ public class FCCLASDecoder {
     
     public FCCLASDecoder(){    
         System.out.println("***************");
-        System.out.println("*BANDDecoder*");
+        System.out.println("*FCCLASdecoder*");
         System.out.println("***************");
         codaDecoder = new CodaEventDecoder();
         detectorDecoder = new DetectorEventDecoder();
@@ -320,17 +320,17 @@ public class FCCLASDecoder {
         HipoDataEvent event = (HipoDataEvent) writer.createEvent();
         
         //for BAND if included in Hipo Files
-//        String[]        adcBankNames = new String[]{"BAND::adc"};
-//        DetectorType[]  adcBankTypes = new DetectorType[]{DetectorType.BAND};
+        String[]        adcBankNames = new String[]{"BAND::adc"};
+        DetectorType[]  adcBankTypes = new DetectorType[]{DetectorType.BAND};
         
-//        String[]        tdcBankNames = new String[]{"BAND::tdc"};
-//        DetectorType[]  tdcBankTypes = new DetectorType[]{DetectorType.BAND};
+        String[]        tdcBankNames = new String[]{"BAND::tdc"};
+        DetectorType[]  tdcBankTypes = new DetectorType[]{DetectorType.BAND};
  
-        String[]        adcBankNames = new String[]{""};
-        DetectorType[]  adcBankTypes = new DetectorType[]{};
-        
-        String[]        tdcBankNames = new String[]{"ECAL::tdc"};
-        DetectorType[]  tdcBankTypes = new DetectorType[]{};
+//        String[]        adcBankNames = new String[]{""};
+//        DetectorType[]  adcBankTypes = new DetectorType[]{};
+//        
+//        String[]        tdcBankNames = new String[]{"ECAL::tdc"};
+//        DetectorType[]  tdcBankTypes = new DetectorType[]{};
         
         for(int i = 0; i < adcBankTypes.length; i++){
             DataBank adcBank = getDataBankADC(adcBankNames[i],adcBankTypes[i]);
