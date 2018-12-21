@@ -50,11 +50,9 @@ public class FCEpics  {
     
     String   grps[] = {"HV","DISC","FADC"};
     String   ftof[] = {"PANEL1A_L","PANEL1A_R","PANEL1B_L","PANEL1B_R","PANEL2_L","PANEL2_R"};
-    String   ctof[] = {"U","D"};
     String   band[] = {"1L","1R","2L","2R","3L","3R","4L","4R","5L","5R"};
     String     ec[] = {"U","V","W","UI","VI","WI","UO","VO","WO"};
     int     nftof[] = {23,23,62,62,5,5};
-    int     nctof[] = {48,48};
     int     nband[] = {24,24,24,24,24,24,24,24,20,20};
     int       nec[] = {68,62,62,36,36,36,36,36,36};
     
@@ -67,7 +65,6 @@ public class FCEpics  {
 	    this.appName = name;
 	    this.detName = det;
         this.layMap.put("FTOF",ftof); this.nlayMap.put("FTOF", nftof);
-        this.layMap.put("CTOF",ctof); this.nlayMap.put("CTOF", nctof);
         this.layMap.put("BAND",band); this.nlayMap.put("BAND", nband);
         this.layMap.put("EC",ec);     this.nlayMap.put("EC",   nec);
 	}
@@ -253,7 +250,6 @@ public class FCEpics  {
 	    switch (det) {
 	    case "FTOF": return det;
 	    case "BAND": return det;
-	    case "CTOF": return det;
 	    case   "EC": return (layer<4) ? "PCAL":"ECAL";
 	    }
 	    return "";
@@ -264,7 +260,6 @@ public class FCEpics  {
 	    String pv = "B_DET_"+detAlias(det,layer)+"_"+grps[grp]+"_SEC"+sector+"_"+layToStr(det,layer)+"_E"+chanToStr(channel);
 	    
 	    switch (det) {
-	    case "CTOF": pv = "B_DET_"+detAlias(det,layer)+"_"+grps[grp]+"_"+layToStr(det,layer)+chanToStr(channel); break;
 	    case "BAND": pv = "B_DET_"+detAlias(det,layer)+"_"+grps[grp]+"_"+BANDConstants.getHvAlias(layToStr(det,layer), channel);
 	    }
 //	    System.out.println(sector+" "+layer+" "+channel+" "+pv+":"+action);

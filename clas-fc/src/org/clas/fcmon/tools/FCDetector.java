@@ -17,7 +17,6 @@ import org.clas.fcmon.detector.view.DetectorPane2D;
 import org.clas.fcmon.detector.view.DetectorShape2D;
 import org.clas.fcmon.ec.ECPixels;
 import org.clas.fcmon.ftof.FTOFPixels;
-import org.clas.fcmon.ctof.CTOFPixels;
 import org.jlab.detector.base.DetectorCollection;
 import org.jlab.detector.base.DetectorDescriptor;
 import org.jlab.utils.groups.IndexedList;
@@ -36,7 +35,7 @@ public class FCDetector {
     
     public ECPixels[]                ecPix = null;  
     public FTOFPixels[]            ftofPix = null; 
-    public CTOFPixels[]            ctofPix = null;  
+     
     public BANDPixels[]            bandPix = null; 
     public MonitorApp                  app = null;
     public DetectorMonitor             mon = null;
@@ -83,18 +82,12 @@ public class FCDetector {
         this.nStrips[2] = ftofPix[2].nstr;
     }
     
-    public FCDetector(String name, CTOFPixels[] ctofPix) {
-        this.appName = name;
-        this.ctofPix = ctofPix;   
-        this.nStrips[0] = ctofPix[0].nstr;
-//        this.nStrips[1] = ctofPix[1].nstr;
-    }   
-    
+  
     public FCDetector(String name, BANDPixels[] bandPix) {
         this.appName = name;
         this.bandPix = bandPix;   
         this.nStrips[0] = bandPix[0].nstr[2];
-//        this.nStrips[1] = ctofPix[1].nstr;
+
     }   
     
     public void setApplicationClass(MonitorApp app) {
@@ -204,11 +197,6 @@ public class FCDetector {
         case "BANDDet": if(!useTDC) {dc = bandPix[ilmap].Lmap_a; mapz=bandPix[ilmap].Lmap_a_z;}
                         if( useTDC) {dc = bandPix[ilmap].Lmap_t; mapz=bandPix[ilmap].Lmap_t_z;}  
                         layer = dd.getOrder()+1; layz=layer;
-                        break;          
-        case "CTOFDet": if(!useTDC) {dc = ctofPix[ilmap].Lmap_a; mapz=ctofPix[ilmap].Lmap_a_z;}
-                        if( useTDC) {dc = ctofPix[ilmap].Lmap_t; mapz=ctofPix[ilmap].Lmap_t_z;}  
-                        layer = dd.getOrder()+1; layz=layer;
-                        break;     
        
         }
         

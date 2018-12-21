@@ -56,7 +56,6 @@ public class FCMenuBar extends JMenuBar  {
         JMenuItem           s4 = new JMenuItem("Sector 4");
         JMenuItem           s5 = new JMenuItem("Sector 5");
         JMenuItem           s6 = new JMenuItem("Sector 6");
-        JMenuItem         ctof = new JMenuItem("CTOF");
         JMenuItem         band = new JMenuItem("BAND");
         JMenuItem          svt = new JMenuItem("SVT");
         JMenuItem          sd3 = new JMenuItem("clondaq3");
@@ -90,7 +89,6 @@ public class FCMenuBar extends JMenuBar  {
             ET_open.add(s4);
             ET_open.add(s5);
             ET_open.add(s6);
-            ET_open.add(ctof);
             ET_open.add(band);
             ET_open.add(svt);
             ET_open.add(sd3);
@@ -108,8 +106,7 @@ public class FCMenuBar extends JMenuBar  {
             s3.addActionListener(this);
             s4.addActionListener(this);
             s5.addActionListener(this);
-            s6.addActionListener(this);   
-          ctof.addActionListener(this);
+            s6.addActionListener(this);
           band.addActionListener(this);
            svt.addActionListener(this);
            sd3.addActionListener(this);     
@@ -130,7 +127,6 @@ public class FCMenuBar extends JMenuBar  {
     	    if(e.getActionCommand().compareTo("Sector 4")==0) {ethost="adcecal4";etfile="/tmp/et_sys_clasprod";}
     	    if(e.getActionCommand().compareTo("Sector 5")==0) {ethost="adcecal5";etfile="/tmp/et_sys_clasprod";}
             if(e.getActionCommand().compareTo("Sector 6")==0) {ethost="adcecal6";etfile="/tmp/et_sys_clasprod";}           
-            if(e.getActionCommand().compareTo("CTOF")==0)     {ethost="adcctof1";etfile="/et/clasltcc";port=11112;}      
             if(e.getActionCommand().compareTo("BAND")==0)     {ethost="tdcband1";etfile="/et/bandtest";port=11112;}      
             if(e.getActionCommand().compareTo("SVT")==0)      {ethost="svt1";    etfile="/et/clasprod";port=11112;}      
             if(e.getActionCommand().compareTo("clondaq3")==0) {ethost="clondaq3";etfile="/tmp/et_sys_clasprod";}       

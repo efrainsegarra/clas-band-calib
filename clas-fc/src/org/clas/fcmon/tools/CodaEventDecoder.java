@@ -710,7 +710,7 @@ public class CodaEventDecoder {
                 if(node.getTag()==57620) {
                     byte[] stringData =  ByteDataTransformer.toByteArray(node.getStructureBuffer(true));
 //                    System.out.println("Found epics bank " + stringData.length);
-                    String value = new String(stringData);
+//                   String value = new String(stringData);
 //                    System.out.println(stringData.length + " " + value);
 //                    for(int i=0; i<stringData.length; i++) {
 //                        System.out.println(stringData.length + " " + i + " " + stringData[i]);                        

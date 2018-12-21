@@ -1,51 +1,28 @@
 package org.clas.fcmon.tools;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
+
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
+
 
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.clas.fcmon.band.BANDPixels;
-import org.clas.fcmon.detector.view.DetectorShape2D;
 import org.clas.fcmon.ec.ECPixels;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import org.clas.fcmon.ctof.CTOFPixels;
-import org.jlab.coda.jevio.ByteDataTransformer;
-import org.jlab.coda.jevio.EvioNode;
 import org.jlab.detector.base.DetectorCollection;
 import org.jlab.detector.base.DetectorDescriptor;
-import org.jlab.detector.calib.tasks.CalibrationEngine;
 import org.jlab.detector.calib.tasks.CalibrationEngineView;
-import org.jlab.detector.decode.DetectorDataDgtz;
-import org.jlab.detector.decode.DetectorDataDgtz.VTPData;
 import org.jlab.groot.group.DataGroup;
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
 import org.jlab.io.evio.EvioDataEvent;
-import org.jlab.io.evio.EvioTreeBranch;
-import org.jlab.io.hipo.HipoDataBank;
-import org.jlab.io.hipo.HipoDataEvent;
 import org.jlab.utils.groups.IndexedList;
 import org.jlab.groot.graphics.EmbeddedCanvas;
 import org.jlab.groot.base.GStyle;
@@ -66,7 +43,6 @@ public class FCApplication implements ActionListener  {
 //    private List<FCParameter>                    parameters = new ArrayList<FCParameter>();
     
     public ECPixels[]                                   ecPix = new ECPixels[2];
-    public CTOFPixels[]                               ctofPix = null;
     public BANDPixels[]                               bandPix = null;
     
 	public DetectorCollection<TreeMap<Integer,Object>> Lmap_a = new  DetectorCollection<TreeMap<Integer,Object>>();
@@ -134,14 +110,7 @@ public class FCApplication implements ActionListener  {
         this.addCanvas(name);
     }   
     
-    public FCApplication(String name, CTOFPixels[] ctofPix) {
-        this.appName = name;
-        this.ctofPix = ctofPix;   
-        this.addCanvas(name);
-    }
-    
   
-    
     public void addEvent(DataEvent event) {
     	
     	// globals set here must go to app.* since this is called only in ReconstructionApp
