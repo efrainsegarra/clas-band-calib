@@ -240,8 +240,7 @@ public class BANDMon extends DetectorMonitor {
         bandDet.update(shape);
 //        if (app.getSelectedTabName().equals("Scalers")) bandScalers.updateDetectorView(shape);
 //        if (app.getSelectedTabName().equals("HV"))           bandHv.updateDetectorView(shape);
-//        ftofCalib.updateDetectorView(shape);
-    }
+ }
         
     @Override
     public void processShape(DetectorShape2D shape) { 

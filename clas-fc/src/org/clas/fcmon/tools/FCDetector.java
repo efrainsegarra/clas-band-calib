@@ -16,7 +16,6 @@ import org.clas.fcmon.band.BANDPixels;
 import org.clas.fcmon.detector.view.DetectorPane2D;
 import org.clas.fcmon.detector.view.DetectorShape2D;
 import org.clas.fcmon.ec.ECPixels;
-import org.clas.fcmon.ftof.FTOFPixels;
 import org.jlab.detector.base.DetectorCollection;
 import org.jlab.detector.base.DetectorDescriptor;
 import org.jlab.utils.groups.IndexedList;
@@ -34,8 +33,6 @@ public class FCDetector {
     private String                 appName = null;
     
     public ECPixels[]                ecPix = null;  
-    public FTOFPixels[]            ftofPix = null; 
-     
     public BANDPixels[]            bandPix = null; 
     public MonitorApp                  app = null;
     public DetectorMonitor             mon = null;
@@ -58,9 +55,7 @@ public class FCDetector {
     }  
    
     
-    public FCDetector(FTOFPixels[] ftofPix) {
-        this.ftofPix = ftofPix;     
-    }
+
     
     public FCDetector(String name, ECPixels[] ecPix) {
         this.appName = name;
@@ -72,16 +67,6 @@ public class FCDetector {
         this.nStrips[4] = ecPix[0].ec_nstr[1];
         this.nStrips[5] = ecPix[0].ec_nstr[2];
     }
-    
-    
-    public FCDetector(String name, FTOFPixels[] ftofPix) {
-        this.appName = name;
-        this.ftofPix = ftofPix;   
-        this.nStrips[0] = ftofPix[0].nstr;
-        this.nStrips[1] = ftofPix[1].nstr;
-        this.nStrips[2] = ftofPix[2].nstr;
-    }
-    
   
     public FCDetector(String name, BANDPixels[] bandPix) {
         this.appName = name;
@@ -190,10 +175,7 @@ public class FCDetector {
         case   "ECDet": if(!useTDC) {dc = ecPix[ilmap].Lmap_a; mapz=ecPix[ilmap].Lmap_a_z ;}
                         if( useTDC) {dc = ecPix[ilmap].Lmap_t; mapz=ecPix[ilmap].Lmap_t_z ;} 
                         break;
-        case "FTOFDet": if(!useTDC) {dc = ftofPix[ilmap].Lmap_a; mapz=ftofPix[ilmap].Lmap_a_z;}
-                        if( useTDC) {dc = ftofPix[ilmap].Lmap_t; mapz=ftofPix[ilmap].Lmap_t_z;}  
-                        layer = dd.getOrder()+1; layz=layer;
-                        break;     
+       
         case "BANDDet": if(!useTDC) {dc = bandPix[ilmap].Lmap_a; mapz=bandPix[ilmap].Lmap_a_z;}
                         if( useTDC) {dc = bandPix[ilmap].Lmap_t; mapz=bandPix[ilmap].Lmap_t_z;}  
                         layer = dd.getOrder()+1; layz=layer;

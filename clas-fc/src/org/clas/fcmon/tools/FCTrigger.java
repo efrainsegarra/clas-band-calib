@@ -38,10 +38,6 @@ public class FCTrigger {
 		public int time;
 	} 
 
-	public class TFTOF_mask{
-		public int[] chan;         // Vector of channels that are fired 
-		public int time;           // time shows the channel in the readout window
-	} 
 
 	public class Trig_word{
 		public int tr_time;       // trigger time with the 4ns resolution
@@ -106,8 +102,6 @@ public class FCTrigger {
                     break;
                 case type_trigger:     ReadTrigger();
                     break;
-                case type_FTOF_clust:  ReadFTOFTrigMask();
-                    break;
                 }		            
 			}			
 		}
@@ -121,7 +115,7 @@ public class FCTrigger {
             }
         }
        
-        fnFTOF_Masks = fv_FTOFMasks.size();	
+      
         
         return true;
 	}	
@@ -144,7 +138,6 @@ public class FCTrigger {
 	public int GetBlockLevel()       {return has_BlockHeader ? fblock_level: UNDEF; }
 	public int GetNAllPeaks()        {return fnAllPeaks;}
 	public int GetNAllClust()        {return fnAllClusters;}
-	public int GetNFTOFMasks()       {return fnFTOF_Masks;}   // Return number of THTCC_Hits objects
 	
 	public int GetNTrig()            {return fnTrigWords;};   // Return number of triggers in the VTP Bank
 	public int GetTrigLane()         {return ftrig_lane;};    // trigger number, i.e. which trigger is fired
@@ -153,8 +146,7 @@ public class FCTrigger {
 	
 	static int n_inst = 2;
 	static int n_view = 3;
-	static int n_FTOF_chan = 62;                              // Number of Max FTOF channels per sector/panel;
-	 
+
 	TEC_Peak     cur_peak = null;
 	TEC_Cluster cur_clust = null;
 	Trig_word     cur_trg = null;
@@ -172,7 +164,7 @@ public class FCTrigger {
 	public IndexedList<List<TEC_Peak>>      fv_ECAllPeaks    = new IndexedList<List<TEC_Peak>>(2); 
 	public IndexedList<List<TEC_Cluster>>   fv_ECAllClusters = new IndexedList<List<TEC_Cluster>>(1); 
 	
-	List<TFTOF_mask> fv_FTOFMasks = new ArrayList<TFTOF_mask>();
+
 	List<Trig_word>  fv_TrigWords = new ArrayList<Trig_word>();
    	      
    	int fnAllPeaks;
@@ -182,7 +174,7 @@ public class FCTrigger {
    	
    	int fnTrigWords;  
    	
-   	int fnFTOF_Masks;
+   
 
    	int ftrig_inst;
    	int ftrig_lane;
@@ -268,8 +260,7 @@ public class FCTrigger {
     }    
     
     
-    void ReadFTOFTrigMask() {};                   // This will read FTOF Trigger mask
-   
+    
     public void ReadTrigger() {
         has_Trigger = true;
 
@@ -344,7 +335,7 @@ public class FCTrigger {
     boolean has_TrigPeak;
     boolean has_TrigClust;
     boolean has_Trigger;
-    boolean has_FTOFMask;   	
+    	
     
     static final int type_blk_head = 0;
     static final int type_blk_trail = 1;
@@ -353,7 +344,7 @@ public class FCTrigger {
     static final int type_ECtrig_peak = 4;
     static final int type_ECTrig_clust = 5;
     static final int type_FT_clust = 7;
-    static final int type_FTOF_clust = 8;
+   
     
     static final int type_trigger = 13;   
     

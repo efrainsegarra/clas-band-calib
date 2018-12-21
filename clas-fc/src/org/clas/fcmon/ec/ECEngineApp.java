@@ -43,8 +43,6 @@ import org.jlab.service.eb.EventBuilder;
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.data.H2F; 
 
-import org.clas.fcmon.ftof.DataProvider;
-import org.clas.fcmon.ftof.TOFPaddle;
 
 public class ECEngineApp extends FCApplication implements ActionListener {
 
@@ -63,7 +61,7 @@ public class ECEngineApp extends FCApplication implements ActionListener {
     JCheckBox               crtBtn = null;
     JCheckBox              gainBtn = null;
     ButtonGroup                bG1 = null;
-    List<TOFPaddle>     paddleList = null;
+  
     
 //    EBEngine                       ebe = new EBEngine("ECMON");
 //    EventBuilder                    eb = null;
@@ -421,19 +419,7 @@ public class ECEngineApp extends FCApplication implements ActionListener {
           DataBank bank = event.getBank("MIP::event");
           for(int i=0; i < bank.rows(); i++) part.mip[i]=bank.getByte("mip", i);
           
-      } else if (event.hasBank("FTOF::adc")) {
-          paddleList = DataProvider.getPaddleList(event);          
-          double[] thresh = {500,1000,1000}; 
-          for (int i=0; i<6; i++) part.mip[i]=0;       
-          if (paddleList!=null) {
-          for (TOFPaddle paddle : paddleList){           
-              int toflay = paddle.getDescriptor().getLayer();            
-              int   isec = paddle.getDescriptor().getSector();
-              part.mip[isec-1] = (paddle.geometricMean()>thresh[toflay-1]) ? 1:0;
-          }
-          }
-          
-      } else if (event.hasBank("REC::Scintillator")) {
+      }  else if (event.hasBank("REC::Scintillator")) {
           double[] thresh = {7,8,8}; 
           for (int i=0; i<6; i++) part.mip[i]=0;       
     	  DataBank bank = event.getBank("REC::Scintillator");

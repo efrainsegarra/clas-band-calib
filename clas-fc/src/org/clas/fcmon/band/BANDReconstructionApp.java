@@ -45,7 +45,7 @@ public class BANDReconstructionApp extends FCApplication {
    IndexedList<List<Integer>>       lapmt = new IndexedList<List<Integer>>(3); 
    IndexedList<List<Integer>>       ltpmt = new IndexedList<List<Integer>>(3); 
    
-   BANDConstants                   ftofcc = new BANDConstants();  
+   BANDConstants                   bandcc = new BANDConstants();  
    
    double[]                sed7=null,sed8=null;
    TreeMap<Integer,Object> map7=null,map8=null; 
@@ -54,8 +54,8 @@ public class BANDReconstructionApp extends FCApplication {
    int     thrcc = 20;
    short[] pulse = new short[100]; 
     
-   public BANDReconstructionApp(String name, BANDPixels[] ftofPix) {
-       super(name,ftofPix);
+   public BANDReconstructionApp(String name, BANDPixels[] bandPix) {
+       super(name, bandPix);
    }
    
    public void init() {
@@ -98,7 +98,7 @@ public class BANDReconstructionApp extends FCApplication {
 	   
        BaseHitReader hitReader = new BaseHitReader();
        
-       Map<DetectorLocation, ArrayList<BaseHit>> hitMap = hitReader.get_Hits(event, "FTOF");
+       Map<DetectorLocation, ArrayList<BaseHit>> hitMap = hitReader.get_Hits(event, "BAND");
        
        System.out.println(" ");
        System.out.println("New Event Size "+hitMap.size());
@@ -349,7 +349,7 @@ public class BANDReconstructionApp extends FCApplication {
       float mc_t=0,tdcf=0;
       float[] tdc = new float[1];
       
-      String det[] = {"FTOF1A","FTOF1B","FTOF2B"}; // FTOF.xml banknames
+      String det[] = {"BAND"}; // FTOF.xml banknames
       
       clear(0); clear(1); clear(2);
       

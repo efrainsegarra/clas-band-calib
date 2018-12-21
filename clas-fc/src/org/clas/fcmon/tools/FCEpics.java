@@ -49,10 +49,8 @@ public class FCEpics  {
     String ca_2H01  = "hallb_IPM2H01_CUR";
     
     String   grps[] = {"HV","DISC","FADC"};
-    String   ftof[] = {"PANEL1A_L","PANEL1A_R","PANEL1B_L","PANEL1B_R","PANEL2_L","PANEL2_R"};
     String   band[] = {"1L","1R","2L","2R","3L","3R","4L","4R","5L","5R"};
     String     ec[] = {"U","V","W","UI","VI","WI","UO","VO","WO"};
-    int     nftof[] = {23,23,62,62,5,5};
     int     nband[] = {24,24,24,24,24,24,24,24,20,20};
     int       nec[] = {68,62,62,36,36,36,36,36,36};
     
@@ -64,7 +62,6 @@ public class FCEpics  {
 	    System.out.println("FCEpics: Initializing detector "+det);
 	    this.appName = name;
 	    this.detName = det;
-        this.layMap.put("FTOF",ftof); this.nlayMap.put("FTOF", nftof);
         this.layMap.put("BAND",band); this.nlayMap.put("BAND", nband);
         this.layMap.put("EC",ec);     this.nlayMap.put("EC",   nec);
 	}
@@ -248,7 +245,6 @@ public class FCEpics  {
 	
 	public String detAlias(String det, int layer) {
 	    switch (det) {
-	    case "FTOF": return det;
 	    case "BAND": return det;
 	    case   "EC": return (layer<4) ? "PCAL":"ECAL";
 	    }

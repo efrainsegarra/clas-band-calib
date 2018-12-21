@@ -79,19 +79,18 @@ public class DetectorEventDecoder {
     public final void initDecoder(){
     	  
         keysTrans = Arrays.asList(new String[]{
-		"ECAL","FTOF","RF","BAND"
+		"ECAL","RF","BAND"
         });
         
         tablesTrans = Arrays.asList(new String[]{
-            "/daq/tt/ec","/daq/tt/ftof",
+            "/daq/tt/ec",
             "/daq/tt/rf","/daq/tt/band"
         });
         
         translationManager.init(keysTrans,tablesTrans);
         
-        keysFitter   = Arrays.asList(new String[]{"FTOF","ECAL","RF","BAND"});
         tablesFitter = Arrays.asList(new String[]{
-            "/daq/fadc/ftof","/daq/fadc/ec",
+            "/daq/fadc/ec",
            "/daq/fadc/rf","/daq/fadc/band"
         });
         fitterManager.init(keysFitter, tablesFitter);
