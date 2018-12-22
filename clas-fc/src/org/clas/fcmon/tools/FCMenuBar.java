@@ -258,12 +258,13 @@ public class FCMenuBar extends JMenuBar  {
         
 		
         String TriggerDef[] = { "Electron",
-		        "Electron S1","Electron S2","Electron S3","Electron S4","Electron S5","Electron S6",
-		        "ElectronOR noDC>300","PCALxECAL>10","",
-		        "FTOFxPCALxECAL(1-4)","FTOFxPCALxECAL(2-5)","FTOFxPCALxECAL(3-6)","","",
-		        "FTxHDxFTOFxPCALxCTOF",
-		        "FTxHDx(FTOFxPCAL)^2","FTxHD>100","FT>100","",
-		        "1K Pulser"};
+                "Electron S1","Electron S2","Electron S3","Electron S4","Electron S5","Electron S6",
+                "ElectronOR noDC>300","PCALxECAL>10","","","","","","","","","","",
+                "FTOFxPCALxECAL(1-4)","FTOFxPCALxECAL(2-5)","FTOFxPCALxECAL(3-6)","","",
+                "FTxHDxFTOFxPCALxCTOF",
+                "FTxHDx(FTOFxPCAL)^2","FTxHD>100","FT>100","","","",
+                "1K Pulser"};
+        		 
         
         public JMenu getMenu() {
         	    return menu;

@@ -77,18 +77,34 @@ public class DetectorEventDecoder {
     
     
     public final void initDecoder(){
-    	  
-        keysTrans = Arrays.asList(new String[]{
-		"FTOF","RF","BAND"});
-        
+    	
+    	keysTrans = Arrays.asList(new String[]{
+                "RF","BAND"
+        });
+
         tablesTrans = Arrays.asList(new String[]{
-            "daq/tt/ftof","/daq/tt/rf","/daq/tt/band" });
-        
+           "/daq/tt/rf","/daq/tt/band"
+        });
+
         translationManager.init(keysTrans,tablesTrans);
-        
+
+        keysFitter   = Arrays.asList(new String[]{"RF","BAND"});
         tablesFitter = Arrays.asList(new String[]{
-            "daq/fadc/ftof","/daq/fadc/rf","/daq/fadc/band" });
+            "/daq/fadc/rf","/daq/fadc/band"
+        });
         fitterManager.init(keysFitter, tablesFitter);
+    	  
+//        keysTrans = Arrays.asList(new String[]{
+//		"FTOF","RF","BAND"});
+//        
+//        tablesTrans = Arrays.asList(new String[]{
+//            "daq/tt/ftof","/daq/tt/rf","/daq/tt/band" });
+//        
+//        translationManager.init(keysTrans,tablesTrans);
+//        
+//        tablesFitter = Arrays.asList(new String[]{
+//            "daq/fadc/ftof","/daq/fadc/rf","/daq/fadc/band" });
+//        fitterManager.init(keysFitter, tablesFitter);
     }
     /**
      * Set the flag to use extended fitter instead of basic fitter

@@ -3,11 +3,8 @@ package org.clas.fcmon.band;
 import static java.lang.System.out;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.clas.fcmon.tools.FADCFitter;
@@ -24,9 +21,9 @@ import org.jlab.utils.groups.IndexedList.IndexGenerator;
 import org.jlab.io.base.DataBank;
 import org.jlab.io.base.DataEvent;
 import org.jlab.io.evio.EvioDataBank;
-import org.jlab.rec.tof.banks.BaseHit;
-import org.jlab.rec.tof.banks.BaseHitReader;
-import org.jlab.rec.tof.banks.BaseHitReader.DetectorLocation;
+//import org.jlab.rec.tof.banks.BaseHit;
+//import org.jlab.rec.tof.banks.BaseHitReader;
+//import org.jlab.rec.tof.banks.BaseHitReader.DetectorLocation;
 
 
 public class BANDReconstructionApp extends FCApplication {
@@ -96,44 +93,44 @@ public class BANDReconstructionApp extends FCApplication {
    
    public void getHits(DataEvent event) {
 	   
-       BaseHitReader hitReader = new BaseHitReader();
-       
-       Map<DetectorLocation, ArrayList<BaseHit>> hitMap = hitReader.get_Hits(event, "BAND");
-       
-       System.out.println(" ");
-       System.out.println("New Event Size "+hitMap.size());
-       
-       if (hitMap != null) {
-
-           Set entrySet = hitMap.entrySet();
-           Iterator it = entrySet.iterator();
-
-           while (it.hasNext()) {
-               Map.Entry me = (Map.Entry) it.next();
-               ArrayList<BaseHit> hitList = (ArrayList<BaseHit>) me.getValue();
-               
-               List<ArrayList<BaseHit>> hitlists = new ArrayList<ArrayList<BaseHit>>();  
-               Collections.sort(hitList);
-              
-   			  for(BaseHit h : hitList)
-   				System.out.println("Sector "+h.get_Sector()+
-   						           " Layer "+h.get_Layer()+
-   						             " PMT "+h.get_Component()+
-   						            " ADC1 "+h.ADC1+
-   						            " ADC2 "+h.ADC2+
-   						            " TDC1 "+h.TDC1+
-   						            " TDC2 "+h.TDC2+
-   						           " ADCi1 "+h.ADCbankHitIdx1+
-   						           " ADCi2 "+h.ADCbankHitIdx2+
-   						           " TDCi1 "+h.TDCbankHitIdx1+
-   						           " TDCi2 "+h.TDCbankHitIdx2);
-   						           
-               for (int i = 0; i < hitList.size(); i++) {
-                   hitlists.add(new ArrayList<BaseHit>());
-               }
-
-           }
-       }	   	   
+//      // BaseHitReader hitReader = new BaseHitReader();
+//       
+//    //   Map<DetectorLocation, ArrayList<BaseHit>> hitMap = hitReader.get_Hits(event, "BAND");
+//       
+//       System.out.println(" ");
+//       System.out.println("New Event Size "+hitMap.size());
+//       
+//       if (hitMap != null) {
+//
+//           Set entrySet = hitMap.entrySet();
+//           Iterator it = entrySet.iterator();
+//
+//           while (it.hasNext()) {
+//               Map.Entry me = (Map.Entry) it.next();
+//               ArrayList<BaseHit> hitList = (ArrayList<BaseHit>) me.getValue();
+//               
+//               List<ArrayList<BaseHit>> hitlists = new ArrayList<ArrayList<BaseHit>>();  
+//               Collections.sort(hitList);
+//              
+//   			  for(BaseHit h : hitList)
+//   				System.out.println("Sector "+h.get_Sector()+
+//   						           " Layer "+h.get_Layer()+
+//   						             " PMT "+h.get_Component()+
+//   						            " ADC1 "+h.ADC1+
+//   						            " ADC2 "+h.ADC2+
+//   						            " TDC1 "+h.TDC1+
+//   						            " TDC2 "+h.TDC2+
+//   						           " ADCi1 "+h.ADCbankHitIdx1+
+//   						           " ADCi2 "+h.ADCbankHitIdx2+
+//   						           " TDCi1 "+h.TDCbankHitIdx1+
+//   						           " TDCi2 "+h.TDCbankHitIdx2);
+//   						           
+//               for (int i = 0; i < hitList.size(); i++) {
+//                   hitlists.add(new ArrayList<BaseHit>());
+//               }
+//
+//           }
+//       }	   	   
    }
    
    public void updateHipoData(DataEvent event) {

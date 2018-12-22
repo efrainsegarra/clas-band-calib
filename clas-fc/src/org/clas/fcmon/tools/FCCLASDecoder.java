@@ -320,11 +320,19 @@ public class FCCLASDecoder {
         HipoDataEvent event = (HipoDataEvent) writer.createEvent();
         
         //for BAND if included in Hipo Files
-        String[]        adcBankNames = new String[]{"BAND::adc"};
-        DetectorType[]  adcBankTypes = new DetectorType[]{DetectorType.BAND};
-        
-        String[]        tdcBankNames = new String[]{"BAND::tdc"};
-        DetectorType[]  tdcBankTypes = new DetectorType[]{DetectorType.BAND};
+//        String[]        adcBankNames = new String[]{"BAND::adc"};
+//        DetectorType[]  adcBankTypes = new DetectorType[]{DetectorType.BAND};
+//        
+//        String[]        tdcBankNames = new String[]{"BAND::tdc"};
+//        DetectorType[]  tdcBankTypes = new DetectorType[]{DetectorType.BAND};
+//        
+        String[]        adcBankNames = new String[]{"ECAL::adc"};
+        DetectorType[]  adcBankTypes = new DetectorType[]{DetectorType.ECAL};
+
+        String[]        tdcBankNames = new String[]{"ECAL::tdc"};
+        DetectorType[]  tdcBankTypes = new DetectorType[]{DetectorType.ECAL};
+
+
  
 //        String[]        adcBankNames = new String[]{""};
 //        DetectorType[]  adcBankTypes = new DetectorType[]{};
