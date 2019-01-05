@@ -225,7 +225,7 @@ public class BANDReconstructionApp extends FCApplication {
    
    public void updateEvioData(DataEvent event) {
        
-       float      tps =  (float) 0.02345;
+       float      tps =  (float) 0.1;//0.02345;
        float     tdcd = 0;
        
        clear(0); clear(1); clear(2); clear(3); clear(4); adcs.clear(); tdcs.clear(); ltpmt.clear() ; lapmt.clear();
@@ -238,15 +238,20 @@ public class BANDReconstructionApp extends FCApplication {
            int is = ddd.getDescriptor().getSector();
            int il = ddd.getDescriptor().getLayer();
            int lr = ddd.getDescriptor().getOrder();
-           int ip = ddd.getDescriptor().getComponent();               
+           int ip = ddd.getDescriptor().getComponent();           
+           // Take TDC channel, convert to nanosecond, and subtract offset.
+           // This offset is arb. defined by looking at data, because our 
+           // 1190 TDC offset is far too large, and our real data starts ~1.2microseconds
+           // after our hardware offset.
            tdcd   = ddd.getTDCData(0).getTime()*tps-app.tdcOffset;  
            if(isGoodSector(is)&&tdcd>0) {
-           if(!tdcs.hasItem(is,il,lr-2,ip)) tdcs.add(new ArrayList<Float>(),is,il,lr-2,ip);
-               tdcs.getItem(is,il,lr-2,ip).add(tdcd);              
-               if (!ltpmt.hasItem(is,il,ip)) {
-      	            ltpmt.add(new ArrayList<Integer>(),is,il,ip);
-                    ltpmt.getItem(is,il,ip).add(ip);
-               }
+        	   // Only take the FIRST tdc entry for every bar
+	           if(!tdcs.hasItem(is,il,lr-2,ip)) tdcs.add(new ArrayList<Float>(),is,il,lr-2,ip);
+	               tdcs.getItem(is,il,lr-2,ip).add(tdcd);              
+	               if (!ltpmt.hasItem(is,il,ip)) {
+	      	            ltpmt.add(new ArrayList<Integer>(),is,il,ip);
+	                    ltpmt.getItem(is,il,ip).add(ip);
+	               }
            }           
        }
        
@@ -429,7 +434,10 @@ public class BANDReconstructionApp extends FCApplication {
              bandPix[idet].strrt[is-1][il-1][inh-1] = ip;
              bandPix[idet].ph[is-1][il-1][inh-1] = adph;
              bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,il,0).fill(tdc[ii],ip,1.0);
-             }
+       }
+       else {
+    	   System.out.println("Had tdc outside this range ahhhhhh");
+       }
        
        bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,1).fill(adc,tdc[ii],1.0);
           
