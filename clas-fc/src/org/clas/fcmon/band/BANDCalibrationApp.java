@@ -17,6 +17,7 @@ import org.jlab.detector.calib.utils.CalibrationConstants;
 import org.jlab.detector.calib.utils.CalibrationConstantsListener;
 import org.jlab.detector.calib.utils.CalibrationConstantsView;
 import org.jlab.groot.data.H1F;
+import org.jlab.groot.data.H2F;
 import org.jlab.groot.fitter.DataFitter;
 import org.jlab.groot.graphics.EmbeddedCanvas;
 import org.jlab.groot.math.F1D;
@@ -291,7 +292,7 @@ public void updateCanvas(DetectorDescriptor dd) {
         int component = dd.getComponent();   
         int layer = ilmap;
         
-        canvas.clear(); canvas.divide(2, 2);
+        canvas.clear(); canvas.divide(2, 3);
         canvas.setAxisFontSize(12);
         
 //      canvas.setAxisTitleFontSize(12);
@@ -303,6 +304,7 @@ public void updateCanvas(DetectorDescriptor dd) {
         String otab[]={" L PMT "," R PMT "};
         String calTitles[]={" ADC"," TDC"};      
         String tit = "SEC "+sector+" LAY "+(layer+1);
+        int bothFired = 0;
        
         // We will loop here for all the calibration plots we want to make for
         // selected pmt
@@ -329,6 +331,7 @@ public void updateCanvas(DetectorDescriptor dd) {
 	            f2.setLineWidth(2);
             	canvas.draw(f1,"same");
             	canvas.draw(f2,"same");
+            	bothFired = 1;
  
             }
             else if( lr == 1 && f1 != null) {
@@ -342,14 +345,33 @@ public void updateCanvas(DetectorDescriptor dd) {
             	canvas.draw(f2,"same");
             }
             
-        // For L-R time plot
-        canvas.cd(1);
-        H1F h2 = bandPix[layer].strips.hmap2.get("H2_t_Hist").get(is,component+1,2).projectionX();
-	    h2.setTitleX(tit+" BAR "+(component+1)+" TL-TR (ns)"); h2.setTitleY("Entries"); h2.setFillColor(32);
-	    canvas.draw(h2);            
-
-            
-            
+        if( bothFired == 1) {
+	        // For L-R time plot
+	        canvas.cd(1);
+	        H1F h2 = bandPix[layer].strips.hmap2.get("H2_t_Hist").get(is,0,0).sliceY(component);   
+	        //H1F h2 = bandPix[layer].strips.hmap2.get("H2_t_Hist").get(is,component+1,2).projectionX();
+		    h2.setTitleX(tit+" BAR "+(component+1)+" TL-TR (ns)"); h2.setTitleY("Entries"); h2.setFillColor(32);
+		    canvas.draw(h2);            
+	
+		    // For L-R time plot with FADC time
+		    canvas.cd(2);
+		    h2 = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,0,1).sliceY(component);   
+		    h2.setTitleX(tit+" BAR "+(component+1)+" TL-TR (ns)"); h2.setTitleY("Entries"); h2.setFillColor(32);
+		    canvas.draw(h2);  
+		    
+		    //  For L+R time plot iwht FADC time
+		    canvas.cd(3);
+		    H2F h3 = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector, component, 8);
+		    h3.setTitleX(tit+" BAR "+(component+1)+" TL+TR (ns) vs FADC Mean"); h3.setTitleY("TL+TR");
+		    canvas.draw(h3); 
+		    
+		    // Add projection of above
+		    canvas.cd(4);
+		    h2 = h3.projectionY();
+		    h2.setTitleX(tit+" BAR "+(component+1)+" TL+TR-TREF (ns)"); h2.setTitleY("Entries"); h2.setFillColor(32);
+		    canvas.draw(h2);
+        }
+        
         canvas.repaint();
 
     }

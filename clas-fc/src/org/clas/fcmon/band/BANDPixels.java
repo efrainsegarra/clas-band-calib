@@ -145,27 +145,37 @@ public class BANDPixels {
         	double nend = nstr[is-1]+1;	// find how many bars are in a sector
             int ill=0; iid="s"+Integer.toString(is)+"_l"+Integer.toString(ill)+"_c";
             
-            H2_a_Hist.add(is, 0, 0, new H2F("a_gmean_"+iid+0, 200,   0., amax[id],nstr[is-1], 1., nend));	// histogram for each sector where y axis is which bar in that sector
-            																								// and x axis is ADC value of some sory of gmean between the two l/r pmts?
-            H2_t_Hist.add(is, 0, 0, new H2F("a_tdif_"+iid+0,  1000, -50.,      50.,nstr[is-1], 1., nend));
+            // Geometric mean plot for L_ADC and R_ADC on a given paddle
+            H2_a_Hist.add(is, 0, 0, new H2F("a_gmean_"+iid+0, 200,   0., amax[id],nstr[is-1], 1., nend));	
+            // L-R TDC plot of a given paddle for TDC time
+            H2_t_Hist.add(is, 0, 0, new H2F("t_tdif_"+iid+0,  600, -20.,      20.,nstr[is-1], 1., nend));
+            // L-R TDC plot of a given paddle for FADC time
+            H2_a_Hist.add(is, 0, 1, new H2F("a_tdif_"+iid+0,  1000, -20.,      20.,nstr[is-1], 1., nend));
             
+            // Add gm vs fadc time sum for each paddle
+            H2_a_Hist.add(is, 0, 9, new H2F("a_tsum_"+iid+0,  5000, 0.,	   500., nstr[is-1], 1., nend));
+            for( int ip = 1 ; ip<nstr[is-1]+1; ip++) {
+            	H2_a_Hist.add(is, ip, 8, new H2F("a_tsum_gm_"+iid+ip+1, 200, 0., 0.5*amax[id] , 600, -15., 15.));
+            }
           
             
-            for (int ip=1; ip<nstr[is-1]+1; ip++) { // loop over bars in sector
-                H2_t_Hist.add(is, ip, 2, new H2F("c_tdif_"+iid+1+ip,   1000, -50., 50.,50,-0.2, 0.4));
-            }            
+            //for (int ip=1; ip<nstr[is-1]+1; ip++) { // loop over bars in sector
+            //    H2_t_Hist.add(is, ip, 2, new H2F("c_tdif_"+iid+1+ip,   1000, -50., 50.,50,-0.2, 0.4));
+            //}            
             
             for (int il=1 ; il<3 ; il++){ // loop for left side and then right side
                 iid="s"+Integer.toString(is)+"_l"+Integer.toString(il)+"_c";
                 H2_a_Hist.add(is, il, 0, new H2F("a_raw_"+iid+0,      400,   0., amax[id],nstr[is-1], 1., nend));
                 H2_a_Hist.add(is, il, 7, new H2F("a_raw_overflowInc_"+iid+0,      400,   0., amax[id],nstr[is-1], 1., nend));
+               
                 H2_t_Hist.add(is, il, 0, new H2F("a_raw_"+iid+0,      500,   -tmax[id], tmax[id], nstr[is-1], 1., nend));
+                
                 H2_a_Hist.add(is, il, 1, new H2F("a_raw_"+iid+1,      300,   0., amax[id],500, -tmax[id],tmax[id]));
                 H2_a_Hist.add(is, il, 3, new H2F("a_ped_"+iid+3,      1000, -500.,  500., nstr[is-1], 1., nend)); 
                 H2_a_Hist.add(is, il, 5, new H2F("a_fadc_"+iid+5,     1000,   0., 1000., nstr[is-1], 1., nend));			// this is used for mode1:sum 2D graph where x axis is samples(4ns/ch)
                 																										// and y-axis is which PMT in the sector/layer for left and right side
                               
-                
+            
                 H2_a_Hist.add(is, il, 6, new H2F("a_fadc_"+iid+6,     100, -20.,  20., nstr[is-1], 1., nend));
                 H1_a_Sevd.add(is, il, 0, new H1F("a_sed_"+iid+0,                       nstr[is-1], 1., nend));
                 H2_a_Sevd.add(is, il, 0, new H2F("a_sed_fadc_"+iid+0, 100,   0., 100., nstr[is-1], 1., nend));
