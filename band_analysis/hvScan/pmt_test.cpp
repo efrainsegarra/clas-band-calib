@@ -120,16 +120,16 @@ int main(int argc, char ** argv)
 		std::vector<double> mR = bar.meansR;
 		std::vector<double> mLerr = bar.meansLerr;
 		std::vector<double> mRerr = bar.meansRerr;
-   //increase error for estimated points by factor 100
+		//increase error for estimated points by factor 100
 		for (int i = 0; i<mLerr.size(); i++) {
-          if (mLerr[i] < 5 || mLerr[i] == 2.4) {
-						mLerr[i] = mL[i]*0.5;
-					}
+			if (mLerr[i] < 5 || mLerr[i] == 2.4) {
+				mLerr[i] = mL[i]*0.5;
+			}
 		}
 		for (int i = 0; i<mRerr.size(); i++) {
-          if (mRerr[i] < 5 || mRerr[i] == 2.4) {
-						mRerr[i] = mR[i]*0.5;
-					}
+			if (mRerr[i] < 5 || mRerr[i] == 2.4) {
+				mRerr[i] = mR[i]*0.5;
+			}
 		}
 
 		TGraphErrors dataL( hL.size() , &hL[0] , &mL[0] , 0 , &mLerr[0] );
@@ -162,8 +162,8 @@ int main(int argc, char ** argv)
 		dataL.GetXaxis()->SetTitle("HV [kV]");
 		dataL.GetYaxis()->SetTitle("ADC Channel");
 		dataL.GetYaxis()->SetTitleOffset(1.6);
-	//	dataL.GetXaxis()->SetRangeUser(0.5,1.8);
-	//	dataL.GetYaxis()->SetRangeUser(1000,30000);
+		//	dataL.GetXaxis()->SetRangeUser(0.5,1.8);
+		//	dataL.GetYaxis()->SetRangeUser(1000,30000);
 		dataL.SetMarkerStyle(20);
 		dataL.SetMarkerColor(2);
 		dataL.Draw("AP");
@@ -174,8 +174,8 @@ int main(int argc, char ** argv)
 		dataR.GetXaxis()->SetTitle("HV [kV]");
 		dataR.GetYaxis()->SetTitle("ADC Channel");
 		dataR.GetYaxis()->SetTitleOffset(1.6);
-	//	dataR.GetXaxis()->SetRangeUser(0.5,1.8);
-	//	dataR.GetYaxis()->SetRangeUser(1000,30000);
+		//	dataR.GetXaxis()->SetRangeUser(0.5,1.8);
+		//	dataR.GetYaxis()->SetRangeUser(1000,30000);
 		dataR.SetMarkerStyle(20);
 		dataR.SetMarkerColor(2);
 		dataR.Draw("AP");
@@ -184,10 +184,10 @@ int main(int argc, char ** argv)
 
 		name = Form("layer%i_sector%i_comp%i",bar.layer,bar.sector,bar.component);
 		c->SaveAs("../hvScan/gain_results/" + name + "_gainCurve.pdf");
-		
-    outFile.precision(4);
+
+		outFile.precision(4);
 		outFile << bar.sector << " " << bar.layer << " " << bar.component << " " << HV_l << " " << HV_r << "\n";
-			// A_l << " " << B_l << " " << A_r << " " << B_r << "\n";
+		// A_l << " " << B_l << " " << A_r << " " << B_r << "\n";
 	}
 
 	// Clean up
