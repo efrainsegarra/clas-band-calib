@@ -136,17 +136,7 @@ public class DetectorEventDecoder {
             for(String table : keysTrans){
                 IndexedTable  tt = translationManager.getConstants(runNumber, table);
                 DetectorType  type = DetectorType.getType(table);
-                
-                //FIX ME: temporarily add BAND channel 410_R without modification of ccdb F.H. 12/11/18
-               if((crate==66 || crate==67) && slot==10 && channel==15) {
-                	data.getDescriptor().setSectorLayerComponent(2, 4, 7);
-                	data.getDescriptor().setOrder(1);
-                	data.getDescriptor().setType(type);
-                	for(int i = 0; i < data.getADCSize(); i++) {
-                        data.getADCData(i).setOrder(1);
-                    }   
-                }
-
+              
                 if(tt.hasEntry(crate,slot,channel)==true){
                     int sector    = tt.getIntValue("sector", crate,slot,channel);
                     int layer     = tt.getIntValue("layer", crate,slot,channel);
