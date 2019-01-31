@@ -21,7 +21,7 @@ public class BANDPixels {
     double band_xpix[][][] = new double[4][14][5];
     double band_ypix[][][] = new double[4][14][5];
     
-    public double        amax[]= {80000.,80000.,80000.,80000.,80000.};
+    public double        amax[]= {5000.,5000.,5000.,5000.,5000.};
     public double        tmax[] = {10000.,10000.,10000.,10000.,10000.};
     
     int        nha[][] = new    int[6][2];
