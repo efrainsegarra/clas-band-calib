@@ -649,7 +649,10 @@ public class MonitorApp extends JFrame implements ActionListener {
             currentCrate = cr = dum[0];  
             currentSlot  = sl = dum[1];  
             currentChan  = ch = dum[2]; 
-        }   
+        }
+        if(sp==6) {
+        	return " Sector:"+is+"  Layer:"+sp+comp+ic+" Order: "+or+"    Crate:"+cr+" Slot:"+sl+" Chan:"+ch+"    V"+setAlias(is,sp,ic,or).substring(1,setAlias(is,sp,ic,or).length()-2);
+        }
         return " Sector:"+is+"  Layer:"+sp+comp+ic+" Order: "+or+"    Crate:"+cr+" Slot:"+sl+" Chan:"+ch+"    "+setAlias(is,sp,ic,or);
     }
     

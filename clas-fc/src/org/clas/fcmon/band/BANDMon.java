@@ -23,7 +23,7 @@ public class BANDMon extends DetectorMonitor {
 	
     static MonitorApp             app = new MonitorApp("BANDCalibration",1800,950);	
     
-    BANDPixels              bandPix[] = new BANDPixels[5];
+    BANDPixels              bandPix[] = new BANDPixels[6];
     ConstantsManager             ccdb = new ConstantsManager();
     FTHashCollection              rtt = null;      
     BANDDet                   bandDet = null;  
@@ -60,6 +60,7 @@ public class BANDMon extends DetectorMonitor {
         bandPix[2] = new BANDPixels("LAYER3");
         bandPix[3] = new BANDPixels("LAYER4");
         bandPix[4] = new BANDPixels("LAYER5");
+        bandPix[5] = new BANDPixels("VETO");
     }
 
     public static void main(String[] args){		
