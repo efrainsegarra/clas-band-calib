@@ -53,7 +53,7 @@ public class BANDDet extends FCDetector {
             app.getDetectorView().getView().setDetectorListener(layer,mon);
          }
         
-        addButtons("DET","View","L1.0.L2.1.L3.2.L4.3.L5.4");
+        addButtons("DET","View","L1.0.L2.1.L3.2.L4.3.L5.4.VETO.5");
         addButtons("LAY","View","LR.0.L.1.R.2");
         addButtons("PMT","Map","EVT.0.ADC.1.TDC.2.STATUS.3");
         addButtons("PIX","Map","EVT.0.ADC.1.TDC.2.STATUS.3");
