@@ -32,7 +32,7 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
     
     public DetectorCollection<F1D> adcFitL = new DetectorCollection<F1D>();
     public DetectorCollection<F1D> adcFitR = new DetectorCollection<F1D>();
-
+    int runnumber = 0;
     public BANDCalibrationEngine[] engines = {
             new BANDHVEventListener(),
             new BANDStatusEventListener()
@@ -146,7 +146,10 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
 	        			
         		        	// Fit both sides of paddle
         		        for( int lr = 1 ; lr < 3 ; lr++) {									// loop over left/right PMT in paddle
-	        				fit(layer, sector, paddle, lr, 0., 0.);
+	        				double x_fit_range = 0.3*BANDPixels.BANDPixels_x_axis_max;
+	        				//int x_fit_range = 7000;
+        		        	//System.out.println("xrange is given as" + x_fit_range);
+        		        	fit(layer, sector, paddle, lr, 0., 0.,x_fit_range);//x_fit_range);
 	        			}
         		        System.out.println("Done with Layer "+ lidx + ", Sector "+ sector + " , Component " + pidx);
                 	} 
@@ -157,19 +160,22 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
         }
         
         
-        @Override
-        public void fit(int layer, int sector, int paddle, int lr, double minRange, double maxRange){ 
-
+        //@Override
+        public void fit(int layer, int sector, int paddle, int lr, double minRange, double maxRange, double x_fit_max){ 
+           
+           System.out.println("Running runnumber = "+runnumber);
+           runnumber++;
            H1F h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,lr,0).sliceY(paddle);
-	   if( h.getIntegral() > 0) {
-	   F1D f1 = null;
-	   if( lr == 1) adcFitL.add(layer, sector,paddle, f1);
-	   if( lr == 2) adcFitR.add(layer, sector,paddle, f1);
-	   return;
-           };
+           if( h.getIntegral() < 50) {
+        	   System.out.println("Integral value is " + h.getIntegral() + " so setting " + layer + " " + sector + " " + paddle + " to null");
+        	   F1D f1 = null;
+        	   if( lr == 1) adcFitL.add(layer, sector,paddle, f1);
+        	   if( lr == 2) adcFitR.add(layer, sector,paddle, f1);
+        	   return;
+           	};
            
            //F1D  f1 = new F1D("f1","[amp]*gaus(x,[mean],[sigma])", 0,40000);
-           F1D  f1 = new F1D("f1","[amp]*landau(x,[mean],[sigma])+[const]",500,40000);
+           F1D  f1 = new F1D("f1","[amp]*landau(x,[mean],[sigma])+[const]",500,x_fit_max);
            f1.setParameter(0, h.getMax() );
            f1.setParameter(1, h.getMean() );
            f1.setParameter(2, 1000 );

@@ -21,7 +21,7 @@ import org.jlab.io.base.DataEvent;
 
 public class BANDMon extends DetectorMonitor {
 	
-    static MonitorApp             app = new MonitorApp("BANDMon",1800,950);	
+    static MonitorApp             app = new MonitorApp("BANDCalibration",1800,950);	
     
     BANDPixels              bandPix[] = new BANDPixels[5];
     ConstantsManager             ccdb = new ConstantsManager();
@@ -320,6 +320,7 @@ public class BANDMon extends DetectorMonitor {
         
     }
 
+    
     @Override
     public void initEpics(Boolean doEpics) {
         // TODO Auto-generated method stub
