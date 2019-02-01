@@ -117,7 +117,7 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
             calib.setName("/calibration/band/gain_balance");
             calib.setPrecision(3);
 
-            for (int i=0; i<3; i++) {
+           /* for (int i=0; i<3; i++) {
                 
                 int layer = i+1;
                 //calib.addConstraint(3, EXPECTED_MIP_CHANNEL[i]-ALLOWED_MIP_DIFF, 
@@ -127,7 +127,7 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
                 // (omit last two if applying to all rows)
                 //calib.addConstraint(4, EXPECTED_MIP_CHANNEL[i]-ALLOWED_MIP_DIFF, 
                 //                       EXPECTED_MIP_CHANNEL[i]+ALLOWED_MIP_DIFF, 1, layer);
-            }
+            }*/
             
             list.add(calib);         
         }
@@ -326,29 +326,54 @@ public void updateCanvas(DetectorDescriptor dd) {
         int sector = dd.getSector();
         int component = dd.getComponent();   
         int layer = ilmap;
+        //int ilm = ilmap;
+               
+        int nstr = bandPix[layer].nstr[is-1];
+        int min=0, max=nstr;
         
         canvas.clear(); canvas.divide(2, 3);
         canvas.setAxisFontSize(12);
-        
+
 //      canvas.setAxisTitleFontSize(12);
 //      canvas.setTitleFontSize(14);
 //      canvas.setStatBoxFontSize(10);
         
+             
+        
         H1F h;
         String alab;
         String otab[]={" L PMT "," R PMT "};
-        String calTitles[]={" ADC"," TDC"};      
+        String calTitles[]={" ADC"," TDC"};
+        //String lab4[]={" ADC"," TDC"," OVERFLOW"}; 
         String tit = "SEC "+sector+" LAY "+(layer+1);
+        //String tit = "SEC "+is+" LAY "+(ilm+1);
         int bothFired = 0;
        
         // We will loop here for all the calibration plots we want to make for
         // selected pmt
-        	alab = tit+otab[lr-1]+(component+1)+calTitles[0];
-            canvas.cd(0);          
+        for(int iip=min;iip<max;iip++) {
+            alab = tit+otab[lr-1]+(iip+1)+calTitles[0];
+            //alab = tit+otab[lr-1]+(component+1)+calTitles[0];
+            canvas.cd(iip-min);          
             // Pull the ADC histogram for 1st canvas plot
-            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,lr,0).sliceY(component);
+            //h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,lr,0).sliceY(component);
+            // Draw one including overflow samples
+            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,lr,7).sliceY(iip); 
             h.setOptStat(Integer.parseInt("1000100")); 
-            h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); canvas.draw(h);
+            h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(34); canvas.draw(h);
+            
+            // Draw one without overflow samples
+            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,lr,0).sliceY(iip); 
+            //h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,lr,7).sliceY(component);
+            h.setOptStat(Integer.parseInt("1000100")); 
+            h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); canvas.draw(h,"same");
+            } 
+            
+            
+            
+            
+ 
+
             
             F1D f1 = adcFitL.get(layer,is,component);
             F1D f2 = adcFitR.get(layer,is,component);
