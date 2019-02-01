@@ -298,6 +298,7 @@ public class BANDReconstructionApp extends FCApplication {
 				  int overflow = 0;
 				  for (int ii=0 ; ii< pulse.length ; ii++) {
 				  if( pulse[ii] >= 4095) {
+				  System.out.println("Overflow detected");
 				  overflow = 1;
 				  break;
 				  }
