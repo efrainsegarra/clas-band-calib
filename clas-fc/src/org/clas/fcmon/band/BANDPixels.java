@@ -21,8 +21,25 @@ public class BANDPixels {
     double band_xpix[][][] = new double[4][14][6];
     double band_ypix[][][] = new double[4][14][6];
     
-    public double        amax[]= {5000.,5000.,5000.,5000.,5000.,5000.};
+
+    static int BANDPixels_x_axis_max = 10000;    
+    //int[]  array = new int[5];
+    //amax = Arrays.fill(array, 1);//*x_axis_max;
+    //public double        amax[]= {5000.,5000.,5000.,5000.,5000.};
+    public double 		 amax[] = {1.,1.,1.,1.,1.,1.}; 
     public double        tmax[] = {10000.,10000.,10000.,10000.,10000.,10000.};
+
+    
+    public void Rescale(double array[],int scaler){
+    	for (int i=0; i<array.length; i++) {
+    		array[i] = array[i] * scaler;
+    	}
+    	//return array;
+    }
+    
+    
+    
+    
     
     int        nha[][] = new    int[6][2];
     int        nht[][] = new    int[6][2];
@@ -56,6 +73,7 @@ public class BANDPixels {
         }
         detName = det;
         pixdef();
+        Rescale(amax,BANDPixels_x_axis_max);
     }
     
     public void getLmapMinMax(int is1, int is2, int il, int opt){
