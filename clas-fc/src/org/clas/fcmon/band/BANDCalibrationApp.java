@@ -32,7 +32,12 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
     
     public DetectorCollection<F1D> adcFitL = new DetectorCollection<F1D>();
     public DetectorCollection<F1D> adcFitR = new DetectorCollection<F1D>();
+    
     int runnumber = 0;
+    double fitscale = 0.8;
+    double x_fit_range = fitscale*BANDPixels.BANDPixels_x_axis_max;//This sets the fitting range based off the x axis range
+    
+    
     public BANDCalibrationEngine[] engines = {
             new BANDHVEventListener(),
             new BANDStatusEventListener()
@@ -146,7 +151,7 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
 	        			
         		        	// Fit both sides of paddle
         		        for( int lr = 1 ; lr < 3 ; lr++) {									// loop over left/right PMT in paddle
-	        				double x_fit_range = 0.3*BANDPixels.BANDPixels_x_axis_max;
+	        				
 	        				//int x_fit_range = 7000;
         		        	//System.out.println("xrange is given as" + x_fit_range);
         		        	fit(layer, sector, paddle, lr, 0., 0.,x_fit_range);//x_fit_range);
@@ -175,13 +180,37 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
            	};
            
            //F1D  f1 = new F1D("f1","[amp]*gaus(x,[mean],[sigma])", 0,40000);
-           F1D  f1 = new F1D("f1","[amp]*landau(x,[mean],[sigma])+[const]",500,x_fit_max);
+           /*F1D  f1 = new F1D("f1","[amp]*landau(x,[mean],[sigma])+[const]",500,x_fit_max);
            f1.setParameter(0, h.getMax() );
            f1.setParameter(1, h.getMean() );
            f1.setParameter(2, 1000 );
            f1.setParameter(3, 20 );
            DataFitter.fit(f1, h, "REQ");
            h.getFunction().show();
+		   */
+           	//**********************&&&&&&&&&&&&&&&&&&&&**********************&&&&&&&&&&&&&&&&&&&&**********************
+           	//NOTE: The parameters below are chosen essentially randomly. They seem to work but are not optimized. They should be optimized. 
+            //**********************&&&&&&&&&&&&&&&&&&&&**********************&&&&&&&&&&&&&&&&&&&&**********************
+           	F1D f1 = new F1D("f1", "[amp]*landau(x,[mean],[sigma]) +[exp_amp]*exp([p]*x)", 0.0, x_fit_max);
+            f1.setParameter(0, h.getMax()*0.8);
+            f1.setParameter(1, h.getMean() );
+            f1.setParameter(2, 1000 );
+            f1.setParameter(3, h.getMax()*0.5 );
+            f1.setParameter(4, -0.001);
+            DataFitter.fit(f1, h, "REQ");
+            h.getFunction().show();
+    		//gmFunc.setParameter(0, maxCounts*0.8);
+    		//gmFunc.setParLimits(0, maxCounts*0.5, maxCounts*1.2);
+    		//gmFunc.setParameter(1, maxPos);
+    		//gmFunc.setParameter(2, 200.0);
+    		//gmFunc.setParLimits(2, 0.0,400.0);
+    		//gmFunc.setParameter(3, maxCounts*0.5);
+    		//gmFunc.setParameter(4, -0.001);
+    		
+            
+		
+		   
+
 
            double amp = h.getFunction().getParameter(0);
            double mean = h.getFunction().getParameter(1);
