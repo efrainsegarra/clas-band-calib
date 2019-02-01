@@ -161,11 +161,11 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
         public void fit(int layer, int sector, int paddle, int lr, double minRange, double maxRange){ 
 
            H1F h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,lr,0).sliceY(paddle);
-           if( h.getIntegral() < 5000) {
-        	   F1D f1 = null;
-        	   if( lr == 1) adcFitL.add(layer, sector,paddle, f1);
-        	   if( lr == 2) adcFitR.add(layer, sector,paddle, f1);
-        	   return;
+	   if( h.getIntegral() > 0) {
+	   F1D f1 = null;
+	   if( lr == 1) adcFitL.add(layer, sector,paddle, f1);
+	   if( lr == 2) adcFitR.add(layer, sector,paddle, f1);
+	   return;
            };
            
            //F1D  f1 = new F1D("f1","[amp]*gaus(x,[mean],[sigma])", 0,40000);
