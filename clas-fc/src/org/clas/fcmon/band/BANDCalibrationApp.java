@@ -373,7 +373,7 @@ public void updateCanvas(DetectorDescriptor dd) {
         }
         
         canvas.repaint();
-
+        //End of plotting
     }
 
     public void stateChanged(ChangeEvent e) {
