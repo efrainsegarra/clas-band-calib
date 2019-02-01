@@ -423,6 +423,41 @@ public void updateCanvas(DetectorDescriptor dd) {
             h.setOptStat(Integer.parseInt("1000100")); 
             h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); canvas.draw(h,"same");
             //}  
+            
+            F1D f3 = adcFitL.get(layer,is,component);
+            F1D f4 = adcFitR.get(layer,is,component);
+        	
+            
+            if( f3 != null && f4 != null) {
+	            if( lr == 1) {
+	            	f3.setLineColor(2);
+	            	f4.setLineColor(3);	
+	            }
+	            if( lr == 2) {
+	            	f3.setLineColor(1);
+	            	f4.setLineColor(2);
+	            }
+	            f3.setLineWidth(2);
+	            f4.setLineWidth(2);
+            	canvas.draw(f3,"same");
+            	canvas.draw(f4,"same");
+        		bothFired = 1;
+ 
+            }
+            else if( lr == 1 && f3 != null) {
+            	f1.setLineColor(2);
+            	f1.setLineWidth(2);
+            	canvas.draw(f3,"same");
+            }
+            else if( lr == 2 && f4 != null) {
+            	f4.setLineColor(2);
+            	f4.setLineWidth(2);
+            	canvas.draw(f4,"same");
+            }
+            
+               
+            
+            
         /*
         if( bothFired == 1) {
 	        // For L-R time plot
