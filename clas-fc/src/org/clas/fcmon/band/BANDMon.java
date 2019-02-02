@@ -33,6 +33,7 @@ public class BANDMon extends DetectorMonitor {
     BANDCalib_C					bandCalib_c = null;
     BANDCalib_Atten				bandCalib_atten = null;
     
+    int 		analyzedBefore = 0;
 
     public int                 calRun = 12;
     int                         detID = 0;
@@ -204,7 +205,7 @@ public class BANDMon extends DetectorMonitor {
 
     @Override
     public void analyze() {
-        
+    	
         switch (app.getInProcess()) {
         case 1: 
             for (int idet=0; idet<bandPix.length; idet++) bandRecon.makeMaps(idet); 
@@ -212,17 +213,18 @@ public class BANDMon extends DetectorMonitor {
         case 2:
             for (int idet=0; idet<bandPix.length; idet++) bandRecon.makeMaps(idet); 
             System.out.println("End of run");      
-            
-            app.addFrame(bandCalib_hv.getName(),             bandCalib_hv.getCalibPane()); 
-            app.addFrame(bandCalib_c.getName(),             bandCalib_c.getCalibPane()); 
-            app.addFrame(bandCalib_atten.getName(),             bandCalib_atten.getCalibPane()); 
+            if( analyzedBefore == 0) {
+	            app.addFrame(bandCalib_hv.getName(),             bandCalib_hv.getCalibPane()); 
+	            app.addFrame(bandCalib_c.getName(),             bandCalib_c.getCalibPane()); 
+	            app.addFrame(bandCalib_atten.getName(),             bandCalib_atten.getCalibPane()); 
+            }
             
             bandCalib_hv.analyze();
             bandCalib_c.analyze();
             bandCalib_atten.analyze();
             
             //bandCalib.engines[0].analyze();
-            
+            analyzedBefore = 1;
             app.setInProcess(3);
         }
     }
