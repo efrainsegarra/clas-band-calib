@@ -121,78 +121,78 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
         calib.fireTableDataChanged();
     }
     
-    public void fit(int layer, int sector, int paddle, int lr, double minRange, double maxRange, double x_fit_max){ 
-        
-        System.out.println("Running runnumber = "+runnumber);
-        runnumber++;
-        H1F h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,lr,0).sliceY(paddle);
-        if( h.getIntegral() < 50) {
-     	   System.out.println("Integral value is " + h.getIntegral() + " so setting " + layer + " " + sector + " " + paddle + " to null");
-     	   F1D f1 = null;
-     	   if( lr == 1) adcFitL.add(layer, sector,paddle, f1);
-     	   if( lr == 2) adcFitR.add(layer, sector,paddle, f1);
-     	   return;
-        	};
-        
-        //F1D  f1 = new F1D("f1","[amp]*gaus(x,[mean],[sigma])", 0,40000);
-        /*F1D  f1 = new F1D("f1","[amp]*landau(x,[mean],[sigma])+[const]",500,x_fit_max);
-        f1.setParameter(0, h.getMax() );
-        f1.setParameter(1, h.getMean() );
-        f1.setParameter(2, 1000 );
-        f1.setParameter(3, 20 );
-        DataFitter.fit(f1, h, "REQ");
-        h.getFunction().show();
-		   */
-        	//**********************&&&&&&&&&&&&&&&&&&&&**********************&&&&&&&&&&&&&&&&&&&&**********************
-        	//NOTE: The parameters below are chosen essentially randomly. They seem to work but are not optimized. They should be optimized. 
-         //**********************&&&&&&&&&&&&&&&&&&&&**********************&&&&&&&&&&&&&&&&&&&&**********************
-        	F1D f1 = new F1D("f1", "[amp]*landau(x,[mean],[sigma]) +[exp_amp]*exp([p]*x)", 0.0, x_fit_max);
-         f1.setParameter(0, h.getMax()*0.8);
-         f1.setParameter(1, h.getMean() );
-         f1.setParameter(2, 1000 );
-         f1.setParameter(3, h.getMax()*0.5 );
-         f1.setParameter(4, -0.001);
-         DataFitter.fit(f1, h, "REQ");
-         h.getFunction().show();
- 		//gmFunc.setParameter(0, maxCounts*0.8);
- 		//gmFunc.setParLimits(0, maxCounts*0.5, maxCounts*1.2);
- 		//gmFunc.setParameter(1, maxPos);
- 		//gmFunc.setParameter(2, 200.0);
- 		//gmFunc.setParLimits(2, 0.0,400.0);
- 		//gmFunc.setParameter(3, maxCounts*0.5);
- 		//gmFunc.setParameter(4, -0.001);
- 		
-         
-		
+        public void fit(int layer, int sector, int paddle, int lr, double minRange, double maxRange, double x_fit_max){ 
+           
+           System.out.println("Running runnumber = "+runnumber);
+           runnumber++;
+           H1F h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,lr,0).sliceY(paddle);
+           if( h.getIntegral() < 500) {
+        	   System.out.println("Integral value is " + h.getIntegral() + " so setting " + layer + " " + sector + " " + paddle + " to null");
+        	   F1D f1 = null;
+        	   if( lr == 1) adcFitL.add(layer, sector,paddle, f1);
+        	   if( lr == 2) adcFitR.add(layer, sector,paddle, f1);
+        	   return;
+           	};
+           
+           //F1D  f1 = new F1D("f1","[amp]*gaus(x,[mean],[sigma])", 0,40000);
+
+           	//**********************&&&&&&&&&&&&&&&&&&&&**********************&&&&&&&&&&&&&&&&&&&&**********************
+           	//NOTE: The parameters below are chosen essentially randomly. They seem to work but are not optimized. They should be optimized. 
+            //**********************&&&&&&&&&&&&&&&&&&&&**********************&&&&&&&&&&&&&&&&&&&&**********************
+           	F1D f1 = new F1D("f1", "[amp]*landau(x,[mean],[sigma]) +[exp_amp]*exp([p]*x)", 500, x_fit_max);
+            f1.setParameter(0, h.getMax()*1);
+            f1.setParameter(1, h.getMean() );
+            f1.setParameter(2, h.getRMS()*0.5 );
+            f1.setParameter(3, h.getMax()*0.5 );
+            f1.setParameter(4, -0.001);
+            DataFitter.fit(f1, h, "REQ");
+            h.getFunction().show();
+    		//gmFunc.setParameter(0, maxCounts*0.8);
+    		//gmFunc.setParLimits(0, maxCounts*0.5, maxCounts*1.2);
+    		//gmFunc.setParameter(1, maxPos);
+    		//gmFunc.setParameter(2, 200.0);
+    		//gmFunc.setParLimits(2, 0.0,400.0);
+    		//gmFunc.setParameter(3, maxCounts*0.5);
+    		//gmFunc.setParameter(4, -0.001);
+    		/*
+           	F1D  f2 = new F1D("f2","[amp]*landau(x,[mean],[sigma])+[const]",500,x_fit_max);
+           	f2.setParameter(0, h.getMax() );
+           	f2.setParameter(1, h.getMean() );
+           	f2.setParameter(2, 1000 );
+           	f2.setParameter(3, 20 );
+           	DataFitter.fit(f2, h, "REQ");
+           	h.getFunction().show();
+		   
+			*/
 		   
 
 
-        double amp = h.getFunction().getParameter(0);
-        double mean = h.getFunction().getParameter(1);
-        double sigma = h.getFunction().getParameter(2);
-        double offset = h.getFunction().getParameter(3);
-        
-        if( amp < 0 || sigma < 0 ) {
-     	   if( lr == 1) adcFitL.add(layer, sector,paddle, null);
-     	   if( lr == 2) adcFitR.add(layer, sector,paddle, null);
-     	   return; 
-        }
-        
-        int lidx = (layer+1);
-        int pidx = (paddle+1);
-        
-        if( lr == 1) {
-     	   adcFitL.add(layer, sector,paddle, f1);
-     	   calib.setDoubleValue(mean, "Left_Mean", sector, lidx, pidx);
-     	   calib.setDoubleValue(sigma, "Left_Sigma", sector, lidx, pidx);
-        }
-        if( lr == 2) {
-     	   adcFitR.add(layer, sector,paddle, f1);
-     	   calib.setDoubleValue(mean, "Right_Mean", sector, lidx, pidx);
-     	   calib.setDoubleValue(sigma, "Right_Sigma", sector, lidx, pidx);
+           double amp = h.getFunction().getParameter(0);
+           double mean = h.getFunction().getParameter(1);
+           double sigma = h.getFunction().getParameter(2);
+           double offset = h.getFunction().getParameter(3);
+           
+           if( amp < 0 || sigma < 0 ) {
+        	   if( lr == 1) adcFitL.add(layer, sector,paddle, null);
+        	   if( lr == 2) adcFitR.add(layer, sector,paddle, null);
+        	   return; 
+           }
+           
+           int lidx = (layer+1);
+           int pidx = (paddle+1);
+           
+           if( lr == 1) {
+        	   adcFitL.add(layer, sector,paddle, f1);
+        	   calib.setDoubleValue(mean, "Left_Mean", sector, lidx, pidx);
+        	   calib.setDoubleValue(sigma, "Left_Sigma", sector, lidx, pidx);
+           }
+           if( lr == 2) {
+        	   adcFitR.add(layer, sector,paddle, f1);
+        	   calib.setDoubleValue(mean, "Right_Mean", sector, lidx, pidx);
+        	   calib.setDoubleValue(sigma, "Right_Sigma", sector, lidx, pidx);
 
+           }
         }
-     }
 
     
     /*public void updateCanvas(DetectorDescriptor dd) {
