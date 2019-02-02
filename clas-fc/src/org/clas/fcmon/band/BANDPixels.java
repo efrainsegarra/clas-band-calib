@@ -18,11 +18,28 @@ public class BANDPixels {
     DatabaseConstantProvider ccdb = new DatabaseConstantProvider(1,"default");
 	BANDConstants              bc = new BANDConstants();  
 	
-    double band_xpix[][][] = new double[4][14][5];
-    double band_ypix[][][] = new double[4][14][5];
+    double band_xpix[][][] = new double[4][14][6];
+    double band_ypix[][][] = new double[4][14][6];
     
-    public double        amax[]= {5000.,5000.,5000.,5000.,5000.};
-    public double        tmax[] = {10000.,10000.,10000.,10000.,10000.};
+
+    static int BANDPixels_x_axis_max = 10000;    
+    //int[]  array = new int[5];
+    //amax = Arrays.fill(array, 1);//*x_axis_max;
+    //public double        amax[]= {5000.,5000.,5000.,5000.,5000.};
+    public double 		 amax[] = {1.,1.,1.,1.,1.,1.}; 
+    public double        tmax[] = {10000.,10000.,10000.,10000.,10000.,10000.};
+
+    
+    public void Rescale(double array[],int scaler){
+    	for (int i=0; i<array.length; i++) {
+    		array[i] = array[i] * scaler;
+    	}
+    	//return array;
+    }
+    
+    
+    
+    
     
     int        nha[][] = new    int[6][2];
     int        nht[][] = new    int[6][2];
@@ -43,14 +60,20 @@ public class BANDPixels {
 	public String detName = null;
 	
     public BANDPixels(String det) {
+    	bc.setSectorRange(1, 6);
         if (det.equals("LAYER1")) id=0;
         if (det.equals("LAYER2")) id=1;
         if (det.equals("LAYER3")) id=2;
         if (det.equals("LAYER4")) id=3;
         if (det.equals("LAYER5")) id=4;
-        for (int is=0; is<bc.bandlay.length; is++) nstr[is]=bc.bandlay[id][is];
+        if (det.equals("VETO")) id=5;
+        //System.out.println(id);
+        for (int is=0; is<(bc.IS2-bc.IS1); is++) {
+        	nstr[is]=bc.bandlay[id][is];
+        }
         detName = det;
         pixdef();
+        Rescale(amax,BANDPixels_x_axis_max);
     }
     
     public void getLmapMinMax(int is1, int is2, int il, int opt){
@@ -92,29 +115,62 @@ public class BANDPixels {
         	double  xoff = bc.bandxoff[is];
         	double  yoff = bc.bandyoff[is];
         	double y_inc = bc.bandwid[is];
-        	for(int i=0 ; i<nnstr ; i++){
-        		x_inc = 0.5*bc.bandlen[is];        	
-                band_xpix[0][nnstr+i][is]=xoff-x_inc;
-                band_xpix[1][nnstr+i][is]=xoff+0;
-                band_xpix[2][nnstr+i][is]=xoff+0.;
-                band_xpix[3][nnstr+i][is]=xoff-x_inc;
-                k = -i*y_inc+yoff*y_inc;	    	   
-                band_ypix[0][nnstr+i][is]=k;
-                band_ypix[1][nnstr+i][is]=k;
-                band_ypix[2][nnstr+i][is]=k-y_inc;
-                band_ypix[3][nnstr+i][is]=k-y_inc;
+        
+        	// Draw all the "pmts" except for the veto layer
+        	if(id<5) {
+        		for(int i=0 ; i<nnstr ; i++){
+        			x_inc = 0.5*bc.bandlen[is];        	
+                	band_xpix[0][nnstr+i][is]=xoff-x_inc;
+                	band_xpix[1][nnstr+i][is]=xoff+0;
+                	band_xpix[2][nnstr+i][is]=xoff+0.;
+                	band_xpix[3][nnstr+i][is]=xoff-x_inc;
+                	k = -i*y_inc+yoff*y_inc;	    	   
+                	band_ypix[0][nnstr+i][is]=k;
+                	band_ypix[1][nnstr+i][is]=k;
+                	band_ypix[2][nnstr+i][is]=k-y_inc;
+                	band_ypix[3][nnstr+i][is]=k-y_inc;
+        		}
+        		for(int i=0 ; i<nnstr ; i++){
+        			x_inc = 0.5*bc.bandlen[is];        	
+        			band_xpix[0][i][is]=xoff+0;
+        			band_xpix[1][i][is]=xoff+x_inc;
+        			band_xpix[2][i][is]=xoff+x_inc;
+        			band_xpix[3][i][is]=xoff+0.;
+        			k = -i*y_inc+yoff*y_inc;	    	   
+        			band_ypix[0][i][is]=k;
+        			band_ypix[1][i][is]=k;
+        			band_ypix[2][i][is]=k-y_inc;
+        			band_ypix[3][i][is]=k-y_inc;
+        		}
         	}
-        	for(int i=0 ; i<nnstr ; i++){
-        		x_inc = 0.5*bc.bandlen[is];        	
-                band_xpix[0][i][is]=xoff+0;
-                band_xpix[1][i][is]=xoff+x_inc;
-                band_xpix[2][i][is]=xoff+x_inc;
-                band_xpix[3][i][is]=xoff+0.;
-                k = -i*y_inc+yoff*y_inc;	    	   
-                band_ypix[0][i][is]=k;
-                band_ypix[1][i][is]=k;
-                band_ypix[2][i][is]=k-y_inc;
-                band_ypix[3][i][is]=k-y_inc;
+        	// Draw all the "pmts" for the veto layer
+        	else {
+        		for(int i=0 ; i<nnstr ; i++){
+        			if(is!=3){
+        				x_inc = 0.5*bc.bandlen[is];        	
+        				band_xpix[0][i][is]=xoff+0;
+        				band_xpix[1][i][is]=xoff+x_inc;
+        				band_xpix[2][i][is]=xoff+x_inc;
+        				band_xpix[3][i][is]=xoff+0.;
+        				k = -i*y_inc+yoff*y_inc;	    	   
+        				band_ypix[0][i][is]=k;
+        				band_ypix[1][i][is]=k;
+        				band_ypix[2][i][is]=k-y_inc;
+        				band_ypix[3][i][is]=k-y_inc;
+        			}
+        			else {
+        				x_inc = 0.5*bc.bandlen[is];        	
+                    	band_xpix[0][nnstr+i][is]=xoff-x_inc;
+                    	band_xpix[1][nnstr+i][is]=xoff+0;
+                    	band_xpix[2][nnstr+i][is]=xoff+0.;
+                    	band_xpix[3][nnstr+i][is]=xoff-x_inc;
+                    	k = -i*y_inc+yoff*y_inc;	    	   
+                    	band_ypix[0][nnstr+i][is]=k;
+                    	band_ypix[1][nnstr+i][is]=k;
+                    	band_ypix[2][nnstr+i][is]=k-y_inc;
+                    	band_ypix[3][nnstr+i][is]=k-y_inc;
+        			}
+        		}
         	}
         }
 	}
@@ -141,7 +197,7 @@ public class BANDPixels {
         
         
         
-        for (int is=1; is<bc.bandlay.length+1 ; is++) { // loop over sectors in a layer
+        for (int is=1; is<(bc.IS2-bc.IS1+1) ; is++) { // loop over sectors in a layer
         	double nend = nstr[is-1]+1;	// find how many bars are in a sector
             int ill=0; iid="s"+Integer.toString(is)+"_l"+Integer.toString(ill)+"_c";
             

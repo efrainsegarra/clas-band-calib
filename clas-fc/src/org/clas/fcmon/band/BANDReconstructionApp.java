@@ -295,9 +295,10 @@ public class BANDReconstructionApp extends FCApplication {
 				// Check for overflow of PMT digitized pulse, which
 				// caps at 4095. If there is overflow, fill a different
 				// histogram
-				/*int overflow = 0;
+				  int overflow = 0;
 				  for (int ii=0 ; ii< pulse.length ; ii++) {
 				  if( pulse[ii] >= 4095) {
+				  System.out.println("Overflow detected");
 				  overflow = 1;
 				  break;
 				  }
@@ -307,7 +308,7 @@ public class BANDReconstructionApp extends FCApplication {
 				  bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,7).fill(ad,ip,1.0);
 				  continue;
 				  }
-				  */
+				  
 				// Add ADCs based on unique ID
 				if (!adcs.hasItem(is,il,lr,ip))adcs.add(new ArrayList<Float>(),is,il,lr,ip);
 				adcs.getItem(is,il,lr,ip).add((float)ad); 
