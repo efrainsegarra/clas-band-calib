@@ -183,7 +183,7 @@ int main(int argc, char ** argv)
 		c->Update();
 
 		name = Form("layer%i_sector%i_comp%i",bar.layer,bar.sector,bar.component);
-		c->SaveAs("../hvScan/gain_results/" + name + "_gainCurve.pdf");
+		c->SaveAs("/fitResults/" + name + "_gainCurve.pdf");
 
 		outFile.precision(4);
 		outFile << bar.sector << " " << bar.layer << " " << bar.component << " " << HV_l << " " << HV_r << "\n";

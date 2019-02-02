@@ -5,8 +5,8 @@ Run this code by doing:
 ./code A B C
 where A = change in PMT voltage [Volts]
       B = 1: all bars
-          2: long bars only
-          3: short bars only
+	  2: long bars only
+	  3: short bars only
       C = /path/to/input/file
 
 The file 'BAND_HV-aftersingleCheckout.snp' can be used
@@ -14,3 +14,8 @@ as an input (or example, or template).
 
 Have fun!
 Rey
+
+
+The SNPtoSLC.py file takes a SNP file and creates a txt file that
+pulls the current HV setting of that SNP file and maps it to sector,layer,component
+to be used for other analysis
