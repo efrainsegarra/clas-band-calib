@@ -22,8 +22,8 @@ public class BANDPixels {
     double band_ypix[][][] = new double[4][14][6];
     
 
-    static double BANDPixels_x_axis_max = 8000;
-    static double short_bar_scaler = 6;
+    static double BANDPixels_x_axis_max = 20000;
+    static double short_bar_scaler = 2.5;
     static double shortscalemax = BANDPixels_x_axis_max*short_bar_scaler;
     // Note: To have all bars have the same x-axis range, set short_bar_scaler to 1 
     
