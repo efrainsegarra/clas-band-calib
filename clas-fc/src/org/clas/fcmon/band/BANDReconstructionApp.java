@@ -298,7 +298,7 @@ public class BANDReconstructionApp extends FCApplication {
 				  int overflow = 0;
 				  for (int ii=0 ; ii< pulse.length ; ii++) {
 				  if( pulse[ii] >= 4095) {
-				  System.out.println("Overflow detected");
+				  //System.out.println("Overflow detected");
 				  overflow = 1;
 				  break;
 				  }
@@ -518,13 +518,13 @@ public class BANDReconstructionApp extends FCApplication {
 					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is, 0, 9).fill(fadc_sum,ip);
 
 					int refPad = 1;
-					if( fadc_lr_diff.getItem(is,il,0,refPad).get(0) != 0  || fadc_lr_diff.getItem(is,il,1,refPad).get(0) != 0) {
-						if( gm > 5000) {
-							float fadc_sumRef = fadc_lr_diff.getItem(is,il,0,refPad).get(0) + fadc_lr_diff.getItem(is,il,1,refPad).get(0);
-							fadc_sumRef *= 0.5;
-							bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is, ip, 8).fill(gm, fadc_sum-fadc_sumRef);
-						}
-					}
+					//if( fadc_lr_diff.getItem(is,il,0,refPad).get(0) != 0  || fadc_lr_diff.getItem(is,il,1,refPad).get(0) != 0) {
+					//	if( gm > 5000) {
+					//		float fadc_sumRef = fadc_lr_diff.getItem(is,il,0,refPad).get(0) + fadc_lr_diff.getItem(is,il,1,refPad).get(0);
+					//		fadc_sumRef *= 0.5;
+					//		bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is, ip, 8).fill(gm, fadc_sum-fadc_sumRef);
+					//	}
+					//}
 				}
 
 			}

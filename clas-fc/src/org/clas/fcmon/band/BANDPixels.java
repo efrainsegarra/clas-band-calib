@@ -22,15 +22,20 @@ public class BANDPixels {
     double band_ypix[][][] = new double[4][14][6];
     
 
-    static int BANDPixels_x_axis_max = 10000;    
+    static double BANDPixels_x_axis_max = 20000;
+    static double short_bar_scaler = 2.5;
+    static double shortscalemax = BANDPixels_x_axis_max*short_bar_scaler;
+    // Note: To have all bars have the same x-axis range, set short_bar_scaler to 1 
+    
     //int[]  array = new int[5];
     //amax = Arrays.fill(array, 1);//*x_axis_max;
     //public double        amax[]= {5000.,5000.,5000.,5000.,5000.};
     public double 		 amax[] = {1.,1.,1.,1.,1.,1.}; 
+    public double		 ashortmax[] = {1.,1.,1.,1.,1.,1.}; 
     public double        tmax[] = {10000.,10000.,10000.,10000.,10000.,10000.};
 
     
-    public void Rescale(double array[],int scaler){
+    public void Rescale(double array[],double scaler){
     	for (int i=0; i<array.length; i++) {
     		array[i] = array[i] * scaler;
     	}
@@ -74,6 +79,7 @@ public class BANDPixels {
         detName = det;
         pixdef();
         Rescale(amax,BANDPixels_x_axis_max);
+        Rescale(ashortmax,shortscalemax);
     }
     
     public void getLmapMinMax(int is1, int is2, int il, int opt){
@@ -198,11 +204,15 @@ public class BANDPixels {
         
         
         for (int is=1; is<(bc.IS2-bc.IS1+1) ; is++) { // loop over sectors in a layer
+        	double axis_scale = amax[id];
+        	if (is == 3 || is == 4) {
+        		axis_scale = ashortmax[id];
+        	}
         	double nend = nstr[is-1]+1;	// find how many bars are in a sector
             int ill=0; iid="s"+Integer.toString(is)+"_l"+Integer.toString(ill)+"_c";
             
             // Geometric mean plot for L_ADC and R_ADC on a given paddle
-            H2_a_Hist.add(is, 0, 0, new H2F("a_gmean_"+iid+0, 200,   0., amax[id],nstr[is-1], 1., nend));	
+            H2_a_Hist.add(is, 0, 0, new H2F("a_gmean_"+iid+0, 200,   0., axis_scale,nstr[is-1], 1., nend));	
             // L-R TDC plot of a given paddle for TDC time
             H2_t_Hist.add(is, 0, 0, new H2F("t_tdif_"+iid+0,  600, -20.,      20.,nstr[is-1], 1., nend));
             // L-R TDC plot of a given paddle for FADC time
@@ -211,7 +221,7 @@ public class BANDPixels {
             // Add gm vs fadc time sum for each paddle
             H2_a_Hist.add(is, 0, 9, new H2F("a_tsum_"+iid+0,  5000, 0.,	   500., nstr[is-1], 1., nend));
             for( int ip = 1 ; ip<nstr[is-1]+1; ip++) {
-            	H2_a_Hist.add(is, ip, 8, new H2F("a_tsum_gm_"+iid+ip+1, 200, 0., 0.5*amax[id] , 600, -15., 15.));
+            	H2_a_Hist.add(is, ip, 8, new H2F("a_tsum_gm_"+iid+ip+1, 200, 0., 0.5*axis_scale , 600, -15., 15.));
             }
           
             
@@ -221,12 +231,12 @@ public class BANDPixels {
             
             for (int il=1 ; il<3 ; il++){ // loop for left side and then right side
                 iid="s"+Integer.toString(is)+"_l"+Integer.toString(il)+"_c";
-                H2_a_Hist.add(is, il, 0, new H2F("a_raw_"+iid+0,      400,   0., amax[id],nstr[is-1], 1., nend));
-                H2_a_Hist.add(is, il, 7, new H2F("a_raw_overflowInc_"+iid+0,      400,   0., amax[id],nstr[is-1], 1., nend));
+                H2_a_Hist.add(is, il, 0, new H2F("a_raw_"+iid+0,      400,   0., axis_scale,nstr[is-1], 1., nend));
+                H2_a_Hist.add(is, il, 7, new H2F("a_raw_overflowInc_"+iid+0,      400,   0., axis_scale,nstr[is-1], 1., nend));
                
                 H2_t_Hist.add(is, il, 0, new H2F("a_raw_"+iid+0,      500,   -tmax[id], tmax[id], nstr[is-1], 1., nend));
                 
-                H2_a_Hist.add(is, il, 1, new H2F("a_raw_"+iid+1,      300,   0., amax[id],500, -tmax[id],tmax[id]));
+                H2_a_Hist.add(is, il, 1, new H2F("a_raw_"+iid+1,      300,   0., axis_scale,500, -tmax[id],tmax[id]));
                 H2_a_Hist.add(is, il, 3, new H2F("a_ped_"+iid+3,      1000, -500.,  500., nstr[is-1], 1., nend)); 
                 H2_a_Hist.add(is, il, 5, new H2F("a_fadc_"+iid+5,     1000,   0., 1000., nstr[is-1], 1., nend));			// this is used for mode1:sum 2D graph where x axis is samples(4ns/ch)
                 																										// and y-axis is which PMT in the sector/layer for left and right side
