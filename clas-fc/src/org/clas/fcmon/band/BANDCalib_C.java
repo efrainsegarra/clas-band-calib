@@ -20,6 +20,9 @@ import org.jlab.detector.calib.utils.CalibrationConstantsView;
 //import org.root.histogram.H1D;
 import org.jlab.groot.graphics.EmbeddedCanvas;
 import org.jlab.groot.math.F1D;
+
+import edu.umd.cs.findbugs.detect.StaticCalendarDetector;
+
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.fitter.DataFitter;
 import org.jlab.groot.data.GraphErrors;
@@ -56,7 +59,7 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
         this.is2=is2;
         
         calib = new CalibrationConstants(3,
-                "nameMe/F:nameMeToo/F");
+                "low_edge/F:high_edge/F:offset [ns]/F:c[cm_ns]/F");
         calib.setName("/calibration/band/nameMeThree");
         calib.setPrecision(3);
         
@@ -67,7 +70,7 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
     } 
     public JPanel getCalibPane() {        
         engineView.setLayout(new BorderLayout());
-        JSplitPane enginePane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT); 
+        JSplitPane enginePane = new JSplitPane(JSplitPane.VERTICAL_SPLIT); 
         ccview.getTabbedPane().addChangeListener(this);
         ccview.addConstants(this.getCalibrationConstants().get(0),this);
 
@@ -84,7 +87,12 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
     		
     		for (int sector=is1 ; sector<is2 ; sector++) {								// loop over sector in layer
     			for(int paddle=0; paddle<bandPix[layer].nstr[sector-1] ; paddle++) {	// loop over paddle in sector
-    					
+    				
+    				// Add entry for the unique paddle
+    				int lidx = (layer+1);
+    		        int pidx = (paddle+1);
+    				calib.addEntry(sector,lidx,pidx);
+    				
     				H1F h1c = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(sector,0,0).sliceY(paddle); h1c.setTitleX(" BAR "+(paddle+1)+" TDIF");
     				double tenPerMax = 0.10*h1c.getMax();
     		        double temp1, temp2, minX, maxX;
@@ -110,6 +118,20 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
     		        col_gr_l1.add(layer, sector,paddle,gr_l1);
     		        col_gr_l2.add(layer, sector,paddle,gr_l2);
     		        
+    		        calib.setDoubleValue(minX, "low_edge" , sector, lidx, pidx);
+    		        calib.setDoubleValue(maxX, "high_edge", sector, lidx, pidx);
+    		        
+    		        double offset = (maxX+minX)/2.0;
+    		        calib.setDoubleValue(offset,"offset [ns]" , sector, lidx, pidx);
+    		        
+    		        double bar_length = 0;
+    		        if     (sector==1)            bar_length = 164.0; //cm
+    		        else if(sector==2||sector==5) bar_length = 202.0; //cm
+    		        else if(sector==3||sector==4) bar_length =  51.0; //cm
+    		        double c_cm_ns = 2*bar_length/(maxX-minX);
+    		        
+    		        calib.setDoubleValue(c_cm_ns, "c[cm_ns]" , sector, lidx, pidx);
+    	
             	} 
     		}        		
         }   	
