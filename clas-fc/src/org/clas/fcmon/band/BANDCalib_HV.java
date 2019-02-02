@@ -43,8 +43,11 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
     public DetectorCollection<F1D> adcFitL = new DetectorCollection<F1D>();
     public DetectorCollection<F1D> adcFitR = new DetectorCollection<F1D>();
     
+           
+    double sigma_modifier = 2; // Multiplicative factor for increasing sigma value if fitting on overflow events
+    double overflow_ratio = 0.8; // If ratio of normal histogram events to overflow events is smaller than this, fit overflow
     int runnumber = 0;
-    double fitscale = 0.8;
+    double fitscale = 1;
     double x_fit_range = fitscale*BANDPixels.BANDPixels_x_axis_max;//This sets the fitting range based off the x axis range
     
     
@@ -83,7 +86,7 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
     } 
     public JPanel getCalibPane() {        
         engineView.setLayout(new BorderLayout());
-        JSplitPane enginePane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT); 
+        JSplitPane enginePane = new JSplitPane(JSplitPane.VERTICAL_SPLIT); 
         ccview.getTabbedPane().addChangeListener(this);
         ccview.addConstants(this.getCalibrationConstants().get(0),this);
 
@@ -113,7 +116,7 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
     		        	//System.out.println("xrange is given as" + x_fit_range);
     		        	fit(layer, sector, paddle, lr, 0., 0.,x_fit_range);//x_fit_range);
         			}
-    		        System.out.println("Done with Layer "+ lidx + ", Sector "+ sector + " , Component " + pidx);
+    		        //System.out.println("Done with Layer "+ lidx + ", Sector "+ sector + " , Component " + pidx);
             	} 
     		}        		
         }   	
@@ -123,11 +126,29 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
     
         public void fit(int layer, int sector, int paddle, int lr, double minRange, double maxRange, double x_fit_max){ 
            
-           System.out.println("Running runnumber = "+runnumber);
+           //System.out.println("Running runnumber = "+runnumber);
            runnumber++;
-           H1F h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,lr,0).sliceY(paddle);
-           if( h.getIntegral() < 500) {
-        	   System.out.println("Integral value is " + h.getIntegral() + " so setting " + layer + " " + sector + " " + paddle + " to null");
+           
+           H1F h = null;
+           double sigma_scaler = 1;
+           H1F reg = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,lr,0).sliceY(paddle);
+           
+           H1F over = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,lr,7).sliceY(paddle);
+           
+           //System.out.println("Ratio for " + layer + " " + sector + " " + paddle + " is"+reg.getIntegral()/over.getIntegral());
+           
+           if (reg.getIntegral()/over.getIntegral() < overflow_ratio) {
+        	   sigma_scaler = sigma_modifier;
+        	   //System.out.println("A lot of overflow events in S.L.P.lr = " + sector + " " + layer + " " + paddle +  " " + lr+ ", fitting overflow" );
+        	   h = over;
+           }
+           else {
+        	   h = reg;
+           }
+           
+           if( h.getIntegral() < 1000) {
+        	   //System.out.println("Integral value is " + h.getIntegral() + " so setting " + layer + " " + sector + " " + paddle + " to null");
+        	   // Layer runs from 0 to 5 (5 is veto layer) while sector runs from 1 - 5 (instead of 0 - 4)
         	   F1D f1 = null;
         	   if( lr == 1) adcFitL.add(layer, sector,paddle, f1);
         	   if( lr == 2) adcFitR.add(layer, sector,paddle, f1);
@@ -136,18 +157,50 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
            
            //F1D  f1 = new F1D("f1","[amp]*gaus(x,[mean],[sigma])", 0,40000);
 
-           	//**********************&&&&&&&&&&&&&&&&&&&&**********************&&&&&&&&&&&&&&&&&&&&**********************
+           	//***************************************************************************************************************
            	//NOTE: The parameters below are chosen essentially randomly. They seem to work but are not optimized. They should be optimized. 
-            //**********************&&&&&&&&&&&&&&&&&&&&**********************&&&&&&&&&&&&&&&&&&&&**********************
+            //*****************************************************************************************************************
            	if( sector == 3 || sector == 4) x_fit_max*=BANDPixels.short_bar_scaler;
+           	//System.out.println(x_fit_max);
+           	
+           	double fit_amp = h.getMax()*1;
+           	
+           	if (reg.getIntegral()/over.getIntegral() < overflow_ratio) {fit_amp = h.getMax()*0.3;} //Overflow peak is usually smaller than global peak
+           	
            	F1D f1 = new F1D("f1", "[amp]*landau(x,[mean],[sigma]) +[exp_amp]*exp([p]*x)", 500, x_fit_max);
-            f1.setParameter(0, h.getMax()*1);
+            f1.setParameter(0, fit_amp);
             f1.setParameter(1, h.getMean() );
             f1.setParameter(2, h.getRMS()*0.5 );
-            f1.setParameter(3, h.getMax()*0.5 );
-            f1.setParameter(4, -0.001);
+            f1.setParameter(3, fit_amp*0.5 );
+            f1.setParameter(4, -0.002);
             DataFitter.fit(f1, h, "REQ");
-            h.getFunction().show();
+            
+            double amp = h.getFunction().getParameter(0);
+            double mean = h.getFunction().getParameter(1);
+            double sigma = h.getFunction().getParameter(2)*sigma_scaler;
+            double offset = h.getFunction().getParameter(3);
+            
+            //if (reg.getIntegral()/over.getIntegral() < overflow_ratio) {h.getFunction().show();}
+            
+            if (sigma > 2*h.getRMS()) {
+            	System.out.println("Large sigma value at S.L.P.lr = " + sector + " " + layer + " " + paddle +  " " + lr);
+            	h.getFunction().show();
+            	}
+           	
+            
+           	/*
+           	F1D  f1 = new F1D("f1","[amp]*landau(x,[mean],[sigma])+[const]",25000,x_fit_max);
+           	f1.setParameter(0, h.getMax() );
+           	f1.setParameter(1, h.getMean() );
+           	f1.setParameter(2, h.getRMS()*0.5 );
+           	f1.setParameter(3, 20 );
+           	DataFitter.fit(f1, h, "REQ");
+           	h.getFunction().show();
+            */
+            
+            
+            
+            
     		//gmFunc.setParameter(0, maxCounts*0.8);
     		//gmFunc.setParLimits(0, maxCounts*0.5, maxCounts*1.2);
     		//gmFunc.setParameter(1, maxPos);
@@ -167,13 +220,10 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 			*/
 		   
 
-
-           double amp = h.getFunction().getParameter(0);
-           double mean = h.getFunction().getParameter(1);
-           double sigma = h.getFunction().getParameter(2);
-           double offset = h.getFunction().getParameter(3);
            
            if( amp < 0 || sigma < 0 ) {
+        	   System.out.println("Fit failed at S.L.P.lr = " + sector + " " + layer + " " + paddle +  " " + lr);
+        	   System.out.println("Failed fit params = " + amp + " " + mean + " " + sigma +  " " + offset);
         	   if( lr == 1) adcFitL.add(layer, sector,paddle, null);
         	   if( lr == 2) adcFitR.add(layer, sector,paddle, null);
         	   return; 
@@ -261,9 +311,9 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
         h.setOptStat(Integer.parseInt("1000100")); 
         h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); c.draw(h,"same");
             																	// 32 is the color red
-/*****&&&&&&&&&&***************&&&&&&&&&&&&&&&&******************
+/*****************************************************************************
 * Empty comment.  
-***************&&&&&&&&&&***************&&&&&&&&&&&&&**********/
+******************************************************************************/
             
         c.cd(0);    
         F1D f1 = adcFitL.get(layer,is,component);
