@@ -1,0 +1,5 @@
+This creates 2 CCDB tables to be uploaded that: 
+(1) translation table: map slot,channel to sector,layer,component.
+(2) fadc table: sets TET, NSA, NSB, ped for each slot, channel
+
+Eventually we will need to add geometry table, other constants table, etc..
