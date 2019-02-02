@@ -428,7 +428,7 @@ public void updateCanvas(DetectorDescriptor dd) {
 	            	f4.setLineColor(3);	
 	            }
 	            if( lr == 2) {
-	            	f3.setLineColor(1);
+	            	f3.setLineColor(3);
 	            	f4.setLineColor(2);
 	            }
 	            f3.setLineWidth(2);
