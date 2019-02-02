@@ -386,7 +386,7 @@ public void updateCanvas(DetectorDescriptor dd) {
 * Empty comment.  
 ***************&&&&&&&&&&***************&&&&&&&&&&&&&**********/
             
-            
+        canvas.cd(0);    
         F1D f1 = adcFitL.get(layer,is,component);
         F1D f2 = adcFitR.get(layer,is,component);
         	
@@ -417,7 +417,7 @@ public void updateCanvas(DetectorDescriptor dd) {
            	canvas.draw(f2,"same");
         }
             
-	        /*
+        canvas.cd(1);   
             F1D f3 = adcFitL.get(layer,is,component);
             F1D f4 = adcFitR.get(layer,is,component);
         	
@@ -450,7 +450,7 @@ public void updateCanvas(DetectorDescriptor dd) {
             }
             
                
-            */
+            
             
         /*
         if( bothFired == 1) {
