@@ -35,7 +35,7 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
     
     int runnumber = 0;
     double fitscale = 0.8;
-    double x_fit_range = fitscale*BANDPixels.BANDPixels_x_axis_max;//This sets the fitting range based off the x axis range
+    double x_fit_range;//This sets the fitting range based off the x axis range
     
     
     public BANDCalibrationEngine[] engines = {
@@ -79,6 +79,9 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
         engineView.add(enginePane);
         return engineView;       
     }  
+
+    //static int BANDPixels_x_axis_max = 30000;    
+    //int[]  array = new int[5];
     
     public BANDCalibrationEngine getSelectedEngine() {
         
@@ -139,9 +142,19 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
         @Override
         public void analyze() {
         	
+      
+        	
         	for( int layer = 0 ; layer<bandPix.length ; layer++) {							// loop over layer
         		
         		for (int sector=is1 ; sector<is2 ; sector++) {								// loop over sector in layer
+        			System.out.println("Sector is = "+sector);
+        			if (sector == 3 || sector == 4){
+        				x_fit_range = fitscale*BANDPixels.shortscalemax;
+        			}        				
+        			if (sector == 1 || sector == 2 || sector == 5){
+        				x_fit_range = fitscale*BANDPixels.BANDPixels_x_axis_max;
+        			}           			
+        			
         			for(int paddle=0; paddle<bandPix[layer].nstr[sector-1] ; paddle++) {	// loop over paddle in sector
         					
         					// Add entry for the unique paddle
@@ -171,7 +184,7 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
            System.out.println("Running runnumber = "+runnumber);
            runnumber++;
            H1F h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,lr,0).sliceY(paddle);
-           if( h.getIntegral() < 50) {
+           if( h.getIntegral() < 500) {
         	   System.out.println("Integral value is " + h.getIntegral() + " so setting " + layer + " " + sector + " " + paddle + " to null");
         	   F1D f1 = null;
         	   if( lr == 1) adcFitL.add(layer, sector,paddle, f1);
@@ -180,21 +193,14 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
            	};
            
            //F1D  f1 = new F1D("f1","[amp]*gaus(x,[mean],[sigma])", 0,40000);
-           /*F1D  f1 = new F1D("f1","[amp]*landau(x,[mean],[sigma])+[const]",500,x_fit_max);
-           f1.setParameter(0, h.getMax() );
-           f1.setParameter(1, h.getMean() );
-           f1.setParameter(2, 1000 );
-           f1.setParameter(3, 20 );
-           DataFitter.fit(f1, h, "REQ");
-           h.getFunction().show();
-		   */
+
            	//**********************&&&&&&&&&&&&&&&&&&&&**********************&&&&&&&&&&&&&&&&&&&&**********************
            	//NOTE: The parameters below are chosen essentially randomly. They seem to work but are not optimized. They should be optimized. 
             //**********************&&&&&&&&&&&&&&&&&&&&**********************&&&&&&&&&&&&&&&&&&&&**********************
-           	F1D f1 = new F1D("f1", "[amp]*landau(x,[mean],[sigma]) +[exp_amp]*exp([p]*x)", 0.0, x_fit_max);
-            f1.setParameter(0, h.getMax()*0.8);
+           	F1D f1 = new F1D("f1", "[amp]*landau(x,[mean],[sigma]) +[exp_amp]*exp([p]*x)", 500, x_fit_max);
+            f1.setParameter(0, h.getMax()*1);
             f1.setParameter(1, h.getMean() );
-            f1.setParameter(2, 1000 );
+            f1.setParameter(2, h.getRMS()*0.5 );
             f1.setParameter(3, h.getMax()*0.5 );
             f1.setParameter(4, -0.001);
             DataFitter.fit(f1, h, "REQ");
@@ -206,9 +212,16 @@ public class BANDCalibrationApp extends FCApplication implements CalibrationCons
     		//gmFunc.setParLimits(2, 0.0,400.0);
     		//gmFunc.setParameter(3, maxCounts*0.5);
     		//gmFunc.setParameter(4, -0.001);
-    		
-            
-		
+    		/*
+           	F1D  f2 = new F1D("f2","[amp]*landau(x,[mean],[sigma])+[const]",500,x_fit_max);
+           	f2.setParameter(0, h.getMax() );
+           	f2.setParameter(1, h.getMean() );
+           	f2.setParameter(2, 1000 );
+           	f2.setParameter(3, 20 );
+           	DataFitter.fit(f2, h, "REQ");
+           	h.getFunction().show();
+		   
+			*/
 		   
 
 
@@ -332,13 +345,7 @@ public void updateCanvas(DetectorDescriptor dd) {
         int min=0, max=nstr;
         
         canvas.clear(); canvas.divide(2, 4);
-        canvas.setAxisFontSize(12);
-
-//      canvas.setAxisTitleFontSize(12);
-//      canvas.setTitleFontSize(14);
-//      canvas.setStatBoxFontSize(10);
-        
-             
+        canvas.setAxisFontSize(12);          
         
         H1F h;
         String alab;
@@ -349,81 +356,68 @@ public void updateCanvas(DetectorDescriptor dd) {
         //String tit = "SEC "+is+" LAY "+(ilm+1);
         int bothFired = 0;
        
-        // We will loop here for all the calibration plots we want to make for
-        // selected pmt
-        /*for(int iip=min;iip<max;iip++) {
+        
+/*****&&&&&&&&&&***************&&&&&&&&&&&&&&&&******************
+ * Plot the left and right histograms for each bar        
+ ***************&&&&&&&&&&***************&&&&&&&&&&&&&**********/
+        canvas.cd(0); 
+        alab = tit+otab[0]+(component+1)+calTitles[0];
+        //Plot left overflow
+        h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,1,7).sliceY(component);
+        h.setOptStat(Integer.parseInt("1000100")); 
+        h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(34); canvas.draw(h);
+		//Plot left histogram														// 34 is the color light blue       
+        h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,1,0).sliceY(component);
+        h.setOptStat(Integer.parseInt("1000100")); 
+        h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); canvas.draw(h,"same");
+        																	// 32 is the color red
+        canvas.cd(1);
+        alab = tit+otab[1]+(component+1)+calTitles[0];  
+        //Plot right overflow
+        h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,2,7).sliceY(component);
+        h.setOptStat(Integer.parseInt("1000100")); 
+        h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(34); canvas.draw(h);
+        //Plot right histogram													// 34 is the color light blue
+        h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,2,0).sliceY(component);
+        h.setOptStat(Integer.parseInt("1000100")); 
+        h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); canvas.draw(h,"same");
+            																	// 32 is the color red
+/*****&&&&&&&&&&***************&&&&&&&&&&&&&&&&******************
+* Empty comment.  
+***************&&&&&&&&&&***************&&&&&&&&&&&&&**********/
             
-        	alab = tit+otab[lr-1]+(iip+1)+calTitles[0];
-            */
-        	alab = tit+otab[0]+(component+1)+calTitles[0];
-            canvas.cd(0);          
-            // Pull the ADC histogram for 1st canvas plot
-            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,1,0).sliceY(component);
-            // Draw one including overflow samples
-            //h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,lr,7).sliceY(iip); 
-            h.setOptStat(Integer.parseInt("1000100")); 
-            h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(34); canvas.draw(h);
-            
-            // Draw one without overflow samples
-            //h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,lr,0).sliceY(iip); 
-            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,1,7).sliceY(component);
-            h.setOptStat(Integer.parseInt("1000100")); 
-            h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); canvas.draw(h,"same");
-            //} 
-            
-            
-            
-            
- 
-
-            
-            F1D f1 = adcFitL.get(layer,is,component);
-            F1D f2 = adcFitR.get(layer,is,component);
+        canvas.cd(0);    
+        F1D f1 = adcFitL.get(layer,is,component);
+        F1D f2 = adcFitR.get(layer,is,component);
         	
             
-            if( f1 != null && f2 != null) {
-	            if( lr == 1) {
-	            	f1.setLineColor(2);
-	            	f2.setLineColor(3);	
+        if( f1 != null && f2 != null) {
+	        if( lr == 1) {
+	           f1.setLineColor(2);
+	           f2.setLineColor(3);	
+	        }
+	        if( lr == 2) {
+	            f1.setLineColor(3);
+	            f2.setLineColor(2);
 	            }
-	            if( lr == 2) {
-	            	f1.setLineColor(1);
-	            	f2.setLineColor(2);
-	            }
-	            f1.setLineWidth(2);
-	            f2.setLineWidth(2);
-            	canvas.draw(f1,"same");
-            	canvas.draw(f2,"same");
-        		bothFired = 1;
- 
-            }
-            else if( lr == 1 && f1 != null) {
-            	f1.setLineColor(2);
-            	f1.setLineWidth(2);
-            	canvas.draw(f1,"same");
-            }
-            else if( lr == 2 && f2 != null) {
-            	f2.setLineColor(2);
-            	f2.setLineWidth(2);
-            	canvas.draw(f2,"same");
-            }
+	        f1.setLineWidth(2);
+	        f2.setLineWidth(2);
+            canvas.draw(f1,"same");
+            canvas.draw(f2,"same");
+        	bothFired = 1;
+        }
+        else if( lr == 1 && f1 != null) {
+            f1.setLineColor(4);
+            f1.setLineWidth(2);
+            canvas.draw(f1,"same");
+        }
+        else if( lr == 2 && f2 != null) {
+            f2.setLineColor(5);
+            f2.setLineWidth(2);
+           	canvas.draw(f2,"same");
+        }
             
-	        canvas.cd(1);
-        	alab = tit+otab[1]+(component+1)+calTitles[0];         
-            // Pull the ADC histogram for 1st canvas plot
-            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,2,0).sliceY(component);
-            // Draw one including overflow samples
-            //h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,lr,7).sliceY(iip); 
-            h.setOptStat(Integer.parseInt("1000100")); 
-            h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(34); canvas.draw(h);
-            
-            // Draw one without overflow samples
-            //h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,lr,0).sliceY(iip); 
-            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,2,7).sliceY(component);
-            h.setOptStat(Integer.parseInt("1000100")); 
-            h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); canvas.draw(h,"same");
-            //}  
-            
+        canvas.cd(1);   
             F1D f3 = adcFitL.get(layer,is,component);
             F1D f4 = adcFitR.get(layer,is,component);
         	
