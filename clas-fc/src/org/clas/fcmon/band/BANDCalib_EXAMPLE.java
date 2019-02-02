@@ -22,9 +22,8 @@ import org.jlab.groot.graphics.EmbeddedCanvas;
 import org.jlab.groot.math.F1D;
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.fitter.DataFitter;
-import org.jlab.groot.data.GraphErrors;
 
-public class BANDCalib_C extends FCApplication implements CalibrationConstantsListener,ChangeListener {
+public class BANDCalib_EXAMPLE extends FCApplication implements CalibrationConstantsListener,ChangeListener {
 
     
     EmbeddedCanvas c = this.getCanvas(this.getName()); 
@@ -35,16 +34,8 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
 
     int is1,is2;
 
-    public DetectorCollection<GraphErrors> col_gr_l1 = new DetectorCollection<GraphErrors>();
-    public DetectorCollection<GraphErrors> col_gr_l2 = new DetectorCollection<GraphErrors>();
     
-    String[] names = {"/calibration/band/NAMEME"};
-    String selectedDir = names[0];
-    int selectedSector = 1;
-    int selectedLayer = 1;
-    int selectedPaddle = 1;
-    
-    public BANDCalib_C(String name, BANDPixels[] bandPix) {
+    public BANDCalib_EXAMPLE(String name, BANDPixels[] bandPix) {
         super(name,bandPix);    
      }
 
@@ -85,31 +76,17 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
     		for (int sector=is1 ; sector<is2 ; sector++) {								// loop over sector in layer
     			for(int paddle=0; paddle<bandPix[layer].nstr[sector-1] ; paddle++) {	// loop over paddle in sector
     					
-    				H1F h1c = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(sector,0,0).sliceY(paddle); h1c.setTitleX(" BAR "+(paddle+1)+" TDIF");
-    				double tenPerMax = 0.10*h1c.getMax();
-    		        double temp1, temp2, minX, maxX;
-    		        minX=0;
-    		        maxX=0;
-    		        for(int i = 1 ; i <= h1c.getXaxis().getNBins();i++ ) {
-    		        	temp1 = h1c.getBinContent(i);
-    		        	temp2 = h1c.getxAxis().getBinCenter(i);
-    		        	if(minX==0&&temp1>tenPerMax) minX=temp2;
-    		        }
-    		        for(int i = h1c.getXaxis().getNBins() ; i >= 1;i-- ) {
-    		        	temp1 = h1c.getBinContent(i);
-    		        	temp2 = h1c.getxAxis().getBinCenter(i);
-    		        	if(maxX==0&&temp1>tenPerMax) maxX=temp2;
-    		        }
-
-    		        double[] xl1 = { minX , minX };
-    		        double[] xl2 = { maxX , maxX };
-    		        double[] yl  = { 0,h1c.getMax()};
-    		        GraphErrors gr_l1 = new GraphErrors("gr_l1",xl1,yl);
-    		        GraphErrors gr_l2 = new GraphErrors("gr_l2",xl2,yl);
-    		        
-    		        col_gr_l1.add(layer, sector,paddle,gr_l1);
-    		        col_gr_l2.add(layer, sector,paddle,gr_l2);
-    		        
+    					// Add entry for the unique paddle
+    				int lidx = (layer+1);
+    		        int pidx = (paddle+1);
+    		        calib.addEntry(sector,lidx,pidx);
+        			
+    		        	// Fit both sides of paddle
+    		        for( int lr = 1 ; lr < 3 ; lr++) {									// loop over left/right PMT in paddle
+        				
+    		        	fit();
+        			}
+    		        System.out.println("Done with Layer "+ lidx + ", Sector "+ sector + " , Component " + pidx);
             	} 
     		}        		
         }   	
@@ -120,6 +97,10 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
     public void fit(){ 
         
      }
+
+    
+    
+    
 
     public void updateCanvas(DetectorDescriptor dd) {
         
@@ -133,21 +114,9 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
         int nstr = bandPix[layer].nstr[is-1];
         int min=0, max=nstr;
         
-        c.clear(); //c.divide(2, 2);
+        c.clear(); c.divide(2, 4);
         c.setAxisFontSize(12);
 
-        H1F h1c;
-        h1c = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(is,0,0).sliceY(ic); h1c.setTitleX(" BAR "+(ic+1)+" TDIF");   h1c.setFillColor(2);
-        c.draw(h1c);
-        
-        GraphErrors gr_l1 = col_gr_l1.get(layer,sector,component);
-        GraphErrors gr_l2 = col_gr_l2.get(layer,sector,component);
-        
-        if( gr_l1 != null && gr_l2 != null) {
-        	c.draw(gr_l1,"same");
-        	c.draw(gr_l2,"same");
-        }
-        
         c.repaint();
         //End of plotting
     }
@@ -155,28 +124,15 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
     
     
     
-    public void stateChanged(ChangeEvent e) {
-        int i = ccview.getTabbedPane().getSelectedIndex();
-        String tabTitle = ccview.getTabbedPane().getTitleAt(i);
-        if (tabTitle != selectedDir) {
-            selectedDir = tabTitle;
-        }
-    }
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 
-	
-	public void constantsEvent(CalibrationConstants cc, int col, int row) {
-
-        String str_sector    = (String) cc.getValueAt(row, 0);
-        String str_layer     = (String) cc.getValueAt(row, 1);
-        String str_component = (String) cc.getValueAt(row, 2);
-            
-        if (cc.getName() != selectedDir) {
-            selectedDir = cc.getName();
-        }
-            
-        selectedSector = Integer.parseInt(str_sector);
-        selectedLayer  = Integer.parseInt(str_layer);
-        selectedPaddle = Integer.parseInt(str_component);
-
-    }
+	@Override
+	public void constantsEvent(CalibrationConstants arg0, int arg1, int arg2) {
+		// TODO Auto-generated method stub
+		
+	}
 }
