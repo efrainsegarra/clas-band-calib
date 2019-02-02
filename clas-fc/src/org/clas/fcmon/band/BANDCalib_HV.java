@@ -108,7 +108,7 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 		file = new File(String.format("../band_analysis/hvScan/calibOutput/run_%d.txt",runno));
 		// Try to open a text file, otherwise do not try to analyze
 		try(PrintWriter output = new PrintWriter(file)) {
-			output.println("Sector\tLayer\tComponent\tOrder\tMean\tSigma\n");
+			output.println("#Sector\tLayer\tComponent\tOrder\tMean\tSigma\n");
 
 			// Loop over all layers
 			for( int layer = 0 ; layer<bandPix.length ; layer++) {
