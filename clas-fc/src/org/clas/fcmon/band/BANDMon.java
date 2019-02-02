@@ -28,16 +28,12 @@ public class BANDMon extends DetectorMonitor {
     FTHashCollection              rtt = null;      
     BANDDet                   bandDet = null;  
     
-    BANDReconstructionApp   bandRecon = null;
-    BANDMode1App            bandMode1 = null;
-    BANDAdcApp                bandAdc = null;
-    BANDTdcApp                bandTdc = null;
-    BANDPedestalApp      bandPedestal = null;
-    BANDMipApp                bandMip = null;    
-    BANDCalibrationApp      bandCalib = null;
-    BANDScalersApp       bandScalers = null;
-    BANDHvApp                  bandHv = null;
-       
+    BANDReconstructionApp   	bandRecon = null;
+    BANDCalib_HV                bandCalib_hv = null; 
+    BANDCalib_C					bandCalib_c = null;
+    BANDCalib_Atten				bandCalib_atten = null;
+    
+
     public int                 calRun = 12;
     int                         detID = 0;
     int                           is1 = 1;    //All sectors: is1=1 is2=7  Single sector: is1=s is2=s+1
@@ -114,56 +110,43 @@ public class BANDMon extends DetectorMonitor {
         System.out.println(appname+".makeApps()"); 
         bandRecon = new BANDReconstructionApp("BANDREC",bandPix);        
         bandRecon.setMonitoringClass(this);
-        bandRecon.setApplicationClass(app);	
+        bandRecon.setApplicationClass(app);	    
         
-        bandMode1 = new BANDMode1App("Mode1",bandPix);        
-        bandMode1.setMonitoringClass(this);
-        bandMode1.setApplicationClass(app);   
+        bandCalib_hv = new BANDCalib_HV("HV",bandPix);        
+        bandCalib_hv.setMonitoringClass(this);
+        bandCalib_hv.setApplicationClass(app); 
+        bandCalib_hv.init(is1,is2);
         
-        bandAdc = new BANDAdcApp("ADC",bandPix);        
-        bandAdc.setMonitoringClass(this);
-        bandAdc.setApplicationClass(app);     
+        bandCalib_c = new BANDCalib_C("Speed of Light",bandPix);        
+        bandCalib_c.setMonitoringClass(this);
+        bandCalib_c.setApplicationClass(app); 
+        bandCalib_c.init(is1,is2);
         
-        bandTdc = new BANDTdcApp("TDC",bandPix);        
-        bandTdc.setMonitoringClass(this);
-        bandTdc.setApplicationClass(app);           
-        
-        bandPedestal = new BANDPedestalApp("Pedestal",bandPix);        
-        bandPedestal.setMonitoringClass(this);
-        bandPedestal.setApplicationClass(app);       
-        
-        bandMip = new BANDMipApp("MIP",bandPix);        
-        bandMip.setMonitoringClass(this);
-        bandMip.setApplicationClass(app);  
-        
-        bandCalib = new BANDCalibrationApp("Calibration", bandPix);
-        bandCalib.setMonitoringClass(this);
-        bandCalib.setApplicationClass(app);  
-        bandCalib.init(is1,is2);
-        
-        bandHv = new BANDHvApp("HV",mondet);
-        bandHv.setMonitoringClass(this);
-        bandHv.setApplicationClass(app);  
-        bandHv.init();
-        
-        bandScalers = new BANDScalersApp("Scalers",mondet);
-        bandScalers.setMonitoringClass(this);
-        bandScalers.setApplicationClass(app); 
-        bandScalers.init();
+        bandCalib_atten = new BANDCalib_Atten("Attenuation",bandPix);        
+        bandCalib_atten.setMonitoringClass(this);
+        bandCalib_atten.setApplicationClass(app); 
+        bandCalib_atten.init(is1,is2);
+
         
         if(app.xMsgHost=="localhost") app.startEpics();
     }
 	
     public void addCanvas() {
         System.out.println(appname+".addCanvas()"); 
-        app.addFrame(bandMode1.getName(),          bandMode1.getPanel());
-        app.addCanvas(bandAdc.getName(),             bandAdc.getCanvas());          
-        app.addCanvas(bandTdc.getName(),             bandTdc.getCanvas());          
-        app.addCanvas(bandPedestal.getName(),   bandPedestal.getCanvas());
-        app.addCanvas(bandMip.getName(),             bandMip.getCanvas()); 
-        app.addFrame(bandCalib.getName(),          bandCalib.getCalibPane());
-        app.addFrame(bandHv.getName(),                bandHv.getPanel());
-        app.addFrame(bandScalers.getName(),      bandScalers.getPanel());
+        //app.addFrame(bandMode1.getName(),          bandMode1.getPanel());
+        //app.addCanvas(bandAdc.getName(),             bandAdc.getCanvas());          
+        //app.addCanvas(bandTdc.getName(),             bandTdc.getCanvas());          
+        //app.addCanvas(bandPedestal.getName(),   bandPedestal.getCanvas());
+        
+        
+        app.addCanvas(bandCalib_hv.getName(),             		bandCalib_hv.getCanvas());
+        app.addCanvas(bandCalib_c.getName(),             		bandCalib_c.getCanvas());
+        app.addCanvas(bandCalib_atten.getName(),             	bandCalib_atten.getCanvas());
+        
+
+        
+        
+        //app.addFrame(bandScalers.getName(),      bandScalers.getPanel());
     }
     
     public void init( ) {       
@@ -228,8 +211,17 @@ public class BANDMon extends DetectorMonitor {
             break;
         case 2:
             for (int idet=0; idet<bandPix.length; idet++) bandRecon.makeMaps(idet); 
-            System.out.println("End of run");                 
-            bandCalib.engines[0].analyze();
+            System.out.println("End of run");      
+            
+            app.addFrame(bandCalib_hv.getName(),             bandCalib_hv.getCalibPane()); 
+            app.addFrame(bandCalib_c.getName(),             bandCalib_c.getCalibPane()); 
+            app.addFrame(bandCalib_atten.getName(),             bandCalib_atten.getCalibPane()); 
+            
+            bandCalib_hv.analyze();
+            bandCalib_c.analyze();
+            bandCalib_atten.analyze();
+            
+            //bandCalib.engines[0].analyze();
             
             app.setInProcess(3);
         }
@@ -250,19 +242,18 @@ public class BANDMon extends DetectorMonitor {
         app.updateStatusString(dd); // For strip/pixel ID and reverse translation table
         this.analyze();  // Refresh color maps      
         switch (app.getSelectedTabName()) {
-        case "Mode1":                        bandMode1.updateCanvas(dd); break;
-        case "ADC":                            bandAdc.updateCanvas(dd); break;
-        case "TDC":                            bandTdc.updateCanvas(dd); break;
-        case "Pedestal":                  bandPedestal.updateCanvas(dd); break;
-        case "MIP":                            bandMip.updateCanvas(dd); break; 
-        case "HV":                              bandHv.updateCanvas(dd); break;
-        case "Calibration":					 bandCalib.updateCanvas(dd); break;
-//        case "Scalers":                    bandScalers.updateCanvas(dd);
+        
+
+        case "HV":                            bandCalib_hv.updateCanvas(dd); break; 
+        case "Speed of Light":                bandCalib_c.updateCanvas(dd); break; 
+        case "Attenuation":                   bandCalib_atten.updateCanvas(dd); break; 
+       
+
        } 
     }
     
     public void loadHV(int is1, int is2, int il1, int il2) {
-        bandHv.loadHV(is1,is2,il1,il2);
+    //    bandHv.loadHV(is1,is2,il1,il2);
     }  
     
     @Override
@@ -325,10 +316,6 @@ public class BANDMon extends DetectorMonitor {
     @Override
     public void initEpics(Boolean doEpics) {
         // TODO Auto-generated method stub
-        System.out.println("monitor.initEpics():Initializing EPICS Channel Access");
-        if (app.xMsgHost=="localhost") {bandHv.online=false ; bandScalers.online=false;}
-        if ( doEpics) {bandHv.startEPICS(); bandScalers.startEPICS();}
-        if (!doEpics) {bandHv.stopEPICS();  bandScalers.stopEPICS();}
     }
     
 }

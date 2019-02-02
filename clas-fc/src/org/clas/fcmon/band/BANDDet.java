@@ -24,7 +24,7 @@ public class BANDDet extends FCDetector {
         initViewButtons(1, 0);
         initViewButtons(0, 0);
         app.getDetectorView().setFPS(10);
-        app.setSelectedTab(1); 
+        app.setSelectedTab(0); 
         
     }   
     
