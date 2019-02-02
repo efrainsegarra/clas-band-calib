@@ -34,6 +34,12 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
 
     int is1,is2;
 
+    String[] names = {"/calibration/band/NAMEME"};
+    String selectedDir = names[0];
+    int selectedSector = 1;
+    int selectedLayer = 1;
+    int selectedPaddle = 1;
+
     
     public BANDCalib_C(String name, BANDPixels[] bandPix) {
         super(name,bandPix);    
@@ -124,15 +130,28 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
     
     
     
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
+    public void stateChanged(ChangeEvent e) {
+        int i = ccview.getTabbedPane().getSelectedIndex();
+        String tabTitle = ccview.getTabbedPane().getTitleAt(i);
+        if (tabTitle != selectedDir) {
+            selectedDir = tabTitle;
+        }
+    }
 
-	@Override
-	public void constantsEvent(CalibrationConstants arg0, int arg1, int arg2) {
-		// TODO Auto-generated method stub
-		
-	}
+	
+	public void constantsEvent(CalibrationConstants cc, int col, int row) {
+
+        String str_sector    = (String) cc.getValueAt(row, 0);
+        String str_layer     = (String) cc.getValueAt(row, 1);
+        String str_component = (String) cc.getValueAt(row, 2);
+            
+        if (cc.getName() != selectedDir) {
+            selectedDir = cc.getName();
+        }
+            
+        selectedSector = Integer.parseInt(str_sector);
+        selectedLayer  = Integer.parseInt(str_layer);
+        selectedPaddle = Integer.parseInt(str_component);
+
+    }
 }
