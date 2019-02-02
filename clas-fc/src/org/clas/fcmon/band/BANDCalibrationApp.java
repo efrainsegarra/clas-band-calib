@@ -344,7 +344,7 @@ public void updateCanvas(DetectorDescriptor dd) {
         int nstr = bandPix[layer].nstr[is-1];
         int min=0, max=nstr;
         
-        canvas.clear(); canvas.divide(2, 4);
+        canvas.clear(); canvas.divide(2,1);
         canvas.setAxisFontSize(12);          
         
         H1F h;
