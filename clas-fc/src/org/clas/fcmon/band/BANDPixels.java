@@ -177,11 +177,11 @@ public class BANDPixels {
         //	H2_a_hist.get(sector,l/r,idx) where idx specifies which 2D histogram is being saved here
         // 		sector: 1-6
         //		l/r: 1=left, 2=right, 0=gmean??
-        //	Then of course there are 5 BANDPix objects, for each layer.
+        //	Then of course there are 5 BANDPix objects, for each layer. THere should be 6 now including Veto
         
         
         
-        for (int is=1; is<(bc.IS2-bc.IS1+1) ; is++) { // loop over sectors in a layer
+        for (int is=1; is<(bc.IS2-bc.IS1+1) ; is++) { // loop over sectors in a layer. 
         	double nend = nstr[is-1]+1;	// find how many bars are in a sector
             int ill=0; iid="s"+Integer.toString(is)+"_l"+Integer.toString(ill)+"_c";
             
@@ -212,7 +212,7 @@ public class BANDPixels {
                 
                 H2_a_Hist.add(is, il, 1, new H2F("a_raw_"+iid+1,      300,   0., amax[id],500, -tmax[id],tmax[id]));
                 H2_a_Hist.add(is, il, 3, new H2F("a_ped_"+iid+3,      1000, -500.,  500., nstr[is-1], 1., nend)); 
-                H2_a_Hist.add(is, il, 5, new H2F("a_fadc_"+iid+5,     1000,   0., 1000., nstr[is-1], 1., nend));			// this is used for mode1:sum 2D graph where x axis is samples(4ns/ch)
+                H2_a_Hist.add(is, il, 5, new H2F("a_fadc_"+iid+5,     200,   0., 100., nstr[is-1], 1., nend));			// this is used for mode1:sum 2D graph where x axis is samples(4ns/ch)
                 																										// and y-axis is which PMT in the sector/layer for left and right side
                               
             

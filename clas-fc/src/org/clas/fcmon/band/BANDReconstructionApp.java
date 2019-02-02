@@ -516,14 +516,7 @@ public class BANDReconstructionApp extends FCApplication {
 					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is, 0, 1).fill(fadc_LR,ip);
 					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is, 0, 9).fill(fadc_sum,ip);
 
-					int refPad = 1;
-					if( fadc_lr_diff.getItem(is,il,0,refPad).get(0) != 0  || fadc_lr_diff.getItem(is,il,1,refPad).get(0) != 0) {
-						if( gm > 5000) {
-							float fadc_sumRef = fadc_lr_diff.getItem(is,il,0,refPad).get(0) + fadc_lr_diff.getItem(is,il,1,refPad).get(0);
-							fadc_sumRef *= 0.5;
-							bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is, ip, 8).fill(gm, fadc_sum-fadc_sumRef);
-						}
-					}
+					
 				}
 
 			}
@@ -556,6 +549,7 @@ public class BANDReconstructionApp extends FCApplication {
 						int ip=bandPix[idet].strra[is][il][n]; int ad=bandPix[idet].adcr[is][il][n];
 						bandPix[idet].strips.hmap1.get("H1_a_Sevd").get(is+1,il+1,0).fill(ip,ad);
 					}
+					//FIX ME: THe next line is causing some out of array exceptions
 					for (int n=0 ; n<bandPix[idet].nht[is][il] ; n++) {
 						int ip=bandPix[idet].strrt[is][il][n]; float td=bandPix[idet].tdcr[is][il][n];
 						double tdc = 0.25*(td-BANDConstants.TOFFSET[il]);
