@@ -178,8 +178,8 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
             double amp = h.getFunction().getParameter(0);
             double mean = h.getFunction().getParameter(1);
             double sigma = h.getFunction().getParameter(2)*sigma_scaler;
-            double offset = h.getFunction().getParameter(3);
-            
+            double exp_amp = h.getFunction().getParameter(3);
+            double exp_const = h.getFunction().getParameter(4);
             //if (reg.getIntegral()/over.getIntegral() < overflow_ratio) {h.getFunction().show();}
             
             if (sigma > 2*h.getRMS()) {
@@ -223,7 +223,7 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
            
            if( amp < 0 || sigma < 0 ) {
         	   System.out.println("Fit failed at S.L.P.lr = " + sector + " " + layer + " " + paddle +  " " + lr);
-        	   System.out.println("Failed fit params = " + amp + " " + mean + " " + sigma +  " " + offset);
+        	   System.out.println("Failed fit params = " + amp + " " + mean + " " + sigma +  " " + exp_amp+  " " + exp_const);
         	   if( lr == 1) adcFitL.add(layer, sector,paddle, null);
         	   if( lr == 2) adcFitR.add(layer, sector,paddle, null);
         	   return; 
