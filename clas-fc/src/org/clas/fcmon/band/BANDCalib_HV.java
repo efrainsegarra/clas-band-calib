@@ -139,6 +139,7 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
            	//**********************&&&&&&&&&&&&&&&&&&&&**********************&&&&&&&&&&&&&&&&&&&&**********************
            	//NOTE: The parameters below are chosen essentially randomly. They seem to work but are not optimized. They should be optimized. 
             //**********************&&&&&&&&&&&&&&&&&&&&**********************&&&&&&&&&&&&&&&&&&&&**********************
+           	if( sector == 3 || sector == 4) x_fit_max*=BANDPixels.short_bar_scaler;
            	F1D f1 = new F1D("f1", "[amp]*landau(x,[mean],[sigma]) +[exp_amp]*exp([p]*x)", 500, x_fit_max);
             f1.setParameter(0, h.getMax()*1);
             f1.setParameter(1, h.getMean() );
