@@ -292,19 +292,17 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
             */
         	alab = tit+otab[0]+(component+1)+calTitles[0];
             c.cd(0);          
-            // Pull the ADC histogram for 1st canvas plot
-            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,1,0).sliceY(component);
+            
             // Draw one including overflow samples
-            //h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,lr,7).sliceY(iip); 
+            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,1,7).sliceY(component);
             h.setOptStat(Integer.parseInt("1000100")); 
             h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(34); c.draw(h);
             
             // Draw one without overflow samples
-            //h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,lr,0).sliceY(iip); 
-            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,1,7).sliceY(component);
-            h.setOptStat(Integer.parseInt("1000100")); 
+            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,1,0).sliceY(component);
+            h.setOptStat(Integer.parseInt("1000100"));
             h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); c.draw(h,"same");
-            //} 
+             
         
             
             F1D f1 = adcFitL.get(layer,is,component);
@@ -317,7 +315,7 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 	            	f2.setLineColor(3);	
 	            }
 	            if( lr == 2) {
-	            	f1.setLineColor(1);
+	            	f1.setLineColor(3);
 	            	f2.setLineColor(2);
 	            }
 	            f1.setLineWidth(2);
@@ -339,20 +337,18 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
             }
             
 	        c.cd(1);
-        	alab = tit+otab[1]+(component+1)+calTitles[0];         
-            // Pull the ADC histogram for 1st canvas plot
-            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,2,0).sliceY(component);
-            // Draw one including overflow samples
-            //h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,lr,7).sliceY(iip); 
+	        
+	        alab = tit+otab[1]+(component+1)+calTitles[0]; 
+	        // Draw one including overflow samples
+            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,2,7).sliceY(component);
             h.setOptStat(Integer.parseInt("1000100")); 
             h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(34); c.draw(h);
             
             // Draw one without overflow samples
-            //h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,lr,0).sliceY(iip); 
-            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,2,7).sliceY(component);
-            h.setOptStat(Integer.parseInt("1000100")); 
+            h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,2,0).sliceY(component);
+            h.setOptStat(Integer.parseInt("1000100"));
             h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); c.draw(h,"same");
-            //}  
+           
             
             F1D f3 = adcFitL.get(layer,is,component);
             F1D f4 = adcFitR.get(layer,is,component);
@@ -364,7 +360,7 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 	            	f4.setLineColor(3);	
 	            }
 	            if( lr == 2) {
-	            	f3.setLineColor(1);
+	            	f3.setLineColor(3);
 	            	f4.setLineColor(2);
 	            }
 	            f3.setLineWidth(2);
