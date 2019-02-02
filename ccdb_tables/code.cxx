@@ -29,9 +29,9 @@ int main(int argc,char ** argv){
 
 	cout << "*****************************************\nCreating ADC, TDC map tables for BAND\n";
 
-	int nsb =  4;
-	int nsa = 12;
-	int tet = 20;
+	int nsb =  4; // Number of Samples Before threshold crossing
+	int nsa = 24; // Number of Samples After threshold crossing
+	int tet = 82; // Threshold value
 	int win_off = 1000;
 	int win_siz = 500 ;
 
@@ -161,7 +161,7 @@ void LoadADCmap(){
 			adc_ctr++;
 		}
 	}
-	adc_ctr--;
+
 	f.close();
 }
 // ===================================================================================================
@@ -196,7 +196,7 @@ void LoadTDCmap(){
 			tdc_ctr++;
 		}
 	}
-	tdc_ctr--;
+
 	f.close();
 }
 // ===================================================================================================
