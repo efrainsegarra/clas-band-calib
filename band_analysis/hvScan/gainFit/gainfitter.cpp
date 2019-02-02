@@ -45,7 +45,7 @@ int main(int argc, char ** argv)
 	if (argc != 3)
 	{
 		cerr << "Wrong number of arguments. Instead use:\n"
-			<< "\tpmt_test /path/to/gain/test/txt /path/to/output/file/txt\n";
+			<< "\tgainfitter /path/to/gain/test/txt /path/to/output/file/txt\n";
 		return -1;
 	}
 
@@ -53,37 +53,45 @@ int main(int argc, char ** argv)
 	inFile.open( argv[1] );
 	char line[256];
 	inFile.getline( line, 256 );
+	double hv, mean, sigma;
 	double hvleft, hvright, leftMean, leftSigma, rightMean, rightSigma;
-	int layer, sector, component;
+	int layer, sector, component, order;
 
 	std::vector< BarInfo > Bars;
 	std::vector< double > HVs;
 	std::vector< double > HVerr;
 	if (inFile.is_open() == true){
-		while ( inFile >> sector >> layer >> component >> hvleft >> hvright >>\
-				leftMean >> leftSigma >> rightMean >> rightSigma ) {
+		while ( inFile >> sector >> layer >> component >> order >> hv >> mean >> sigma ) {
+      if (order == 0) { //Left PMTs
+           hvleft = hv;
+					 leftMean = mean;
+					 leftSigma = sigma;
+			}
+			else if (order == 1) { //Right PMTs
+           hvright = hv;
+					 rightMean = mean;
+					 rightSigma = sigma;
+			}
+			else { cout << "Wrong Order number: " << order << endl; continue; }
 
-			int ID = layer*5 + layer + sector*5*sector + component*7 + component;
-			if (std::isnan(hvleft)) {
-				hvleft = 0;
-				cout << "HV left is NaN and was changed to 0 for bar ID " << ID << endl;
-			}
-			if (std::isnan(hvright)) {
-				hvright = 0;
-				cout << "HV right is NaN and was changed to 0 for bar ID " << ID << endl;
-			}
+			int ID = sector*1000 + layer*100 + component*10;
+
 			std::vector< BarInfo >::iterator it;
 			it = std::find_if( Bars.begin(), Bars.end(), find_bar( ID ) );
 			// If I've already started saving this bar
 			if( it != Bars.end() ){
 				int idx = std::distance( Bars.begin() , it );
 				BarInfo bar = Bars.at(idx);
-				Bars.at(idx).hvL.push_back( hvleft );
+				if (order == 0) {
+						Bars.at(idx).hvL.push_back( hvleft );
+						Bars.at(idx).meansL.push_back( leftMean );
+						Bars.at(idx).meansLerr.push_back( leftSigma );
+				}
+	      else { //Assuming order can be only 1 since all other values are catched previouly
 				Bars.at(idx).hvR.push_back( hvright );
-				Bars.at(idx).meansL.push_back( leftMean );
 				Bars.at(idx).meansR.push_back( rightMean );
-				Bars.at(idx).meansLerr.push_back( leftSigma );
 				Bars.at(idx).meansRerr.push_back( rightSigma );
+			  }
 			}
 			else{	// Otherwise create and add new bar
 				BarInfo bar;
@@ -91,15 +99,19 @@ int main(int argc, char ** argv)
 				bar.sector = sector;
 				bar.layer = layer;
 				bar.component = component;
-				bar.hvL.push_back( hvleft );
+				if (order == 0) {
+						bar.hvL.push_back( hvleft );
+					  bar.meansL.push_back( leftMean );
+						bar.meansLerr.push_back( leftSigma );
+				}
+				else { //Assuming order can be only 1 since all other values are catched previouly
 				bar.hvR.push_back( hvright );
-				bar.meansL.push_back( leftMean );
 				bar.meansR.push_back( rightMean );
-				bar.meansLerr.push_back( leftSigma );
 				bar.meansRerr.push_back( rightSigma );
+			  }
 				Bars.push_back( bar );
 			}
-			cout << ID << " " << " " << sector << " " << layer << " " << component << " " << hvleft << " " << hvright << " " << leftMean <<  " " << rightMean <<"\n";
+			cout << ID << " " << " " << sector << " " << layer << " " << component << " " << order << " "<< hv << " " << mean <<  " " << sigma <<"\n";
 		}
 	}
 
@@ -121,7 +133,7 @@ int main(int argc, char ** argv)
 		std::vector<double> mLerr = bar.meansLerr;
 		std::vector<double> mRerr = bar.meansRerr;
 		//increase error for estimated points by factor 100
-		for (int i = 0; i<mLerr.size(); i++) {
+	/*	for (int i = 0; i<mLerr.size(); i++) {
 			if (mLerr[i] < 5 || mLerr[i] == 2.4) {
 				mLerr[i] = mL[i]*0.5;
 			}
@@ -131,7 +143,7 @@ int main(int argc, char ** argv)
 				mRerr[i] = mR[i]*0.5;
 			}
 		}
-
+*/
 		TGraphErrors dataL( hL.size() , &hL[0] , &mL[0] , 0 , &mLerr[0] );
 		TGraphErrors dataR( hR.size() , &hR[0] , &mR[0] , 0 , &mRerr[0] );
 
@@ -183,7 +195,7 @@ int main(int argc, char ** argv)
 		c->Update();
 
 		name = Form("layer%i_sector%i_comp%i",bar.layer,bar.sector,bar.component);
-		c->SaveAs("/fitResults/" + name + "_gainCurve.pdf");
+	//	c->SaveAs("/fitResults/" + name + "_gainCurve.pdf");
 
 		outFile.precision(4);
 		outFile << bar.sector << " " << bar.layer << " " << bar.component << " " << HV_l << " " << HV_r << "\n";
