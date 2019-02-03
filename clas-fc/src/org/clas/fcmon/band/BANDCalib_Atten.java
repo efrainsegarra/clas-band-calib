@@ -92,7 +92,7 @@ public class BANDCalib_Atten extends FCApplication implements CalibrationConstan
         				
     		        	fit();
         			}
-    		        System.out.println("Done with Layer "+ lidx + ", Sector "+ sector + " , Component " + pidx);
+    		       //System.out.println("Completed Layer "+ lidx + ", Sector "+ sector + " , Component " + pidx);
             	} 
     		}        		
         }   	

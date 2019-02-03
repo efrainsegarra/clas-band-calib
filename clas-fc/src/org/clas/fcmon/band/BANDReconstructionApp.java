@@ -600,6 +600,3 @@ public class BANDReconstructionApp extends FCApplication {
 
 }
 
-
-
-
