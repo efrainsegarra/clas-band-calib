@@ -597,8 +597,8 @@ public class BANDReconstructionApp extends FCApplication {
 
 		for (int is=is1;is<is2;is++) {
 			for (int il=1 ; il<3 ; il++) {
-				if (!app.isSingleEvent()) bandPix[idet].Lmap_a.add(is,il,0, toTreeMap(H2_a_Hist.get(is,il,0).projectionY().getData())); //Strip View ADC 
-				if (!app.isSingleEvent()) bandPix[idet].Lmap_t.add(is,il,0, toTreeMap(H2_t_Hist.get(is,il,0).projectionY().getData())); //Strip View TDC 
+				if (!app.isSingleEvent()) bandPix[idet].Lmap_a.add(is,il,0, toTreeMap(H2_a_Hist.get(is,0,1+il).projectionY().getData())); //Strip View ADC 
+				if (!app.isSingleEvent()) bandPix[idet].Lmap_t.add(is,il,0, toTreeMap(H2_t_Hist.get(is,0,0+il).projectionY().getData())); //Strip View TDC 
 				//if  (app.isSingleEvent()) bandPix[idet].Lmap_a.add(is,il,0, toTreeMap(H1_a_Sevd.get(is,il,0).getData()));           
 			}
 		} 

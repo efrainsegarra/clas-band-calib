@@ -264,6 +264,9 @@ public class BANDPixels {
 				// 	idx (is,0,4) = L pmts
 				// 	idx (is,0,5) = R pmts
 				H2_a_Hist.add(is, 0, 3+il, new H2F("fadc_ad_overflowInc_"+iid+0,      400,   0., axis_scale,nstr[is-1], 1., nend));
+				
+				//Empty histogram needed for mapping -- to be something else later on
+				H2_t_Hist.add(is, 0, 0+il, new H2F("tdc_addHere"+iid,		400,0.,axis_scale,	nstr[is-1],1.,nend));
 
 			}
 		}       
