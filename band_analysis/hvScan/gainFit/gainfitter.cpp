@@ -155,8 +155,8 @@ void find_gain(int numRuns, TGraph * data, std::vector<double> * HVs, double &A,
 	myFunc.SetParameter(0,A);
 	myFunc.SetParameter(1,7);
 
-	TFitResultPtr fitRes = data->Fit(&myFunc,"QES","",HVs->at(0)-200.,HVs->at(numRuns-1)+200.);
-	cout << "\n\tGain Functional for PMT is:\tA = " << fitRes->Parameter(0) << "\t\tB [GAIN] = " << fitRes->Parameter(1) << "\n";
+	TFitResultPtr fitRes = data->Fit(&myFunc,"QES","",HVs->at(0)-400.,HVs->at(numRuns-1)+400.);
+	cout << "\n\tGain Functional for PMT is:\tA = " << fitRes->Parameter(0) << "\t\tB [GAIN] = " << fitRes->Parameter(1) << " with range: " << HVs->at(0)-200. << " to " << HVs->at(numRuns-1)+200. << "\n";
 
 	A = fitRes->Parameter(0);
 	Aerr = fitRes->ParError(0);
