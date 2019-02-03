@@ -1,13 +1,13 @@
 CFLAGS:=`root-config --cflags`
 LFLAGS:=`root-config --libs`
 
-all: pmt_test
+all: gainfitter
 
-pmt_test: pmt_test.cpp
+gainfitter: gainfitter.cpp
 	g++ $(CFLAGS) $(LFLAGS) $^ -o $@
 
 
 .PHONY: all clean
 
 clean:
-	rm -rf pmt_test *.o
+	rm -rf gainfitter *.o
