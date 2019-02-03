@@ -79,7 +79,6 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 		calib.setPrecision(3);
 
 		/* for (int i=0; i<3; i++) {
-
 		   int layer = i+1;
 		//calib.addConstraint(3, EXPECTED_MIP_CHANNEL[i]-ALLOWED_MIP_DIFF, 
 		//                       EXPECTED_MIP_CHANNEL[i]+ALLOWED_MIP_DIFF, 1, layer);
@@ -159,9 +158,9 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
         
         H1F h = null;
         double sigma_scaler = 1;
-        H1F reg = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,1+lr).sliceY(paddle);
+        H1F reg = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,lr,0).sliceY(paddle);
         
-        H1F over = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,3+lr).sliceY(paddle);
+        H1F over = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,lr,7).sliceY(paddle);
         
         //System.out.println("Ratio for " + layer + " " + sector + " " + paddle + " is"+reg.getIntegral()/over.getIntegral());
         
@@ -322,12 +321,12 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
          c.cd(0);          
          
          // Draw one including overflow samples
-         h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,0,4).sliceY(component);
+         h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,1,7).sliceY(component);
          h.setOptStat(Integer.parseInt("1000100")); 
          h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(34); c.draw(h);
          
          // Draw one without overflow samples
-         h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,0,2).sliceY(component);
+         h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,1,0).sliceY(component);
          h.setOptStat(Integer.parseInt("1000100"));
          h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); c.draw(h,"same");
           
@@ -335,11 +334,11 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
      c.cd(1);
      alab = tit+otab[1]+(component+1)+calTitles[0];  
      //Plot right overflow
-     h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,0,5).sliceY(component);
+     h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,2,7).sliceY(component);
      h.setOptStat(Integer.parseInt("1000100")); 
      h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(34); c.draw(h);
      //Plot right histogram													// 34 is the color light blue
-     h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,0,3).sliceY(component);
+     h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,2,0).sliceY(component);
      h.setOptStat(Integer.parseInt("1000100")); 
      h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); c.draw(h,"same");
          																	// 32 is the color red
@@ -474,5 +473,4 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 
 	}
 	}
-
 
