@@ -69,16 +69,20 @@ public class BANDReconstructionApp extends FCApplication {
 
 		for (int idet=0; idet<bandPix.length; idet++) {
 			for (int is=is1 ; is<is2 ; is++) {
+				int nstr = bandPix[idet].nstr[is];
+
 				bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,0,0).reset();
+				bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,0,1).reset();
 				bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,0,0).reset();
+
+				for( int ip = 1 ; ip<nstr[is-1]+1; ip++){
+					bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,ip,0).reset();
+					bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,ip,0).reset();
+				}
+
 				for (int il=1 ; il<3 ; il++) {
-					bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,0).reset();
-					bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,1).reset();
-					bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,3).reset();
-					bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,5).reset();
-					bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,6).reset();
-					bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,il,0).reset();
-					bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,il,2).reset();
+					bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,0,1+il).reset();
+					bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,0,3+il).reset();
 				}
 			}       
 		} 
@@ -195,7 +199,7 @@ public class BANDReconstructionApp extends FCApplication {
 						for (int ii=0; ii<tdcc.length; ii++) {
 							tdc[ii] = tdcc[ii]-app.phaseCorrection*4;  
 							float tdif = tdc[ii]-BANDConstants.TOFFSET[lr]-t;
-							bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,6).fill(tdif,ip);
+							//bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,6).fill(tdif,ip);
 						}
 					} else {
 						tdc = new float[1];
@@ -203,9 +207,9 @@ public class BANDReconstructionApp extends FCApplication {
 
 					for (int ii=0 ; ii< 100 ; ii++) {
 						float wgt = (ii==(int)(t/4)) ? adc:0;
-						bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,5).fill(ii,ip,wgt);
+						//bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,5).fill(ii,ip,wgt);
 						if (app.isSingleEvent()) {
-							bandPix[il-1].strips.hmap2.get("H2_a_Sevd").get(is,lr+1,0).fill(ii,ip,wgt);
+							//bandPix[il-1].strips.hmap2.get("H2_a_Sevd").get(is,lr+1,0).fill(ii,ip,wgt);
 						}
 					}
 
@@ -214,9 +218,9 @@ public class BANDReconstructionApp extends FCApplication {
 						getMode7(dum[0],dum[1],dum[2]);
 					}
 
-					if (ped>0) bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,3).fill(this.pedref-ped, ip);  
+					//if (ped>0) bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,3).fill(this.pedref-ped, ip);  
 
-					fill(il-1, is, lr+1, ip, adc, tdc, t, (float) adc);    
+					//fill(il-1, is, lr+1, ip, adc, tdc, t, (float) adc);    
 
 				} //isGoodSector?
 			}
@@ -304,8 +308,8 @@ public class BANDReconstructionApp extends FCApplication {
 				  }
 				  }
 				  if( overflow == 1 ) {
-				  bandPix[il-1].strips.hmap1.get("H1_o_Hist").get(is,lr+1, 0).fill(ip);
-				  bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,7).fill(ad,ip,1.0);
+				  bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,1+lr).fill(ad,ip,1.0);
+				  bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,3+lr).fill(ad,ip,1.0);
 				  continue;
 				  }
 				  
@@ -340,7 +344,7 @@ public class BANDReconstructionApp extends FCApplication {
 						// This means if there are multiple ADCs, we do the 
 						// filling twice... But, quoting Florian, we shouldn't have
 						// this happening...
-						bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,6).fill(tdif,ip);
+						//bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,6).fill(tdif,ip);
 					}
 				} else {
 					tdc = new float[1];
@@ -352,16 +356,16 @@ public class BANDReconstructionApp extends FCApplication {
 
 				// Loop through the waveform
 				for (int ii=0 ; ii< pulse.length ; ii++) {
-					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,5).fill(ii,ip,pulse[ii]-ped);
+					//bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,5).fill(ii,ip,pulse[ii]-ped);
 					if (app.isSingleEvent()) {
-						bandPix[il-1].strips.hmap2.get("H2_a_Sevd").get(is,lr+1,0).fill(ii,ip,pulse[ii]-ped);
+						//bandPix[il-1].strips.hmap2.get("H2_a_Sevd").get(is,lr+1,0).fill(ii,ip,pulse[ii]-ped);
 						int w1 = t0-this.nsb;
 						int w2 = t0+this.nsa;
-						if (ad>0&&ii>=w1&&ii<=w2) bandPix[il-1].strips.hmap2.get("H2_a_Sevd").get(is,lr+1,1).fill(ii,ip,pulse[ii]-ped);                     
+						//if (ad>0&&ii>=w1&&ii<=w2) bandPix[il-1].strips.hmap2.get("H2_a_Sevd").get(is,lr+1,1).fill(ii,ip,pulse[ii]-ped);                     
 					}
 				}
 
-				if (pd>0) bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,3).fill(this.pedref-pd, ip);
+				//if (pd>0) bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,3).fill(this.pedref-pd, ip);
 
 				// Fill a bunch of histograms
 				fill(il-1, is, lr+1, ip, ad, tdc, tf, ph);   
@@ -447,11 +451,11 @@ public class BANDReconstructionApp extends FCApplication {
 		if (app.isSingleEvent()) {
 			for (int is=0 ; is<5 ; is++) {
 				for (int il=0 ; il<2 ; il++) {
-					bandPix[idet].strips.hmap1.get("H1_a_Sevd").get(is+1,il+1,0).reset();
-					bandPix[idet].strips.hmap2.get("H2_a_Sevd").get(is+1,il+1,0).reset();
-					bandPix[idet].strips.hmap2.get("H2_a_Sevd").get(is+1,il+1,1).reset();
-					bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is+1,il+1,5).reset();
-					bandPix[idet].strips.hmap2.get("H2_t_Sevd").get(is+1,il+1,0).reset();
+					//bandPix[idet].strips.hmap1.get("H1_a_Sevd").get(is+1,il+1,0).reset();
+					//bandPix[idet].strips.hmap2.get("H2_a_Sevd").get(is+1,il+1,0).reset();
+					//bandPix[idet].strips.hmap2.get("H2_a_Sevd").get(is+1,il+1,1).reset();
+					//bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is+1,il+1,5).reset();
+					//bandPix[idet].strips.hmap2.get("H2_t_Sevd").get(is+1,il+1,0).reset();
 				}
 			}
 		}   
@@ -471,13 +475,13 @@ public class BANDReconstructionApp extends FCApplication {
 				bandPix[idet].tdcr[is-1][il-1][inh-1] = (float) tdc[ii];
 				bandPix[idet].strrt[is-1][il-1][inh-1] = ip;
 				bandPix[idet].ph[is-1][il-1][inh-1] = adph;
-				bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,il,0).fill(tdc[ii],ip,1.0);
+				//bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,il,0).fill(tdc[ii],ip,1.0);
 			}
 			//else {
 			//	System.out.println("Had tdc outside this range ahhhhhh");
 			//}
 
-			bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,1).fill(adc,tdc[ii],1.0);
+			//bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,1).fill(adc,tdc[ii],1.0);
 
 		}
 
@@ -487,8 +491,7 @@ public class BANDReconstructionApp extends FCApplication {
 			bandPix[idet].adcr[is-1][il-1][inh-1] = adc;
 			bandPix[idet].tf[is-1][il-1][inh-1] = tdcf;
 			bandPix[idet].strra[is-1][il-1][inh-1] = ip;
-			bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,0).fill(adc,ip,1.0);
-			bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,7).fill(adc,ip,1.0);
+			bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,0,1+il).fill(adc,ip,1.0);
 		} 
 	}
 
@@ -515,7 +518,6 @@ public class BANDReconstructionApp extends FCApplication {
 					float fadc_sum = fadc_lr_diff.getItem(is,il,0,ip).get(0) + fadc_lr_diff.getItem(is,il,1,ip).get(0);
 					fadc_sum *= 0.5;
 					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is, 0, 1).fill(fadc_LR,ip);
-					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is, 0, 9).fill(fadc_sum,ip);
 
 					int refPad = 1;
 					//if( fadc_lr_diff.getItem(is,il,0,refPad).get(0) != 0  || fadc_lr_diff.getItem(is,il,1,refPad).get(0) != 0) {
@@ -550,6 +552,7 @@ public class BANDReconstructionApp extends FCApplication {
 
 	public void processSED() {
 
+		/*
 		for (int idet=0; idet<bandPix.length; idet++) {
 			for (int is=0; is<5; is++) {
 				for (int il=0; il<2; il++ ){;
@@ -567,6 +570,7 @@ public class BANDReconstructionApp extends FCApplication {
 				}
 			} 
 		}
+		*/
 	} 
 
 	public void findPixels() {      
@@ -582,13 +586,13 @@ public class BANDReconstructionApp extends FCApplication {
 
 		H2_a_Hist = bandPix[idet].strips.hmap2.get("H2_a_Hist");
 		H2_t_Hist = bandPix[idet].strips.hmap2.get("H2_t_Hist");
-		H1_a_Sevd = bandPix[idet].strips.hmap1.get("H1_a_Sevd");
+		//H1_a_Sevd = bandPix[idet].strips.hmap1.get("H1_a_Sevd");
 
 		for (int is=is1;is<is2;is++) {
 			for (int il=1 ; il<3 ; il++) {
 				if (!app.isSingleEvent()) bandPix[idet].Lmap_a.add(is,il,0, toTreeMap(H2_a_Hist.get(is,il,0).projectionY().getData())); //Strip View ADC 
 				if (!app.isSingleEvent()) bandPix[idet].Lmap_t.add(is,il,0, toTreeMap(H2_t_Hist.get(is,il,0).projectionY().getData())); //Strip View TDC 
-				if  (app.isSingleEvent()) bandPix[idet].Lmap_a.add(is,il,0, toTreeMap(H1_a_Sevd.get(is,il,0).getData()));           
+				//if  (app.isSingleEvent()) bandPix[idet].Lmap_a.add(is,il,0, toTreeMap(H1_a_Sevd.get(is,il,0).getData()));           
 			}
 		} 
 
