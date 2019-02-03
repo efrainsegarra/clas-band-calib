@@ -31,10 +31,10 @@ with open(sys.argv[2],'w') as g:
 
 				# Parse order
 				order = -1
-				if 'L' in name: order = 1
-				elif 'R' in name: order = 2
-				elif 'V' in name and 'B' not in name: order = 1
-				elif 'V' in name and 'A' not in name: order = 2
+				if 'L' in name: order = 0
+				elif 'R' in name: order = 1
+				elif 'V' in name and 'B' not in name: order = 0
+				elif 'V' in name and 'A' not in name: order = 1
 		
 				g.write(str(sector)+"\t"+str(layer)+"\t"+str(comp)+"\t"+str(order)+"\t"+str(hv)+"\n")
 
