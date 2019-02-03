@@ -51,6 +51,8 @@ public class BANDReconstructionApp extends FCApplication {
 	int nsa,nsb,tet,pedref;     
 	int     thrcc = 20;
 	short[] pulse = new short[100]; 
+	
+	public int[] nstr = new int[bandcc.bandlen.length];
 
 	public BANDReconstructionApp(String name, BANDPixels[] bandPix) {
 		super(name, bandPix);
@@ -63,14 +65,18 @@ public class BANDReconstructionApp extends FCApplication {
 		is2 = BANDConstants.IS2;
 		iis1 = BANDConstants.IS1-1;
 		iis2 = BANDConstants.IS2-1;
+		
 	} 
 
 	public void clearHistograms() {
 
 		for (int idet=0; idet<bandPix.length; idet++) {
+			
+		
+			
 			for (int is=is1 ; is<is2 ; is++) {
-				int nstr = bandPix[idet].nstr[is];
-
+				nstr[is]=bandcc.bandlay[idet][is];
+				
 				bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,0,0).reset();
 				bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,0,1).reset();
 				bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,0,0).reset();
@@ -246,7 +252,8 @@ public class BANDReconstructionApp extends FCApplication {
 			int is = ddd.getDescriptor().getSector();
 			int il = ddd.getDescriptor().getLayer();
 			int lr = ddd.getDescriptor().getOrder();
-			int ip = ddd.getDescriptor().getComponent();           
+			int ip = ddd.getDescriptor().getComponent(); 
+
 			// Take TDC channel, convert to nanosecond, and subtract offset.
 			// This offset is arb. defined by looking at data, because our 
 			// 1190 TDC offset is far too large, and our real data starts ~1.2microseconds
