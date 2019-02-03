@@ -86,7 +86,7 @@ public class BANDCalib_EXAMPLE extends FCApplication implements CalibrationConst
         				
     		        	fit();
         			}
-    		        System.out.println("Done with Layer "+ lidx + ", Sector "+ sector + " , Component " + pidx);
+    		        //System.out.println("Finished with Layer "+ lidx + ", Sector "+ sector + " , Component " + pidx);
             	} 
     		}        		
         }   	
