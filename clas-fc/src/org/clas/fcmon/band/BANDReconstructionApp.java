@@ -540,7 +540,7 @@ public class BANDReconstructionApp extends FCApplication {
 
 	
 				// Cut on source position in middle of bar
-				if( java.lang.Math.abs(td) < 3){
+				if( java.lang.Math.abs(td+1.5) < 3){
 					bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is, 0, 0).fill(td,ip,1.0);  
 					// Grab corresponding FADC values for the pmts on a bar
 					

@@ -243,7 +243,14 @@ public class BANDMon extends DetectorMonitor {
 			// From updateGUI timer or mouseover : process entering a new detector shape and repaint
 			DetectorDescriptor dd = shape.getDescriptor();
 			app.updateStatusString(dd); // For strip/pixel ID and reverse translation table
-			this.analyze();  // Refresh color maps      
+			this.analyze();  // Refresh color maps   
+			
+			if( ( (app.laserData ? 1 : 0) + (app.cosmicData ? 1 : 0) 
+					+ (app.sourceData ? 1 : 0) + (app.prodData ? 1 : 0) ) > 1) {
+				System.out.println("<-----! INVALID SETTINGS; EXITING NOW !-----> ");
+				System.exit(0);
+			}
+
 			switch (app.getSelectedTabName()) {
 
 				case "HV":                            bandCalib_hv.updateCanvas(dd); break; 

@@ -15,6 +15,7 @@ shortbar = np.asarray([0,3200,5400,4600,2800],dtype=float)
 
 Al,Bl = curve_fit(f, mev,longbar)[0] 
 As,Bs  = curve_fit(f, mev,shortbar)[0]
+print Al,Bl,As,Bs
 pts = np.linspace(0,2)
 
 plt.figure(1)

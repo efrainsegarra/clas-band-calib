@@ -51,10 +51,10 @@ public class FCMenuBar extends JMenuBar  {
         JMenu          XM_open = new JMenu("xMsg Ring");
         JMenuItem    file_open = new JMenuItem("Load EVIO or HIPO File");    
         JMenuItem         band = new JMenuItem("BAND");
-        JMenuItem          sd3 = new JMenuItem("clondaq3");
-        JMenuItem          sd4 = new JMenuItem("clondaq4");
-        JMenuItem          sd5 = new JMenuItem("clondaq5");
-        JMenuItem          sd6 = new JMenuItem("clondaq6");
+        //JMenuItem          sd3 = new JMenuItem("clondaq3");
+        //JMenuItem          sd4 = new JMenuItem("clondaq4");
+        //JMenuItem          sd5 = new JMenuItem("clondaq5");
+        //JMenuItem          sd6 = new JMenuItem("clondaq6");
         JMenuItem           x0 = new JMenuItem("EVIO");
         JMenuItem           x1 = new JMenuItem("HIPO");
     
@@ -78,10 +78,10 @@ public class FCMenuBar extends JMenuBar  {
            
 
             ET_open.add(band);
-            ET_open.add(sd3);
-            ET_open.add(sd4);
-            ET_open.add(sd5);
-            ET_open.add(sd6);
+            //ET_open.add(sd3);
+            //ET_open.add(sd4);
+            //ET_open.add(sd5);
+            //ET_open.add(sd6);
      
             XM_open.add(x0);
             XM_open.add(x1);
@@ -89,10 +89,10 @@ public class FCMenuBar extends JMenuBar  {
             file_open.addActionListener(this);   
         
           band.addActionListener(this);
-           sd3.addActionListener(this);     
-           sd4.addActionListener(this);     
-           sd5.addActionListener(this);     
-           sd6.addActionListener(this);     
+           //sd3.addActionListener(this);     
+           //sd4.addActionListener(this);     
+           //sd5.addActionListener(this);     
+           //sd6.addActionListener(this);     
             x0.addActionListener(this);      
             x1.addActionListener(this);   
           
@@ -143,6 +143,8 @@ public class FCMenuBar extends JMenuBar  {
 	public class MenuSettings extends JMenu implements ActionListener {
 		
 		JMenuItem item1,item2,item3,item4;
+		JMenuItem source,cosmic,laser,production;
+		JMenuItem beamOn;
 		
         public MenuSettings() {
             createMenu();
@@ -158,6 +160,89 @@ public class FCMenuBar extends JMenuBar  {
         }
         
         public void createMenu() {
+        	
+        	// Switch option for beam on vs beam off
+        	JCheckBoxMenuItem beamOn = new JCheckBoxMenuItem("Beam On");  
+        	beamOn.setSelected(true);
+        	beamOn.addItemListener(new ItemListener() {
+                public void itemStateChanged(ItemEvent e) {        	
+                    if(e.getStateChange() == ItemEvent.SELECTED) {
+             	          app.beamOn = true;
+             	          System.out.println("\t**Assuming beam on!**");
+                    } else {
+             	          app.beamOn = false;
+             	          System.out.println("\t**Assuming beam off!**");
+                    };
+                }
+                }); 
+            menu.add(beamOn);
+        	
+            // Switch item if laser is on/off
+            JCheckBoxMenuItem laser = new JCheckBoxMenuItem("Laser Data");  
+            laser.setSelected(false);
+            laser.addItemListener(new ItemListener() {
+                public void itemStateChanged(ItemEvent e) {        	
+                    if(e.getStateChange() == ItemEvent.SELECTED) {
+             	          app.laserData = true;
+             	         System.out.println("\t**Switch to laser data!**");
+                    } else {
+             	          app.laserData = false;
+             	          System.out.println("\t**Turning off laser data!**");
+                    };
+                }
+                }); 
+            menu.add(laser);
+        	
+            // Switch item if taking cosmic data or not
+            JCheckBoxMenuItem cosmic = new JCheckBoxMenuItem("Cosmic Data");  
+            cosmic.setSelected(false);
+            cosmic.addItemListener(new ItemListener() {
+                public void itemStateChanged(ItemEvent e) {        	
+                    if(e.getStateChange() == ItemEvent.SELECTED) {
+             	          app.cosmicData = true;
+             	         System.out.println("\t**Switch to cosmic data!**");
+                    } else {
+             	          app.cosmicData = false;
+             	          System.out.println("\t**Turning off cosmic data!**");
+                    };
+                }
+                }); 
+            menu.add(cosmic);
+        	
+            // Switch item if taking source data or not
+            JCheckBoxMenuItem source = new JCheckBoxMenuItem("Source Data");  
+            source.setSelected(false);
+            source.addItemListener(new ItemListener() {
+                public void itemStateChanged(ItemEvent e) {        	
+                    if(e.getStateChange() == ItemEvent.SELECTED) {
+             	          app.sourceData = true;
+             	          System.out.println("\t**Switch to source data!**");
+                    } else {
+             	          app.sourceData = false;
+             	          System.out.println("\t**Turning off source data!**");
+                    };
+                }
+                }); 
+            menu.add(source);
+            
+            // Switch item if taking production data or not
+            JCheckBoxMenuItem production = new JCheckBoxMenuItem("Production Data");  
+            production.setSelected(false);
+            production.addItemListener(new ItemListener() {
+                public void itemStateChanged(ItemEvent e) {        	
+                    if(e.getStateChange() == ItemEvent.SELECTED) {
+             	          app.prodData = true;
+             	          System.out.println("\t**Switch to production data!**");
+                    } else {
+             	          app.prodData = false;
+             	          System.out.println("\t**Turning off production data!**");
+                    };
+                }
+                }); 
+            menu.add(production);
+        	
+        	
+        	/*
             item1 = new JMenuItem("HISTO reset interval");
             item1.addActionListener(this);
             menu.add(item1);
@@ -167,6 +252,7 @@ public class FCMenuBar extends JMenuBar  {
             item3 = new JMenuItem("Phase Offset");
             item3.addActionListener(this);
             menu.add(item3);
+            
             JCheckBoxMenuItem item4 = new JCheckBoxMenuItem("Phase Correction");  
             item4.setSelected(true);
             item4.addItemListener(new ItemListener() {
@@ -179,6 +265,7 @@ public class FCMenuBar extends JMenuBar  {
                 }
                 }); 
             menu.add(item4);
+             */
         }
         
         public void chooseUpdateInterval() {

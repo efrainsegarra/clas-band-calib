@@ -145,6 +145,12 @@ public class MonitorApp extends JFrame implements ActionListener {
     public float            phase = 0;
     public float  phaseCorrection = 0;
     public boolean  correctPhase  = true;
+    public boolean		  beamOn  = true;
+    public boolean		laserData = false;
+    public boolean	   cosmicData = false;
+    public boolean	   sourceData = false;
+    public boolean		 prodData = false;
+    
 
     public int tet,nsa,nsb,pedref;
     public int maxEvents=100000000;
