@@ -79,7 +79,6 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 		calib.setPrecision(3);
 
 		/* for (int i=0; i<3; i++) {
-
 		   int layer = i+1;
 		//calib.addConstraint(3, EXPECTED_MIP_CHANNEL[i]-ALLOWED_MIP_DIFF, 
 		//                       EXPECTED_MIP_CHANNEL[i]+ALLOWED_MIP_DIFF, 1, layer);
@@ -474,5 +473,4 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 
 	}
 	}
-
 
