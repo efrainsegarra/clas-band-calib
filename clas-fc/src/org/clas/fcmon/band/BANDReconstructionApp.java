@@ -79,6 +79,8 @@ public class BANDReconstructionApp extends FCApplication {
 					bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,6).reset();
 					bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,il,0).reset();
 					bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,il,2).reset();
+					bandPix[idet].strips.hmap2.get("H2_x_Hist").get(is,il,0).reset();
+					bandPix[idet].strips.hmap2.get("H2_x_Hist").get(is,il,1).reset();		
 				}
 			}       
 		} 
@@ -224,6 +226,8 @@ public class BANDReconstructionApp extends FCApplication {
 		if (app.isHipoFileOpen) app.writer.writeEvent(event);       
 
 	}  
+	
+	//****************************** EVIO DATA UPDATING *********************************************
 
 	public void updateEvioData(DataEvent event) {
 
@@ -299,7 +303,7 @@ public class BANDReconstructionApp extends FCApplication {
 				  for (int ii=0 ; ii< pulse.length ; ii++) {
 				  if( pulse[ii] >= 4095) {
 				  //System.out.println("Overflow detected");
-				  overflow = 1;
+					  overflow = 1;
 				  break;
 				  }
 				  }
@@ -461,6 +465,11 @@ public class BANDReconstructionApp extends FCApplication {
 	public void fill(int idet, int is, int il, int ip, int adc, float[] tdc, float tdcf, float adph) {
 
 		int nstr = bandPix[idet].nstr[is-1];
+		
+		//dcs
+		//tdcs
+		
+		
 
 		for (int ii=0; ii<tdc.length; ii++) {
 
@@ -472,6 +481,8 @@ public class BANDReconstructionApp extends FCApplication {
 				bandPix[idet].strrt[is-1][il-1][inh-1] = ip;
 				bandPix[idet].ph[is-1][il-1][inh-1] = adph;
 				bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,il,0).fill(tdc[ii],ip,1.0);
+				//bandPix[idet].strips.hmap2.get("H2_x_Hist").get(is,il,0).fill(adc,tdc[ii]-tdcf,1.0);
+				bandPix[idet].strips.hmap2.get("H2_x_Hist").get(is,il,0).fill(adc,tdc[ii],1.0);
 			}
 			//else {
 			//	System.out.println("Had tdc outside this range ahhhhhh");
@@ -489,6 +500,8 @@ public class BANDReconstructionApp extends FCApplication {
 			bandPix[idet].strra[is-1][il-1][inh-1] = ip;
 			bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,0).fill(adc,ip,1.0);
 			bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,7).fill(adc,ip,1.0);
+			//bandPix[idet].strips.hmap2.get("H2_x_Hist").get(is,il,0).fill(adc,tdc-tdcf,1.0);
+
 		} 
 	}
 

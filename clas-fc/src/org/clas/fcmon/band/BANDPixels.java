@@ -194,7 +194,8 @@ public class BANDPixels {
         DetectorCollection<H2F> H2_a_Sevd = new DetectorCollection<H2F>();
         DetectorCollection<H2F> H2_t_Sevd = new DetectorCollection<H2F>();
         DetectorCollection<H1F> H1_o_Hist = new DetectorCollection<H1F>();
-        
+        DetectorCollection<H2F> H2_x_Hist = new DetectorCollection<H2F>();
+                
         //Histograms stored as:
         //	H2_a_hist.get(sector,l/r,idx) where idx specifies which 2D histogram is being saved here
         // 		sector: 1-6
@@ -217,6 +218,8 @@ public class BANDPixels {
             H2_t_Hist.add(is, 0, 0, new H2F("t_tdif_"+iid+0,  600, -20.,      20.,nstr[is-1], 1., nend));
             // L-R TDC plot of a given paddle for FADC time
             H2_a_Hist.add(is, 0, 1, new H2F("a_tdif_"+iid+0,  1000, -20.,      20.,nstr[is-1], 1., nend));
+            
+            //H2_x_Hist.add(is, 0, 0, new H2F("adc"+iid+0,  1000, -20.,      20.,nstr[is-1], 1., nend));
             
             // Add gm vs fadc time sum for each paddle
             H2_a_Hist.add(is, 0, 9, new H2F("a_tsum_"+iid+0,  5000, 0.,	   500., nstr[is-1], 1., nend));
@@ -241,7 +244,10 @@ public class BANDPixels {
                 H2_a_Hist.add(is, il, 5, new H2F("a_fadc_"+iid+5,     1000,   0., 1000., nstr[is-1], 1., nend));			// this is used for mode1:sum 2D graph where x axis is samples(4ns/ch)
                 																										// and y-axis is which PMT in the sector/layer for left and right side
                               
-            
+                H2_x_Hist.add(is, il, 0, new H2F("FADC-TDC"+iid+0,  200,   0., axis_scale/2,1000, 0, 500));
+                
+                
+                
                 H2_a_Hist.add(is, il, 6, new H2F("a_fadc_"+iid+6,     100, -20.,  20., nstr[is-1], 1., nend));
                 H1_a_Sevd.add(is, il, 0, new H1F("a_sed_"+iid+0,                       nstr[is-1], 1., nend));
                 H2_a_Sevd.add(is, il, 0, new H2F("a_sed_fadc_"+iid+0, 100,   0., 100., nstr[is-1], 1., nend));
@@ -260,6 +266,7 @@ public class BANDPixels {
             calib.getFile(hipoFile);
             H2_a_Hist = calib.getCollection("H2_a_Hist");
             H2_t_Hist = calib.getCollection("H2_t_Hist");
+            H2_t_Hist = calib.getCollection("H2_x_Hist");          
         }         
         
         strips.addH1DMap("H1_a_Sevd",  H1_a_Sevd);
@@ -269,6 +276,8 @@ public class BANDPixels {
         strips.addH2DMap("H2_t_Hist",  H2_t_Hist);
         strips.addH2DMap("H2_a_Sevd",  H2_a_Sevd);
         strips.addH2DMap("H2_t_Sevd",  H2_t_Sevd);
+        strips.addH2DMap("H2_x_Hist",  H2_x_Hist);
+        
     } 
     
 }

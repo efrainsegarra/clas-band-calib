@@ -30,6 +30,7 @@ public class BANDMon extends DetectorMonitor {
 
 	BANDReconstructionApp   	bandRecon = null;
 	BANDCalib_HV                bandCalib_hv = null; 
+	BANDCalib_TimeWalk			bandCalib_tw = null;
 	BANDCalib_C					bandCalib_c = null;
 	BANDCalib_Atten				bandCalib_atten = null;
 
@@ -117,6 +118,11 @@ public class BANDMon extends DetectorMonitor {
 		bandCalib_hv.setMonitoringClass(this);
 		bandCalib_hv.setApplicationClass(app); 
 		bandCalib_hv.init(is1,is2);
+				
+		bandCalib_tw = new BANDCalib_TimeWalk("TW",bandPix);        
+		bandCalib_tw.setMonitoringClass(this);
+		bandCalib_tw.setApplicationClass(app); 
+		bandCalib_tw.init(is1,is2);
 
 		bandCalib_c = new BANDCalib_C("Speed of Light",bandPix);        
 		bandCalib_c.setMonitoringClass(this);
@@ -139,7 +145,7 @@ public class BANDMon extends DetectorMonitor {
 		//app.addCanvas(bandTdc.getName(),             bandTdc.getCanvas());          
 		//app.addCanvas(bandPedestal.getName(),   bandPedestal.getCanvas());
 
-
+		app.addCanvas(bandCalib_tw.getName(),             		bandCalib_tw.getCanvas());
 		app.addCanvas(bandCalib_hv.getName(),             		bandCalib_hv.getCanvas());
 		app.addCanvas(bandCalib_c.getName(),             		bandCalib_c.getCanvas());
 		app.addCanvas(bandCalib_atten.getName(),             	bandCalib_atten.getCanvas());
@@ -216,10 +222,11 @@ public class BANDMon extends DetectorMonitor {
 					System.out.println("End of run");      
 					if( analyzedBefore == 0) {
 						app.addFrame(bandCalib_hv.getName(),             bandCalib_hv.getCalibPane()); 
+						app.addFrame(bandCalib_tw.getName(),             bandCalib_tw.getCalibPane()); 
 						app.addFrame(bandCalib_c.getName(),             bandCalib_c.getCalibPane()); 
 						app.addFrame(bandCalib_atten.getName(),             bandCalib_atten.getCalibPane()); 
 					}
-
+					bandCalib_tw.analyze();
 					bandCalib_hv.analyze();
 					bandCalib_c.analyze();
 					bandCalib_atten.analyze();
@@ -247,6 +254,7 @@ public class BANDMon extends DetectorMonitor {
 			switch (app.getSelectedTabName()) {
 
 				case "HV":                            bandCalib_hv.updateCanvas(dd); break; 
+				case "TW":                            bandCalib_tw.updateCanvas(dd); break; 
 				case "Speed of Light":                bandCalib_c.updateCanvas(dd); break; 
 				case "Attenuation":                   bandCalib_atten.updateCanvas(dd); break; 
 
