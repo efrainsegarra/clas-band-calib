@@ -304,8 +304,8 @@ public class BANDReconstructionApp extends FCApplication {
 				  }
 				  }
 				  if( overflow == 1 ) {
-				  bandPix[il-1].strips.hmap1.get("H1_o_Hist").get(is,lr+1, 0).fill(ip);
-				  bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,7).fill(ad,ip,1.0);
+				  //bandPix[il-1].strips.hmap1.get("H1_o_Hist").get(is,lr+1, 0).fill(ip);
+				  //bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,7).fill(ad,ip,1.0);
 				  continue;
 				  }
 				  
@@ -487,8 +487,8 @@ public class BANDReconstructionApp extends FCApplication {
 			bandPix[idet].adcr[is-1][il-1][inh-1] = adc;
 			bandPix[idet].tf[is-1][il-1][inh-1] = tdcf;
 			bandPix[idet].strra[is-1][il-1][inh-1] = ip;
-			bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,0).fill(adc,ip,1.0);
-			bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,7).fill(adc,ip,1.0);
+			//bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,0).fill(adc,ip,1.0);
+			//bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,il,7).fill(adc,ip,1.0);
 		} 
 	}
 
@@ -537,12 +537,28 @@ public class BANDReconstructionApp extends FCApplication {
 
 			if(tdcs.hasItem(is,il,0,ip)&&tdcs.hasItem(is,il,1,ip)) {
 				float td = tdcs.getItem(is,il,0,ip).get(0)-tdcs.getItem(is,il,1,ip).get(0);
-				bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is, 0, 0).fill(td,ip,1.0);  
 
-				//if(adcs.hasItem(is,il,0,ip)&&adcs.hasItem(is,il,1,ip)) {
-				//float lograt = (float) Math.log10(adcs.getItem(is,il,0,ip).get(0)/adcs.getItem(is,il,1,ip).get(0));
-				//bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is, ip, 2).fill(td,lograt);
-				//}    
+	
+				// Cut on source position in middle of bar
+				if( java.lang.Math.abs(td) < 3){
+					bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is, 0, 0).fill(td,ip,1.0);  
+					// Grab corresponding FADC values for the pmts on a bar
+					
+					if(adcs.hasItem(is,il,0,ip) && adcs.hasItem(is,il,1,ip)) {
+						float adcL = adcs.getItem(is,il,0,ip).get(0);
+						float adcR = adcs.getItem(is,il,1,ip).get(0);
+							// we should have a cut on correlation of ADC
+						
+						if( java.lang.Math.abs(adcL-adcR+150) < 2*180){
+							bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,1,0).fill(adcL,ip,1.0);
+							bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,1,7).fill(adcL,ip,1.0);
+								// TODO fix hack here to have R hand plot the correlation of FADCs
+							bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,2,0).fill(4000+adcL-adcR,ip,1.0);
+							bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,2,7).fill(4000+adcL-adcR,ip,1.0);
+						}
+					}
+					
+				}
 			}
 		}
 
