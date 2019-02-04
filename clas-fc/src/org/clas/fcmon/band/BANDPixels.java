@@ -18,11 +18,13 @@ public class BANDPixels {
     DatabaseConstantProvider ccdb = new DatabaseConstantProvider(1,"default");
 	BANDConstants              bc = new BANDConstants();  
 	
-    double band_xpix[][][] = new double[4][14][5];
-    double band_ypix[][][] = new double[4][14][5];
+    double band_xpix[][][] = new double[4][14][6];
+    double band_ypix[][][] = new double[4][14][6];
     
-    public double        amax[]= {80000.,80000.,80000.,80000.,80000.};
-    public double        tmax[] = {10000.,10000.,10000.,10000.,10000.};
+
+    public double        amax[]= {50000.,50000.,50000.,50000.,50000.,50000};
+    public double        tmax[] = {10000.,10000.,10000.,10000.,10000.,10000};
+
     
     int        nha[][] = new    int[6][2];
     int        nht[][] = new    int[6][2];
@@ -43,12 +45,17 @@ public class BANDPixels {
 	public String detName = null;
 	
     public BANDPixels(String det) {
+    	bc.setSectorRange(1, 6);
         if (det.equals("LAYER1")) id=0;
         if (det.equals("LAYER2")) id=1;
         if (det.equals("LAYER3")) id=2;
         if (det.equals("LAYER4")) id=3;
         if (det.equals("LAYER5")) id=4;
-        for (int is=0; is<bc.bandlay.length; is++) nstr[is]=bc.bandlay[id][is];
+        if (det.equals("VETO")) id=5;
+        //System.out.println(id);
+        for (int is=0; is<(bc.IS2-bc.IS1); is++) {
+        	nstr[is]=bc.bandlay[id][is];
+        }
         detName = det;
         pixdef();
     }
@@ -92,29 +99,62 @@ public class BANDPixels {
         	double  xoff = bc.bandxoff[is];
         	double  yoff = bc.bandyoff[is];
         	double y_inc = bc.bandwid[is];
-        	for(int i=0 ; i<nnstr ; i++){
-        		x_inc = 0.5*bc.bandlen[is];        	
-                band_xpix[0][nnstr+i][is]=xoff-x_inc;
-                band_xpix[1][nnstr+i][is]=xoff+0;
-                band_xpix[2][nnstr+i][is]=xoff+0.;
-                band_xpix[3][nnstr+i][is]=xoff-x_inc;
-                k = -i*y_inc+yoff*y_inc;	    	   
-                band_ypix[0][nnstr+i][is]=k;
-                band_ypix[1][nnstr+i][is]=k;
-                band_ypix[2][nnstr+i][is]=k-y_inc;
-                band_ypix[3][nnstr+i][is]=k-y_inc;
+        
+        	// Draw all the "pmts" except for the veto layer
+        	if(id<5) {
+        		for(int i=0 ; i<nnstr ; i++){
+        			x_inc = 0.5*bc.bandlen[is];        	
+                	band_xpix[0][nnstr+i][is]=xoff-x_inc;
+                	band_xpix[1][nnstr+i][is]=xoff+0;
+                	band_xpix[2][nnstr+i][is]=xoff+0.;
+                	band_xpix[3][nnstr+i][is]=xoff-x_inc;
+                	k = -i*y_inc+yoff*y_inc;	    	   
+                	band_ypix[0][nnstr+i][is]=k;
+                	band_ypix[1][nnstr+i][is]=k;
+                	band_ypix[2][nnstr+i][is]=k-y_inc;
+                	band_ypix[3][nnstr+i][is]=k-y_inc;
+        		}
+        		for(int i=0 ; i<nnstr ; i++){
+        			x_inc = 0.5*bc.bandlen[is];        	
+        			band_xpix[0][i][is]=xoff+0;
+        			band_xpix[1][i][is]=xoff+x_inc;
+        			band_xpix[2][i][is]=xoff+x_inc;
+        			band_xpix[3][i][is]=xoff+0.;
+        			k = -i*y_inc+yoff*y_inc;	    	   
+        			band_ypix[0][i][is]=k;
+        			band_ypix[1][i][is]=k;
+        			band_ypix[2][i][is]=k-y_inc;
+        			band_ypix[3][i][is]=k-y_inc;
+        		}
         	}
-        	for(int i=0 ; i<nnstr ; i++){
-        		x_inc = 0.5*bc.bandlen[is];        	
-                band_xpix[0][i][is]=xoff+0;
-                band_xpix[1][i][is]=xoff+x_inc;
-                band_xpix[2][i][is]=xoff+x_inc;
-                band_xpix[3][i][is]=xoff+0.;
-                k = -i*y_inc+yoff*y_inc;	    	   
-                band_ypix[0][i][is]=k;
-                band_ypix[1][i][is]=k;
-                band_ypix[2][i][is]=k-y_inc;
-                band_ypix[3][i][is]=k-y_inc;
+        	// Draw all the "pmts" for the veto layer
+        	else {
+        		for(int i=0 ; i<nnstr ; i++){
+        			if(is!=3){
+        				x_inc = 0.5*bc.bandlen[is];        	
+        				band_xpix[0][i][is]=xoff+0;
+        				band_xpix[1][i][is]=xoff+x_inc;
+        				band_xpix[2][i][is]=xoff+x_inc;
+        				band_xpix[3][i][is]=xoff+0.;
+        				k = -i*y_inc+yoff*y_inc;	    	   
+        				band_ypix[0][i][is]=k;
+        				band_ypix[1][i][is]=k;
+        				band_ypix[2][i][is]=k-y_inc;
+        				band_ypix[3][i][is]=k-y_inc;
+        			}
+        			else {
+        				x_inc = 0.5*bc.bandlen[is];        	
+                    	band_xpix[0][nnstr+i][is]=xoff-x_inc;
+                    	band_xpix[1][nnstr+i][is]=xoff+0;
+                    	band_xpix[2][nnstr+i][is]=xoff+0.;
+                    	band_xpix[3][nnstr+i][is]=xoff-x_inc;
+                    	k = -i*y_inc+yoff*y_inc;	    	   
+                    	band_ypix[0][nnstr+i][is]=k;
+                    	band_ypix[1][nnstr+i][is]=k;
+                    	band_ypix[2][nnstr+i][is]=k-y_inc;
+                    	band_ypix[3][nnstr+i][is]=k-y_inc;
+        			}
+        		}
         	}
         }
 	}
@@ -137,11 +177,11 @@ public class BANDPixels {
         //	H2_a_hist.get(sector,l/r,idx) where idx specifies which 2D histogram is being saved here
         // 		sector: 1-6
         //		l/r: 1=left, 2=right, 0=gmean??
-        //	Then of course there are 5 BANDPix objects, for each layer.
+        //	Then of course there are 5 BANDPix objects, for each layer. THere should be 6 now including Veto
         
         
         
-        for (int is=1; is<bc.bandlay.length+1 ; is++) { // loop over sectors in a layer
+        for (int is=1; is<(bc.IS2-bc.IS1+1) ; is++) { // loop over sectors in a layer. 
         	double nend = nstr[is-1]+1;	// find how many bars are in a sector
             int ill=0; iid="s"+Integer.toString(is)+"_l"+Integer.toString(ill)+"_c";
             
@@ -172,7 +212,7 @@ public class BANDPixels {
                 
                 H2_a_Hist.add(is, il, 1, new H2F("a_raw_"+iid+1,      300,   0., amax[id],500, -tmax[id],tmax[id]));
                 H2_a_Hist.add(is, il, 3, new H2F("a_ped_"+iid+3,      1000, -500.,  500., nstr[is-1], 1., nend)); 
-                H2_a_Hist.add(is, il, 5, new H2F("a_fadc_"+iid+5,     1000,   0., 1000., nstr[is-1], 1., nend));			// this is used for mode1:sum 2D graph where x axis is samples(4ns/ch)
+                H2_a_Hist.add(is, il, 5, new H2F("a_fadc_"+iid+5,     200,   0., 100., nstr[is-1], 1., nend));			// this is used for mode1:sum 2D graph where x axis is samples(4ns/ch)
                 																										// and y-axis is which PMT in the sector/layer for left and right side
                               
             

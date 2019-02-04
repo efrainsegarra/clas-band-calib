@@ -23,7 +23,7 @@ public class BANDMon extends DetectorMonitor {
 	
     static MonitorApp             app = new MonitorApp("BANDMon",1800,950);	
     
-    BANDPixels              bandPix[] = new BANDPixels[5];
+    BANDPixels              bandPix[] = new BANDPixels[6];
     ConstantsManager             ccdb = new ConstantsManager();
     FTHashCollection              rtt = null;      
     BANDDet                   bandDet = null;  
@@ -34,7 +34,6 @@ public class BANDMon extends DetectorMonitor {
     BANDTdcApp                bandTdc = null;
     BANDPedestalApp      bandPedestal = null;
     BANDMipApp                bandMip = null;    
-    BANDCalibrationApp      bandCalib = null;
     BANDScalersApp       bandScalers = null;
     BANDHvApp                  bandHv = null;
        
@@ -60,6 +59,7 @@ public class BANDMon extends DetectorMonitor {
         bandPix[2] = new BANDPixels("LAYER3");
         bandPix[3] = new BANDPixels("LAYER4");
         bandPix[4] = new BANDPixels("LAYER5");
+        bandPix[5] = new BANDPixels("VETO");
     }
 
     public static void main(String[] args){		
@@ -135,11 +135,6 @@ public class BANDMon extends DetectorMonitor {
         bandMip.setMonitoringClass(this);
         bandMip.setApplicationClass(app);  
         
-        bandCalib = new BANDCalibrationApp("Calibration", bandPix);
-        bandCalib.setMonitoringClass(this);
-        bandCalib.setApplicationClass(app);  
-        bandCalib.init(is1,is2);
-        
         bandHv = new BANDHvApp("HV",mondet);
         bandHv.setMonitoringClass(this);
         bandHv.setApplicationClass(app);  
@@ -160,7 +155,6 @@ public class BANDMon extends DetectorMonitor {
         app.addCanvas(bandTdc.getName(),             bandTdc.getCanvas());          
         app.addCanvas(bandPedestal.getName(),   bandPedestal.getCanvas());
         app.addCanvas(bandMip.getName(),             bandMip.getCanvas()); 
-        app.addFrame(bandCalib.getName(),          bandCalib.getCalibPane());
         app.addFrame(bandHv.getName(),                bandHv.getPanel());
         app.addFrame(bandScalers.getName(),      bandScalers.getPanel());
     }
@@ -228,7 +222,7 @@ public class BANDMon extends DetectorMonitor {
         case 2:
             for (int idet=0; idet<bandPix.length; idet++) bandRecon.makeMaps(idet); 
             System.out.println("End of run");                 
-            bandCalib.engines[0].analyze();
+         
             
             app.setInProcess(3);
         }
@@ -255,7 +249,6 @@ public class BANDMon extends DetectorMonitor {
         case "Pedestal":                  bandPedestal.updateCanvas(dd); break;
         case "MIP":                            bandMip.updateCanvas(dd); break; 
         case "HV":                              bandHv.updateCanvas(dd); break;
-        case "Calibration":					 bandCalib.updateCanvas(dd); break;
 //        case "Scalers":                    bandScalers.updateCanvas(dd);
        } 
     }

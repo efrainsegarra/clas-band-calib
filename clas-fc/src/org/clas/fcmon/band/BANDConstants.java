@@ -9,11 +9,11 @@ public class BANDConstants {
     public static float[] bandwid  = {7.5f,7.5f,7.5f,7.5f,7.5f};
     public static float[] bandxoff = {0.f,0.f,75.35f,-75.35f,0.f};
     public static float[] bandyoff = {13,10,3,3,-3};
-    public static int[][] bandlay  = {{3,7,6,6,2},{3,7,6,6,2},{3,7,6,6,2},{3,7,6,6,2},{3,7,5,5,0}};
-    public static int[][] bandtsum = {{1,4,11,17,23},{1,4,11,17,23},{1,4,11,17,23},{1,4,11,17,23},{1,4,11,16,0}};
+    public static int[][] bandlay  = {{3,7,6,6,2},{3,7,6,6,2},{3,7,6,6,2},{3,7,6,6,2},{3,7,5,5,0},{3,7,6,6,2}};
+    public static int[][] bandtsum = {{1,4,11,17,23},{1,4,11,17,23},{1,4,11,17,23},{1,4,11,17,23},{1,4,11,16,0},{1,4,11,17,23}};
     public static   int[] bandsum  = {1,4,11,11,17};
-    public static   int[] bandbar  = {18,18,18,18,15};
-    public static String[] bandlab = {"","","A","B",""};
+    public static   int[] bandbar  = {18,18,18,18,15,18};
+    public static String[] bandlab = {"","","A","B","",""};
     
     public static final void setSectorRange(int is1, int is2) {
         IS1=is1;
@@ -34,11 +34,14 @@ public class BANDConstants {
     	int[]    map5 = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,11,12,13,14,15};
     	String[]  smap= {"","","","","","","","","","","A","A","A","A","A","A","B","B","B","B","B","B","",""};
     	String[] smap5= {"","","","","","","","","","","A","A","A","A","A","B","B","B","B","B"};
+    	
     	String i1 = l.substring(0,1);
+  
     	int  chan = Integer.parseInt(i1)==5?map5[c-1]:map[c-1];
     	String i2 = chan<10 ? "0"+Integer.toString(chan):Integer.toString(chan);
     	String i3 = Integer.parseInt(i1)==5?smap5[c-1]:smap[c-1];
     	String i4 = "_"+l.substring(1,2);
+    	
     	return i1+i2+i3+i4;
     }
     

@@ -172,7 +172,7 @@ public class DetectorEventDecoder {
             	           int tet = (this.tet>0) ? this.tet:daq.getIntValue("tet", crate,slot,channel); //lcs
             	           int nsa = (this.nsa>0) ? this.nsa:daq.getIntValue("nsa", crate,slot,channel); //lcs
             	           int nsb = (this.nsb>0) ? this.nsb:daq.getIntValue("nsb", crate,slot,channel); //lcs
-            	           int ped = ped = daq.getIntValue("pedestal", crate,slot,channel);
+            	           int ped = 0; // daq.getIntValue("pedestal", crate,slot,channel);
                        if(table.equals("RF")&&data.getDescriptor().getType().getName().equals("RF")) ped = daq.getIntValue("pedestal", crate,slot,channel);
         	           //System.out.println(">>>>> tet : " + tet + " nsa : " + nsa + 
         	        	//	   				" nsb : " + nsb + " ped: " + ped + " crate: " + crate + 
