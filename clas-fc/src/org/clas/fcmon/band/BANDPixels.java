@@ -199,9 +199,9 @@ public class BANDPixels {
             }
           
             
-            //for (int ip=1; ip<nstr[is-1]+1; ip++) { // loop over bars in sector
-            //    H2_t_Hist.add(is, ip, 2, new H2F("c_tdif_"+iid+1+ip,   1000, -50., 50.,50,-0.2, 0.4));
-            //}            
+            for (int ip=1; ip<nstr[is-1]+1; ip++) { // loop over bars in sector
+                H2_t_Hist.add(is, ip, 2, new H2F("c_tdif_"+iid+1+ip,   1000, -50., 50.,50,-0.2, 0.4));
+            }            
             
             for (int il=1 ; il<3 ; il++){ // loop for left side and then right side
                 iid="s"+Integer.toString(is)+"_l"+Integer.toString(il)+"_c";

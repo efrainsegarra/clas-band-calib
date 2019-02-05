@@ -20,7 +20,7 @@ public class BANDMode1App extends FCApplication {
     EmbeddedCanvas               c = this.getCanvas(this.getName()); 
     
     int is,lr,ic,idet,nstr;
-    int ics[][] = new int[5][10];
+    int ics[][] = new int[6][10];
     String tit;
     String otab[]={" L PMT "," R PMT "};
     
@@ -174,12 +174,12 @@ public class BANDMode1App extends FCApplication {
        
         int n=0;
         
-        for (int iis=1; iis<bandPix.length+1; iis++) {
-        for (int il=1; il<3; il++) {       	
-            h2=dc2a.get(iis,il,1); 
-            h2.setTitleY("TDC") ; h2.setTitleX("SEC "+iis+" LAY "+(idet+1)+otab[il-1]+" FADC");
-            canvasConfig(c,n,0.,bandPix[0].amax[idet],150.,250.,true).draw(h2); n++;           
-        }
+        for (int iis=1; iis<bandPix.length; iis++) {
+        	for (int il=1; il<3; il++) {       	
+        		h2=dc2a.get(iis,il,1);
+        		h2.setTitleY("TDC") ; h2.setTitleX("SEC "+iis+" LAY "+(idet+1)+otab[il-1]+" FADC");
+        		canvasConfig(c,n,0.,bandPix[0].amax[idet],150.,250.,true).draw(h2); n++;           
+        	}
         }
         
         c.repaint();
@@ -195,9 +195,9 @@ public class BANDMode1App extends FCApplication {
         c = mode1.getCanvas("LOGRAT");  c.clear(); c.divide(2, 4);
 
         for(int iip=0;iip<nstr;iip++) {
-            h2=dc2t.get(is,iip+1,2); 
+            h2=dc2t.get(is,iip+1,2);
             h2.setTitleX(tit+" BAR "+(iip+1)+" TL-TR (ns)"); h2.setTitleY("LOG (AL/AR)");
-            canvasConfig(c,iip,-15.,5.,-0.2,0.4,true).draw(h2);            
+            canvasConfig(c,iip,-15.,5.,-0.2,0.4,true).draw(h2);  
         }
         
         c.repaint();
