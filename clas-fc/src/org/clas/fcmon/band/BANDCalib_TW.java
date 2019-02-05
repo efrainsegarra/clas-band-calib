@@ -148,28 +148,7 @@ public class BANDCalib_TW extends FCApplication implements CalibrationConstantsL
         h2 = bandPix[layer].strips.hmap2.get("H2_t_Hist").get(sector,component+1,0); 
         h2.setTitleX("Sqrt(ADC_L*ADC_R) vs (ToF-Ref) from TDC");   
         c.draw(h2);
-        
-        /*
-        c.cd(1);
-        h1c = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,14).sliceY(component); 
-        h1c.setOptStat(Integer.parseInt("1000100")); 
-        h1c.setTitleX("ADC_L - ADC_R Correlation");   h1c.setFillColor(2);
-        c.draw(h1c);
-
-        
-                
-        c.cd(2);
-        h1c = bandPix[layer].strips.hmap2.get("H2_t_Hist").get(sector,0,0).sliceY(component); 
-        h1c.setOptStat(Integer.parseInt("1000100")); 
-        h1c.setTitleX("TDC L-R BAR "+(component+1)+" TDIF");   h1c.setFillColor(2);
-        c.draw(h1c);
-        
-        c.cd(3);
-        h1c = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,1).sliceY(component); 
-        h1c.setTitleX("FADC L-R BAR "+(component+1)+" TDIF");   h1c.setFillColor(2);
-        h1c.setOptStat(Integer.parseInt("1000100")); 
-        c.draw(h1c);
-        */
+       
         
         c.repaint();
 
