@@ -139,7 +139,7 @@ public class BANDReconstructionApp extends FCApplication {
 		float      tps =  (float) 0.02345;
 		float     tdcd = 0;
 
-		clear(0); clear(1); clear(2); clear(3); clear(4); adcs.clear(); tdcs.clear(); ltpmt.clear() ; lapmt.clear();
+		clear(0); clear(1); clear(2); clear(3); clear(4); clear(5); adcs.clear(); tdcs.clear(); ltpmt.clear() ; lapmt.clear();
 		fadc_lr_diff.clear();
 
 		if(event.hasBank("BAND::tdc")){
@@ -230,7 +230,7 @@ public class BANDReconstructionApp extends FCApplication {
 		float      tps =  (float) 0.025;//0.02345;
 		float     tdcd = 0;
 
-		clear(0); clear(1); clear(2); clear(3); clear(4); adcs.clear(); tdcs.clear(); ltpmt.clear() ; lapmt.clear();
+		clear(0); clear(1); clear(2); clear(3); clear(4); clear(5); adcs.clear(); tdcs.clear(); ltpmt.clear() ; lapmt.clear();
 		fadc_lr_diff.clear();
 
 		List<DetectorDataDgtz> adcDGTZ = app.decoder.getEntriesADC(DetectorType.BAND);
@@ -481,7 +481,9 @@ public class BANDReconstructionApp extends FCApplication {
 		}
 
 		if(adc>thrcc){
-			bandPix[idet].nha[is-1][il-1]++; int inh = bandPix[idet].nha[is-1][il-1];
+			bandPix[idet].nha[is-1][il-1]++;
+		
+			int inh = bandPix[idet].nha[is-1][il-1];
 			if (inh>nstr) inh=nstr;
 			bandPix[idet].adcr[is-1][il-1][inh-1] = adc;
 			bandPix[idet].tf[is-1][il-1][inh-1] = tdcf;
@@ -546,7 +548,8 @@ public class BANDReconstructionApp extends FCApplication {
 			for (int is=0; is<5; is++) {
 				for (int il=0; il<2; il++ ){;
 					for (int n=0 ; n<bandPix[idet].nha[is][il] ; n++) {
-						int ip=bandPix[idet].strra[is][il][n]; int ad=bandPix[idet].adcr[is][il][n];
+						int ip=bandPix[idet].strra[is][il][n];
+						int ad=bandPix[idet].adcr[is][il][n];
 						bandPix[idet].strips.hmap1.get("H1_a_Sevd").get(is+1,il+1,0).fill(ip,ad);
 					}
 					//FIX ME: THe next line is causing some out of array exceptions
