@@ -1,8 +1,12 @@
 package org.clas.fcmon.band;
 
 import java.awt.BorderLayout;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -37,15 +41,21 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
     JPanel                    engineView = new JPanel();
 
     int is1,is2;
+	int runno;
+	
+	double MAXX,MINX;
 
-    public DetectorCollection<GraphErrors> col_gr_l1 = new DetectorCollection<GraphErrors>();
-    public DetectorCollection<GraphErrors> col_gr_l2 = new DetectorCollection<GraphErrors>();
+    public DetectorCollection<GraphErrors> fa_col_gr_l1 = new DetectorCollection<GraphErrors>();
+    public DetectorCollection<GraphErrors> fa_col_gr_l2 = new DetectorCollection<GraphErrors>();
+    public DetectorCollection<GraphErrors> td_col_gr_l1 = new DetectorCollection<GraphErrors>();
+    public DetectorCollection<GraphErrors> td_col_gr_l2 = new DetectorCollection<GraphErrors>();
     
-    String[] names = {"/calibration/band/NAMEME"};
+    String[] names = {"/calibration/band/TsC"};
     String selectedDir = names[0];
     int selectedSector = 1;
     int selectedLayer = 1;
     int selectedPaddle = 1;
+    File file = null;
     
     public BANDCalib_C(String name, BANDPixels[] bandPix) {
         super(name,bandPix);    
@@ -59,8 +69,8 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
         this.is2=is2;
         
         calib = new CalibrationConstants(3,
-                "low_edge/F:high_edge/F:offset [ns]/F:c[cm_ns]/F");
-        calib.setName("/calibration/band/nameMeThree");
+                "offset_TDC [ns]/F:c_TDC [cm_ns]/F:offset_FADC [ns]/F:c_FADC [cm_ns]/F");
+        calib.setName("/calibration/band/TsC");
         calib.setPrecision(3);
         
         list.add(calib);         
@@ -83,66 +93,79 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
 
     public void analyze() {
     	
-    	for( int layer = 0 ; layer<bandPix.length ; layer++) {							// loop over layer
+    	if( app.cosmicData  == true) {
     		
-    		for (int sector=is1 ; sector<is2 ; sector++) {								// loop over sector in layer
-    			for(int paddle=0; paddle<bandPix[layer].nstr[sector-1] ; paddle++) {	// loop over paddle in sector
-    				
-    				// Add entry for the unique paddle
-    				int lidx = (layer+1);
-    		        int pidx = (paddle+1);
-    				calib.addEntry(sector,lidx,pidx);
-    				
-    				H1F h1c = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(sector,0,0).sliceY(paddle); h1c.setTitleX(" BAR "+(paddle+1)+" TDIF");
-    				double tenPerMax = 0.10*h1c.getMax();
-    		        double temp1, temp2, minX, maxX;
-    		        minX=0;
-    		        maxX=0;
-    		        for(int i = 1 ; i <= h1c.getXaxis().getNBins();i++ ) {
-    		        	temp1 = h1c.getBinContent(i);
-    		        	temp2 = h1c.getxAxis().getBinCenter(i);
-    		        	if(minX==0&&temp1>tenPerMax) minX=temp2;
-    		        }
-    		        for(int i = h1c.getXaxis().getNBins() ; i >= 1;i-- ) {
-    		        	temp1 = h1c.getBinContent(i);
-    		        	temp2 = h1c.getxAxis().getBinCenter(i);
-    		        	if(maxX==0&&temp1>tenPerMax) maxX=temp2;
-    		        }
-
-    		        double[] xl1 = { minX , minX };
-    		        double[] xl2 = { maxX , maxX };
-    		        double[] yl  = { 0,h1c.getMax()};
-    		        GraphErrors gr_l1 = new GraphErrors("gr_l1",xl1,yl);
-    		        GraphErrors gr_l2 = new GraphErrors("gr_l2",xl2,yl);
-    		        
-    		        col_gr_l1.add(layer, sector,paddle,gr_l1);
-    		        col_gr_l2.add(layer, sector,paddle,gr_l2);
-    		        
-    		        calib.setDoubleValue(minX, "low_edge" , sector, lidx, pidx);
-    		        calib.setDoubleValue(maxX, "high_edge", sector, lidx, pidx);
-    		        
-    		        double offset = (maxX+minX)/2.0;
-    		        calib.setDoubleValue(offset,"offset [ns]" , sector, lidx, pidx);
-    		        
-    		        double bar_length = 0;
-    		        if     (sector==1)            bar_length = 164.0; //cm
-    		        else if(sector==2||sector==5) bar_length = 202.0; //cm
-    		        else if(sector==3||sector==4) bar_length =  51.0; //cm
-    		        double c_cm_ns = 2*bar_length/(maxX-minX);
-    		        
-    		        calib.setDoubleValue(c_cm_ns, "c[cm_ns]" , sector, lidx, pidx);
+    		file = new File(String.format("../band_analysis/hvScan/calibOutput/run_%d-tdcFit.txt",runno));
+			// Try to open a text file, otherwise do not try to analyze
+			try(PrintWriter output = new PrintWriter(file)) {
+				
+				output.println("#Sector\tLayer\tComponent\ttdc_TShift\ttdc_c\tfadc_TShift\tfadc_c\n");
     	
-            	} 
-    		}        		
-        }   	
+				// Loop over all layers
+				for( int layer = 0 ; layer<bandPix.length ; layer++) {
+	
+					// Loop over all sectors in a layer
+					for (int sector=is1 ; sector<is2 ; sector++) {
+		
+						// Loop over all paddles in a sector
+						for(int paddle=0; paddle<bandPix[layer].nstr[sector-1] ; paddle++) {
+	
+							// Add entry for the unique paddle
+							int lidx = (layer+1);
+							int pidx = (paddle+1);
+							calib.addEntry(sector,lidx,pidx);
+		    				
+							fit(sector, layer, paddle,output);//x_fit_range);
+		    				
+		    				
+		    	
+		            	} 
+		    		}        		
+		        }
+			}
+			catch(FileNotFoundException e){
+				e.printStackTrace();
+			}
+    	}
     	
         calib.fireTableDataChanged();
     }
     
-    public void fit(){ 
+    public void fit(int sector, int layer, int paddle,PrintWriter FILE){ 
+    	int lidx = (layer+1);
+        int pidx = (paddle+1);
         
+        // TDC offset
+        H1F h1c = bandPix[layer].strips.hmap2.get("H2_t_Hist").get(sector,0,0).sliceY(paddle);
+        boxHist(h1c,sector,layer,paddle,false);
+
+        double offset_T = (MAXX+MINX)/2.0;
+        calib.setDoubleValue(offset_T,"offset_TDC [ns]" , sector, lidx, pidx);
+        double bar_length = 0;
+        if     (sector==1)            bar_length = 164.0; //cm
+        else if(sector==2||sector==5) bar_length = 202.0; //cm
+        else if(sector==3||sector==4) bar_length =  51.0; //cm
+        double c_cm_ns_T = 2*bar_length/(MAXX-MINX);
+        calib.setDoubleValue(c_cm_ns_T, "c_TDC [cm_ns]" , sector, lidx, pidx);
+        
+        // FADC offset
+        h1c = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,1).sliceY(paddle);
+        boxHist(h1c,sector,layer,paddle,true);
+        
+        double offset_A = (MAXX+MINX)/2.0;
+        calib.setDoubleValue(offset_A,"offset_FADC [ns]" , sector, lidx, pidx);
+        bar_length = 0;
+        if     (sector==1)            bar_length = 164.0; //cm
+        else if(sector==2||sector==5) bar_length = 202.0; //cm
+        else if(sector==3||sector==4) bar_length =  51.0; //cm
+        double c_cm_ns_A = 2*bar_length/(MAXX-MINX);
+        calib.setDoubleValue(c_cm_ns_A, "c_FADC [cm_ns]" , sector, lidx, pidx);
+        
+        FILE.println(String.format("%d\t%d\t%d\t%f\t%f\t%f\t%f",sector,lidx,pidx,offset_T,c_cm_ns_T,offset_A,c_cm_ns_A));        
      }
 
+    
+    
     public void updateCanvas(DetectorDescriptor dd) {
         
         this.getDetIndices(dd); 
@@ -157,24 +180,79 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
         
         c.clear(); //c.divide(2, 2);
         c.setAxisFontSize(12);
-
-        H1F h1c;
-        h1c = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(is,0,0).sliceY(ic); h1c.setTitleX(" BAR "+(ic+1)+" TDIF");   h1c.setFillColor(2);
-        c.draw(h1c);
         
-        GraphErrors gr_l1 = col_gr_l1.get(layer,sector,component);
-        GraphErrors gr_l2 = col_gr_l2.get(layer,sector,component);
+        c.divide(1,2);
+
+        c.cd(0);
+        H1F h1c;
+        h1c = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(is,0,0).sliceY(ic); 
+        h1c.setOptStat(Integer.parseInt("1000100")); 
+        h1c.setTitleX("TDC L-R BAR "+(ic+1)+" TDIF");   h1c.setFillColor(2);
+        c.draw(h1c);
+ 
+        
+        GraphErrors gr_l1 = td_col_gr_l1.get(layer,sector,component);
+        GraphErrors gr_l2 = td_col_gr_l2.get(layer,sector,component);
         
         if( gr_l1 != null && gr_l2 != null) {
         	c.draw(gr_l1,"same");
         	c.draw(gr_l2,"same");
         }
         
+        c.cd(1);
+        h1c = bandPix[ilmap].strips.hmap2.get("H2_a_Hist").get(is,0,1).sliceY(ic); 
+        h1c.setTitleX("FADC L-R BAR "+(ic+1)+" TDIF");   h1c.setFillColor(2);
+        h1c.setOptStat(Integer.parseInt("1000100")); 
+        c.draw(h1c);
+        
+        gr_l1 = fa_col_gr_l1.get(layer,sector,component);
+        gr_l2 = fa_col_gr_l2.get(layer,sector,component);
+        
+        if( gr_l1 != null && gr_l2 != null) {
+        	c.draw(gr_l1,"same");
+        	c.draw(gr_l2,"same");
+        }
+        
+        
         c.repaint();
         //End of plotting
     }
     
-    
+    public void boxHist(H1F h1c, int sector,int layer,int paddle,boolean FADC) {
+    	
+    	double tenPerMax = 0.30*h1c.getMax();
+        double temp1, temp2, minX, maxX;
+        minX=0;
+        maxX=0;
+        for(int i = 1 ; i <= h1c.getXaxis().getNBins();i++ ) {
+        	temp1 = h1c.getBinContent(i);
+        	temp2 = h1c.getxAxis().getBinCenter(i);
+        	if(minX==0&&temp1>tenPerMax) minX=temp2;
+        }
+        for(int i = h1c.getXaxis().getNBins() ; i >= 1;i-- ) {
+        	temp1 = h1c.getBinContent(i);
+        	temp2 = h1c.getxAxis().getBinCenter(i);
+        	if(maxX==0&&temp1>tenPerMax) maxX=temp2;
+        }
+
+        double[] xl1 = { minX , minX };
+        double[] xl2 = { maxX , maxX };
+        double[] yl  = { 0,h1c.getMax()};
+        GraphErrors gr_l1 = new GraphErrors("gr_l1",xl1,yl);
+        GraphErrors gr_l2 = new GraphErrors("gr_l2",xl2,yl);
+        
+        if( FADC == true ) {
+        	fa_col_gr_l1.add(layer, sector,paddle,gr_l1);
+            fa_col_gr_l2.add(layer, sector,paddle,gr_l2);
+        }
+        else {
+        	td_col_gr_l1.add(layer, sector,paddle,gr_l1);
+            td_col_gr_l2.add(layer, sector,paddle,gr_l2);
+        }
+    	
+        MAXX=maxX;
+        MINX=minX;
+    }
     
     
     public void stateChanged(ChangeEvent e) {

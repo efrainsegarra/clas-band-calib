@@ -18,33 +18,13 @@ public class BANDPixels {
     DatabaseConstantProvider ccdb = new DatabaseConstantProvider(1,"default");
 	BANDConstants              bc = new BANDConstants();  
 	
+	static double adcMax = 30000;
     double band_xpix[][][] = new double[4][14][6];
     double band_ypix[][][] = new double[4][14][6];
     
-
-    static double BANDPixels_x_axis_max = 10000;
-    static double short_bar_scaler = 1.;
-    static double shortscalemax = BANDPixels_x_axis_max*short_bar_scaler;
-    // Note: To have all bars have the same x-axis range, set short_bar_scaler to 1 
-    
-    //int[]  array = new int[5];
-    //amax = Arrays.fill(array, 1);//*x_axis_max;
-    //public double        amax[]= {5000.,5000.,5000.,5000.,5000.};
-    public double 		 amax[] = {1.,1.,1.,1.,1.,1.}; 
-    public double		 ashortmax[] = {1.,1.,1.,1.,1.,1.}; 
+    public double 		 amax[] = {50000.,50000.,50000.,50000.,50000.,50000.};
     public double        tmax[] = {10000.,10000.,10000.,10000.,10000.,10000.};
-
-    
-    public void Rescale(double array[],double scaler){
-    	for (int i=0; i<array.length; i++) {
-    		array[i] = array[i] * scaler;
-    	}
-    	//return array;
-    }
-    
-    
-    
-    
+        
     
     int        nha[][] = new    int[6][2];
     int        nht[][] = new    int[6][2];
@@ -78,10 +58,9 @@ public class BANDPixels {
         }
         detName = det;
         pixdef();
-        Rescale(amax,BANDPixels_x_axis_max);
-        Rescale(ashortmax,shortscalemax);
     }
     
+    // Gets the max / min events to know how to color scale the bars
     public void getLmapMinMax(int is1, int is2, int il, int opt){
         TreeMap<Integer,Object> map = null;
         double min,max,avg,aavg=0,tavg=0;
@@ -98,7 +77,7 @@ public class BANDPixels {
 
         a[2]=Math.min(500000,aavg/(is2-is1));
         t[2]=Math.min(500000,tavg/(is2-is1));
-        
+                        
         Lmap_a_z.add(a,il,opt);
         Lmap_t_z.add(t,il,opt);        
     }	
@@ -181,7 +160,11 @@ public class BANDPixels {
         }
 	}
     
-    public void initHistograms(String hipoFile) {
+    public void initHistograms(String hipoFile, double adcRange) {
+    	
+        adcMax = adcRange;
+        amax[0] = adcMax; amax[1] = adcMax; amax[2] = adcMax;
+        amax[3] = adcMax; amax[4] = adcMax; amax[5] = adcMax;
         
         System.out.println("BANDPixels.initHistograms(): "+this.detName);  
         
@@ -193,70 +176,104 @@ public class BANDPixels {
         DetectorCollection<H2F> H2_t_Hist = new DetectorCollection<H2F>();
         DetectorCollection<H2F> H2_a_Sevd = new DetectorCollection<H2F>();
         DetectorCollection<H2F> H2_t_Sevd = new DetectorCollection<H2F>();
-        DetectorCollection<H1F> H1_o_Hist = new DetectorCollection<H1F>();
-        DetectorCollection<H2F> H2_x_Hist = new DetectorCollection<H2F>();
-                
-        //Histograms stored as:
-        //	H2_a_hist.get(sector,l/r,idx) where idx specifies which 2D histogram is being saved here
-        // 		sector: 1-6
-        //		l/r: 1=left, 2=right, 0=gmean??
-        //	Then of course there are 5 BANDPix objects, for each layer.
+        DetectorCollection<H2F> H2_at_Hist = new DetectorCollection<H2F>();
+        
+        // README:
+        /*	Storage of histograms: we have 2D and 1D histograms for ADC/TDC information, 
+         *  and also specifies FULL FILE read vs single event:
+         *  	H1_a_Sevd: stores all 1D histograms for single event reading, all FADC info
+         *  	H2_t_Hist: stores all 2D histograms for FULL FILE reading, all TDC info
+         * 
+         *  Accessing:
+         *  	H2_a_Hist.get(sector,paddle,idx)
+         *  		sector: identifies which sector in the layer (0,1,2,3,4)
+         *  		paddle: IF THIS IS 0, it means the histogram is a 2D histogram that stores info for ALL pmts
+         *  					in a sector. So typically the y-axis identifies which bar in the sector
+         *  				ELSE: this ID's bar in the sector ( 1 - # bars in sector)
+         *  		idx: 	we could have more than 1 histogram for the same sector,paddle, like
+         *  					a histogram that stores ADC that doesn't include overflow (idx=0) and 
+         *  					one that does include overflow (idx=1)
+         *  
+         *   Want to add more?:
+         *   	Need to initialize it here, and then fill correct values in BANDReconstruction.
+         *   	If you need to have information from both L&R pmts on a bar, you need to fill it
+         *   	in the ProcessCalib() function of BANDReconstruction
+         */					
         
         
-        
-        for (int is=1; is<(bc.IS2-bc.IS1+1) ; is++) { // loop over sectors in a layer
-        	double axis_scale = amax[id];
-        	if (is == 3 || is == 4) {
-        		axis_scale = ashortmax[id];
-        	}
-        	double nend = nstr[is-1]+1;	// find how many bars are in a sector
-            int ill=0; iid="s"+Integer.toString(is)+"_l"+Integer.toString(ill)+"_c";
+        // Loop over sectors in a layer (remember there are 6 BANDPix objects for each layer)
+        for (int is=1; is<(bc.IS2-bc.IS1+1) ; is++) {
+        	// Grab how many bars are in the current sector (id is the current layer idx (0-5))
+        	double nend = nstr[is-1]+1;
+        	
+        	// ill = 0 means histogram has info from both l+r pmts
+            int ill=0; 
+            // Create string name
+            iid = Integer.toString(is)+"_S_"+Integer.toString(id)+"_L_"+"_all_C_"+"_0_LR";
             
-            // Geometric mean plot for L_ADC and R_ADC on a given paddle
-            H2_a_Hist.add(is, 0, 0, new H2F("a_gmean_"+iid+0, 200,   0., axis_scale,nstr[is-1], 1., nend));	
-            // L-R TDC plot of a given paddle for TDC time
-            H2_t_Hist.add(is, 0, 0, new H2F("t_tdif_"+iid+0,  600, -20.,      20.,nstr[is-1], 1., nend));
-            // L-R TDC plot of a given paddle for FADC time
-            H2_a_Hist.add(is, 0, 1, new H2F("a_tdif_"+iid+0,  1000, -20.,      20.,nstr[is-1], 1., nend));
+            // First, let's create histograms that use information from BOTH left and right
+            // and histograms that will store information for ALL PMTs in a sector 
             
-            //H2_x_Hist.add(is, 0, 0, new H2F("adc"+iid+0,  1000, -20.,      20.,nstr[is-1], 1., nend));
+            	// Geometric mean plot: x-axis is GM of sqrt(L*R) ADC and y-axis identifies which
+            	// bar in the sector
+            H2_a_Hist.add(is, 0, 0,	new H2F("fadc_gm_"+iid,		400,0.,8000.,	nstr[is-1],1.,nend));	
             
-            // Add gm vs fadc time sum for each paddle
-            H2_a_Hist.add(is, 0, 9, new H2F("a_tsum_"+iid+0,  5000, 0.,	   500., nstr[is-1], 1., nend));
+            H2_a_Hist.add(is, 0, 14,new H2F("fadc_diff_"+iid,	500,-500.,500.,	nstr[is-1],1.,nend));	
+            
+            
+	        	// L-R FADC plot: x-axis is TDC time difference for L-R given from our FADC digital signal
+	        	// y-axis identifies which bar in the sector
+            H2_a_Hist.add(is, 0, 1, new H2F("fadc_tdif_"+iid,  400, -20.,20.,		nstr[is-1], 1., nend));
+            
+            	// L-R TDC plot: x-axis is TDC time difference for L-R given from our TDC modules
+            	// y-axis identifies which bar in the sector
+            H2_t_Hist.add(is, 0, 0, new H2F("tdc_tdif_"+iid,	400,-20.,20.,		nstr[is-1],1.,nend));
+            
+            
+            // Loop over all bars in a sector
             for( int ip = 1 ; ip<nstr[is-1]+1; ip++) {
-            	H2_a_Hist.add(is, ip, 8, new H2F("a_tsum_gm_"+iid+ip+1, 200, 0., 0.5*axis_scale , 600, -15., 15.));
+            		//  ToF - Ref vs GM: x-axis is GM of sqrt(L*R) ADC and y-axis is (L+R)/2. - RF time using 
+            		//	times from FADC
+            	iid = Integer.toString(is)+"_S_"+Integer.toString(id)+"_L_"+Integer.toString(ip)+"_C_"+"_0_LR";
+            	H2_a_Hist.add(is, ip, 0, new H2F("fadc_gm_tof_"+iid,		400,0.,amax[id],	500,-5.,5.));
+	            	//  ToF - Ref vs GM: x-axis is GM of sqrt(L*R) ADC and y-axis is (L+R)/2. - RF time using 
+	        		//	times from TDC
+            	H2_t_Hist.add(is, ip, 0, new H2F("tdc_gm_tof_"+iid,		400,0.,amax[id],	500,-5.,5.));
+            	
+            	
             }
           
-            
-            //for (int ip=1; ip<nstr[is-1]+1; ip++) { // loop over bars in sector
-            //    H2_t_Hist.add(is, ip, 2, new H2F("c_tdif_"+iid+1+ip,   1000, -50., 50.,50,-0.2, 0.4));
-            //}            
-            
-            for (int il=1 ; il<3 ; il++){ // loop for left side and then right side
-                iid="s"+Integer.toString(is)+"_l"+Integer.toString(il)+"_c";
-                H2_a_Hist.add(is, il, 0, new H2F("a_raw_"+iid+0,      400,   0., axis_scale,nstr[is-1], 1., nend));
-                H2_a_Hist.add(is, il, 7, new H2F("a_raw_overflowInc_"+iid+0,      400,   0., axis_scale,nstr[is-1], 1., nend));
-               
-                H2_t_Hist.add(is, il, 0, new H2F("a_raw_"+iid+0,      500,   -tmax[id], tmax[id], nstr[is-1], 1., nend));
+            // Loop over L and R side of a bar, because I no longer
+            // need to use information from both L & R side
+            for (int lr=1 ; lr<3 ; lr++){
+            	iid = Integer.toString(is)+"_S_"+Integer.toString(id)+"_L_"+"_all_C_"+Integer.toString(lr)+"_LR";
+
+	            	// ADC plot that throws out overflow: x-axis is ADC spectrum, not including any overflow events
+            		// and y-axis identifies which bar in the sector -- only L side and only R side separately
+                H2_a_Hist.add(is, 0, 1+lr, new H2F("fadc_adc_"+iid,			200,0.,amax[id],		nstr[is-1], 1., nend));
+             	
+                	// ADC plot that throws out overflow: x-axis is ADC spectrum, not including any overflow events
+        			// and y-axis identifies which bar in the sector -- only L side and only R side separately
+                H2_a_Hist.add(is, 0, 3+lr, new H2F("fadc_adcOver_"+iid,		200,0.,amax[id],		nstr[is-1], 1., nend));
                 
-                H2_a_Hist.add(is, il, 1, new H2F("a_raw_"+iid+1,      300,   0., axis_scale,500, -tmax[id],tmax[id]));
-                H2_a_Hist.add(is, il, 3, new H2F("a_ped_"+iid+3,      1000, -500.,  500., nstr[is-1], 1., nend)); 
-                H2_a_Hist.add(is, il, 5, new H2F("a_fadc_"+iid+5,     1000,   0., 1000., nstr[is-1], 1., nend));			// this is used for mode1:sum 2D graph where x axis is samples(4ns/ch)
-                																										// and y-axis is which PMT in the sector/layer for left and right side
-                              
-                H2_x_Hist.add(is, il, 0, new H2F("FADC-TDC"+iid+0,  200,   0., axis_scale/2,1000, 0, 500));
+                // Loop over all the bars for the L side and R side individually:	
+                for( int ip = 1 ; ip<nstr[is-1]+1; ip++) {
+                		// FADC-TDC diff plot: x-axis is the ADC of the PMT and y-axis is the FADC-TDC time difference 
+                	H2_at_Hist.add(is, ip, lr-1, new H2F("fadc_tdc_diff_"+iid,	410,0.,4100,	200,-110,-70));
+                }
                 
-                
-                
-                H2_a_Hist.add(is, il, 6, new H2F("a_fadc_"+iid+6,     100, -20.,  20., nstr[is-1], 1., nend));
-                H1_a_Sevd.add(is, il, 0, new H1F("a_sed_"+iid+0,                       nstr[is-1], 1., nend));
-                H2_a_Sevd.add(is, il, 0, new H2F("a_sed_fadc_"+iid+0, 100,   0., 100., nstr[is-1], 1., nend));
-                H2_a_Sevd.add(is, il, 1, new H2F("a_sed_fadc_"+iid+1, 100,   0., 100., nstr[is-1], 1., nend));
-                H2_t_Sevd.add(is, il, 0, new H2F("a_sed_fadc_"+iid+0, 200,   0., 100., nstr[is-1], 1., nend));
-                
-                iid="s"+Integer.toString(is)+"_l"+Integer.toString(il);
-                H1_o_Hist.add(is,il,0,	new H1F("overflow_"+iid,	nstr[is-1],1.,nend) );
-                H1F d = null;
+                // Histograms not used by calib suite, but for monitoring software
+                	// First two are raw ADC,TDC for coloring in the bandMon
+                H2_t_Hist.add(is, 0, lr, new H2F("t_raw_"+iid+0,      100,   0, tmax[id], nstr[is-1], 1., nend));
+                H2_a_Hist.add(is, 0, 5+lr, new H2F("a_raw_"+iid+1,      100,   0., amax[id], nstr[is-1], 1., nend));
+                H2_a_Hist.add(is, 0, 7+lr, new H2F("a_ped_"+iid+3,      1000, -500.,  500., nstr[is-1], 1., nend)); 
+                H2_a_Hist.add(is, 0, 9+lr, new H2F("a_fadc_"+iid+5,     1000,   0., 1000., nstr[is-1], 1., nend));
+                H2_a_Hist.add(is, 0, 11+lr, new H2F("a_fadc_"+iid+6,     100, -20.,  20., nstr[is-1], 1., nend));
+                H1_a_Sevd.add(is, lr, 0, new H1F("a_sed_"+iid+0,                       nstr[is-1], 1., nend));
+                H2_a_Sevd.add(is, lr, 0, new H2F("a_sed_fadc_"+iid+0, 100,   0., 100., nstr[is-1], 1., nend));
+                H2_a_Sevd.add(is, lr, 1, new H2F("a_sed_fadc_"+iid+1, 100,   0., 100., nstr[is-1], 1., nend));
+                H2_t_Sevd.add(is, lr, 0, new H2F("a_sed_fadc_"+iid+0, 200,   0., 100., nstr[is-1], 1., nend));
+                iid="s"+Integer.toString(is)+"_l"+Integer.toString(lr);
                 
             }
         }       
@@ -270,13 +287,12 @@ public class BANDPixels {
         }         
         
         strips.addH1DMap("H1_a_Sevd",  H1_a_Sevd);
-        strips.addH1DMap("H1_o_Hist",  H1_o_Hist);
         strips.addH1DMap("H1_t_Sevd",  H1_t_Sevd);
         strips.addH2DMap("H2_a_Hist",  H2_a_Hist);
         strips.addH2DMap("H2_t_Hist",  H2_t_Hist);
         strips.addH2DMap("H2_a_Sevd",  H2_a_Sevd);
         strips.addH2DMap("H2_t_Sevd",  H2_t_Sevd);
-        strips.addH2DMap("H2_x_Hist",  H2_x_Hist);
+        strips.addH2DMap("H2_at_Hist",  H2_at_Hist);
         
     } 
     

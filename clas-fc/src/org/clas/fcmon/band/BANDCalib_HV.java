@@ -28,8 +28,6 @@ import org.jlab.groot.fitter.DataFitter;
 
 public class BANDCalib_HV extends FCApplication implements CalibrationConstantsListener,ChangeListener{
 
-
-
 	EmbeddedCanvas c = this.getCanvas(this.getName()); 
 	CalibrationConstantsView      ccview = new CalibrationConstantsView();
 	ArrayList<CalibrationConstants> list = new ArrayList<CalibrationConstants>();
@@ -47,18 +45,14 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 
 	File file = null;
 
-
-
 	public DetectorCollection<F1D> adcFitL = new DetectorCollection<F1D>();
 	public DetectorCollection<F1D> adcFitR = new DetectorCollection<F1D>();
-
 	
 	double sigma_modifier = 2; // Multiplicative factor for increasing sigma value if fitting on overflow events
     double overflow_ratio = 0.8; // If ratio of normal histogram events to overflow events is smaller than this, fit overflow
     int runnumber = 0;
     double fitscale = 1;
-    double x_fit_range = fitscale*BANDPixels.BANDPixels_x_axis_max;//This sets the fitting range based off the x axis range
-    
+    double x_fit_range = fitscale*BANDPixels.adcMax;//This sets the fitting range based off the x axis range
 
 
 	public BANDCalib_HV(String name, BANDPixels[] bandPix) {
@@ -110,37 +104,40 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 
 	public void analyze() {
 		
-		file = new File(String.format("../band_analysis/hvScan/calibOutput/run_%d.txt",runno));
-		// Try to open a text file, otherwise do not try to analyze
-		try(PrintWriter output = new PrintWriter(file)) {
-			output.println("#Sector\tLayer\tComponent\tOrder\tMean\tSigma\n");
-
-			// Loop over all layers
-			for( int layer = 0 ; layer<bandPix.length ; layer++) {
-
-				// Loop over all sectors in a layer
-				for (int sector=is1 ; sector<is2 ; sector++) {
+		if( app.cosmicData  == true) {
+			
+			file = new File(String.format("../band_analysis/hvScan/calibOutput/run_%d-adcFit.txt",runno));
+			// Try to open a text file, otherwise do not try to analyze
+			try(PrintWriter output = new PrintWriter(file)) {
+				output.println("#Sector\tLayer\tComponent\tOrder\tMean\tSigma\n");
 	
-					// Loop over all paddles in a sector
-					for(int paddle=0; paddle<bandPix[layer].nstr[sector-1] ; paddle++) {
-
-						// Add entry for the unique paddle
-						int lidx = (layer+1);
-						int pidx = (paddle+1);
-						calib.addEntry(sector,lidx,pidx);
-
-						// Fit both sides of paddle
-						for( int lr = 1 ; lr < 3 ; lr++) {
-							//int x_fit_range = 7000;
-							fit(layer, sector, paddle, lr, 0., 0.,x_fit_range,output);//x_fit_range);
-						}
-						//System.out.println("Done with Layer "+ lidx + ", Sector "+ sector + " , Component " + pidx);
-					} 
-				}        		
-			}   	
-		}
-		catch(FileNotFoundException e){
-			e.printStackTrace();
+				// Loop over all layers
+				for( int layer = 0 ; layer<bandPix.length ; layer++) {
+	
+					// Loop over all sectors in a layer
+					for (int sector=is1 ; sector<is2 ; sector++) {
+		
+						// Loop over all paddles in a sector
+						for(int paddle=0; paddle<bandPix[layer].nstr[sector-1] ; paddle++) {
+	
+							// Add entry for the unique paddle
+							int lidx = (layer+1);
+							int pidx = (paddle+1);
+							calib.addEntry(sector,lidx,pidx);
+	
+							// Fit both sides of paddle
+							for( int lr = 1 ; lr < 3 ; lr++) {
+								//int x_fit_range = 7000;
+								fit(layer, sector, paddle, lr,x_fit_range,output);//x_fit_range);
+							}
+							//System.out.println("Done with Layer "+ lidx + ", Sector "+ sector + " , Component " + pidx);
+						} 
+					}        		
+				}   	
+			}
+			catch(FileNotFoundException e){
+				e.printStackTrace();
+			}
 		}
 
 
@@ -149,18 +146,17 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 
 
 
-    public void fit(int layer, int sector, int paddle, int lr, double minRange, double maxRange, double x_fit_max, PrintWriter FILE){ 
+    public void fit(int layer, int sector, int paddle, int lr, double x_fit_max, PrintWriter FILE){ 
         
-        //System.out.println("Running runnumber = "+runnumber);
         runnumber++;
         int lidx = (layer+1);
         int pidx = (paddle+1);
         
         H1F h = null;
         double sigma_scaler = 1;
-        H1F reg = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,lr,0).sliceY(paddle);
+        H1F reg = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,1+lr).sliceY(paddle);
         
-        H1F over = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,lr,7).sliceY(paddle);
+        H1F over = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,3+lr).sliceY(paddle);
         
         //System.out.println("Ratio for " + layer + " " + sector + " " + paddle + " is"+reg.getIntegral()/over.getIntegral());
         
@@ -188,7 +184,6 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
         	//***************************************************************************************************************
         	//NOTE: The parameters below are chosen essentially randomly. They seem to work but are not optimized. They should be optimized. 
          //*****************************************************************************************************************
-        	if( sector == 3 || sector == 4) x_fit_max*=BANDPixels.short_bar_scaler;
         	//System.out.println(x_fit_max);
         	
         	double fit_amp = h.getMax()*1;
@@ -292,7 +287,7 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
      int nstr = bandPix[layer].nstr[sector-1];
      int min=0, max=nstr;
      
-     c.clear(); c.divide(2, 4);
+     c.clear(); c.divide(1,2);
      c.setAxisFontSize(12);
 
 //   canvas.setAxisTitleFontSize(12);
@@ -321,12 +316,12 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
          c.cd(0);          
          
          // Draw one including overflow samples
-         h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,1,7).sliceY(component);
+         h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,4).sliceY(component);
          h.setOptStat(Integer.parseInt("1000100")); 
          h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(34); c.draw(h);
          
          // Draw one without overflow samples
-         h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,1,0).sliceY(component);
+         h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,2).sliceY(component);
          h.setOptStat(Integer.parseInt("1000100"));
          h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); c.draw(h,"same");
           
@@ -334,11 +329,11 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
      c.cd(1);
      alab = tit+otab[1]+(component+1)+calTitles[0];  
      //Plot right overflow
-     h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,2,7).sliceY(component);
+     h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,5).sliceY(component);
      h.setOptStat(Integer.parseInt("1000100")); 
      h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(34); c.draw(h);
      //Plot right histogram													// 34 is the color light blue
-     h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,2,0).sliceY(component);
+     h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,3).sliceY(component);
      h.setOptStat(Integer.parseInt("1000100")); 
      h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); c.draw(h,"same");
          																	// 32 is the color red
@@ -439,6 +434,8 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 		    canvas.draw(h2);
      }
      */
+
+         
      c.repaint();
      //End of plotting
  }

@@ -30,7 +30,8 @@ public class BANDMon extends DetectorMonitor {
 
 	BANDReconstructionApp   	bandRecon = null;
 	BANDCalib_HV                bandCalib_hv = null; 
-	BANDCalib_TimeWalk			bandCalib_tw = null;
+	BANDCalib_Source            bandCalib_source = null; 
+	BANDCalib_TW				bandCalib_tw = null;
 	BANDCalib_C					bandCalib_c = null;
 	BANDCalib_Atten				bandCalib_atten = null;
 
@@ -44,6 +45,9 @@ public class BANDMon extends DetectorMonitor {
 	double                 PCMon_zmin = 0;
 	double                 PCMon_zmax = 0;
 	boolean                firstevent = true;
+	
+	double maxADC = 50000.;
+
 
 	String mondet                     = "BAND";
 	static String             appname = "BANDMON";
@@ -81,7 +85,7 @@ public class BANDMon extends DetectorMonitor {
 		monitor.initDetector();
 		app.init();
 		app.getDetectorView().setFPS(10);
-		app.setSelectedTab(2); 
+		app.setSelectedTab(0); 
 		app.setTDCOffset(1200);
 		monitor.bandDet.initButtons();
 	}
@@ -114,20 +118,25 @@ public class BANDMon extends DetectorMonitor {
 		bandRecon.setMonitoringClass(this);
 		bandRecon.setApplicationClass(app);	    
 
-		bandCalib_hv = new BANDCalib_HV("HV",bandPix);        
+		bandCalib_hv = new BANDCalib_HV("Cosmic: Gain",bandPix);        
 		bandCalib_hv.setMonitoringClass(this);
 		bandCalib_hv.setApplicationClass(app); 
 		bandCalib_hv.init(is1,is2);
 				
-		bandCalib_tw = new BANDCalib_TimeWalk("TW",bandPix);        
+		bandCalib_tw = new BANDCalib_TW("Time Walk",bandPix);        
 		bandCalib_tw.setMonitoringClass(this);
 		bandCalib_tw.setApplicationClass(app); 
 		bandCalib_tw.init(is1,is2);
 
-		bandCalib_c = new BANDCalib_C("Speed of Light",bandPix);        
+		bandCalib_c = new BANDCalib_C("Cosmic: T.S. & S.o.L.",bandPix);        
 		bandCalib_c.setMonitoringClass(this);
 		bandCalib_c.setApplicationClass(app); 
 		bandCalib_c.init(is1,is2);
+		
+		bandCalib_source = new BANDCalib_Source("Source: 1MeVee",bandPix);
+		bandCalib_source.setMonitoringClass(this);
+		bandCalib_source.setApplicationClass(app); 
+		bandCalib_source.init(is1,is2);
 
 		bandCalib_atten = new BANDCalib_Atten("Attenuation",bandPix);        
 		bandCalib_atten.setMonitoringClass(this);
@@ -145,9 +154,11 @@ public class BANDMon extends DetectorMonitor {
 		//app.addCanvas(bandTdc.getName(),             bandTdc.getCanvas());          
 		//app.addCanvas(bandPedestal.getName(),   bandPedestal.getCanvas());
 
-		app.addCanvas(bandCalib_tw.getName(),             		bandCalib_tw.getCanvas());
+		//app.addCanvas(bandCalib_tw.getName(),             		bandCalib_tw.getCanvas());
 		app.addCanvas(bandCalib_hv.getName(),             		bandCalib_hv.getCanvas());
 		app.addCanvas(bandCalib_c.getName(),             		bandCalib_c.getCanvas());
+		app.addCanvas(bandCalib_source.getName(),             	bandCalib_source.getCanvas());
+		app.addCanvas(bandCalib_tw.getName(),             	bandCalib_tw.getCanvas());
 		app.addCanvas(bandCalib_atten.getName(),             	bandCalib_atten.getCanvas());
 
 
@@ -160,7 +171,8 @@ public class BANDMon extends DetectorMonitor {
 		System.out.println(appname+".init()");   
 		app.setInProcess(0);
 		initApps();
-		for (int i=0; i<bandPix.length; i++) bandPix[i].initHistograms(" "); 
+		
+		for (int i=0; i<bandPix.length; i++) bandPix[i].initHistograms(" ",maxADC); 
 	}
 
 	public void initApps() {
@@ -218,21 +230,26 @@ public class BANDMon extends DetectorMonitor {
 					break;
 				case 2:
 					bandCalib_hv.runno = app.run;
+					bandCalib_c.runno = app.run;
+					bandCalib_tw.runno = app.run;
 					for (int idet=0; idet<bandPix.length; idet++) bandRecon.makeMaps(idet); 
 					System.out.println("End of run");      
-					if( analyzedBefore == 0) {
+					if( analyzedBefore == 0 && (app.cosmicData == true)) {
 						app.addFrame(bandCalib_hv.getName(),             bandCalib_hv.getCalibPane()); 
-						app.addFrame(bandCalib_tw.getName(),             bandCalib_tw.getCalibPane()); 
+						//app.addFrame(bandCalib_tw.getName(),             bandCalib_tw.getCalibPane()); 
 						app.addFrame(bandCalib_c.getName(),             bandCalib_c.getCalibPane()); 
-						app.addFrame(bandCalib_atten.getName(),             bandCalib_atten.getCalibPane()); 
+						app.addFrame(bandCalib_tw.getName(),             bandCalib_tw.getCalibPane());
+						app.addFrame(bandCalib_atten.getName(),             bandCalib_atten.getCalibPane());
+						analyzedBefore = 1;
 					}
-					bandCalib_tw.analyze();
+					//bandCalib_tw.analyze();
 					bandCalib_hv.analyze();
 					bandCalib_c.analyze();
+					bandCalib_source.analyze();
+					bandCalib_tw.analyze();
 					bandCalib_atten.analyze();
 
 					//bandCalib.engines[0].analyze();
-					analyzedBefore = 1;
 					app.setInProcess(3);
 			}
 		}
@@ -260,10 +277,12 @@ public class BANDMon extends DetectorMonitor {
 
 			switch (app.getSelectedTabName()) {
 
-				case "HV":                            bandCalib_hv.updateCanvas(dd); break; 
-				case "TW":                            bandCalib_tw.updateCanvas(dd); break; 
-				case "Speed of Light":                bandCalib_c.updateCanvas(dd); break; 
+				case "Cosmic: Gain":               bandCalib_hv.updateCanvas(dd); break; 
+				//case "TW":                            bandCalib_tw.updateCanvas(dd); break; 
+				case "Cosmic: T.S. & S.o.L.":                bandCalib_c.updateCanvas(dd); break; 
 				case "Attenuation":                   bandCalib_atten.updateCanvas(dd); break; 
+				case "Source: 1MeVee":			bandCalib_source.updateCanvas(dd); break; 
+				case "Time Walk":			bandCalib_tw.updateCanvas(dd); break; 
 
 
 			} 
@@ -287,7 +306,8 @@ public class BANDMon extends DetectorMonitor {
 			for (int idet=0; idet<3; idet++) {
 				String hipoFileName = app.hipoPath+mondet+idet+"_"+app.runNumber+".hipo";
 				System.out.println("Reading Histograms from "+hipoFileName);
-				bandPix[idet].initHistograms(hipoFileName);
+
+				bandPix[idet].initHistograms(hipoFileName, maxADC);
 			}
 			app.setInProcess(2);          
 		}
