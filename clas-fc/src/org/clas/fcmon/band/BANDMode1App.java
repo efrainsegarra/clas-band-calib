@@ -98,7 +98,7 @@ public class BANDMode1App extends FCApplication {
             
         c.repaint();
     }   
-    
+    // ==============================================================================================
     public void updateSum() {
         
         DetectorCollection<H2F> dc2a = bandPix[idet].strips.hmap2.get("H2_a_Hist");        
@@ -117,8 +117,10 @@ public class BANDMode1App extends FCApplication {
             h2 = dc2a.get(is,il,5); h2.setTitleY(tit+otab[il-1]) ; h2.setTitleX("SAMPLES (4 ns/ch)");
             canvasConfig(c,il-1,0.,100.,1.,nstr+1.,true).draw(h2);
             if (lr==il) {c.draw(f1,"same"); c.draw(f2,"same");}
-            h1 = dc2a.get(is,il,5).sliceY(ic); h1.setOptStat(Integer.parseInt("1000100"));
-            h1.setTitleX(tit+otab[il-1]+(ic+1)+" (4 ns/ch)"); h1.setFillColor(0);
+            h1 = dc2a.get(is,il,5).sliceY(ic);
+            h1.setOptStat(Integer.parseInt("1000100"));
+            h1.setTitleX(tit+otab[il-1]+(ic+1)+" (4 ns/ch)");
+            h1.setFillColor(0);
             c.cd(il+1); h1.setTitle(" "); c.draw(h1);
             if (lr==il) {
                 h1=dc2a.get(is,il,5).sliceY(ic) ; h1.setFillColor(2); h1.setOptStat(Integer.parseInt("1000100"));
@@ -130,9 +132,9 @@ public class BANDMode1App extends FCApplication {
         c.repaint();
         ics[idet][lr-1]=ic;
         
-     } 
-    
-     public void updateTDIF() {
+    } 
+    // ==============================================================================================
+    public void updateTDIF() {
         
         DetectorCollection<H2F> dc2a = bandPix[idet].strips.hmap2.get("H2_a_Hist");        
         
@@ -146,15 +148,20 @@ public class BANDMode1App extends FCApplication {
         c = mode1.getCanvas("TDIF");  c.clear(); c.divide(2,2);       
             
         for (int il=1; il<3 ; il++) {
-            h2 = dc2a.get(is,il,6); h2.setTitleY(tit+otab[il-1]) ; h2.setTitleX("TDC-FADC (NSEC)");
-            canvasConfig(c,il-1,-20.,20.,1.,nstr+1.,true).draw(h2);
+            h2 = dc2a.get(is,il,6);
+            h2.setTitleY(tit+otab[il-1]);
+            h2.setTitleX("TDC-FADC (NSEC)");
+            canvasConfig(c,il-1,0.,300.,1.,nstr+1.,true).draw(h2);
             if (lr==il) {c.draw(f1,"same"); c.draw(f2,"same");}
-            h1 = dc2a.get(is,il,6).sliceY(ic); h1.setOptStat(Integer.parseInt("10"));
-            h1.setTitleX(tit+otab[il-1]+(ic+1)+" (NSEC)"); h1.setFillColor(0);
+            h1 = dc2a.get(is,il,6).sliceY(ic);
+            h1.setOptStat(Integer.parseInt("10"));
+            h1.setTitleX(tit+otab[il-1]+(ic+1)+" (NSEC)");
+            h1.setFillColor(0);
             c.cd(il+1); h1.setTitle(" "); c.draw(h1);
             if (lr==il) {
                 h1=dc2a.get(is,il,6).sliceY(ic) ; h1.setFillColor(2);
-                h1.setTitleX(tit+otab[il-1]+(ic+1)+" (NSEC)"); c.draw(h1);
+                h1.setTitleX(tit+otab[il-1]+(ic+1)+" (NSEC)");
+                c.draw(h1);
             }            
         }
         
@@ -163,14 +170,14 @@ public class BANDMode1App extends FCApplication {
         ics[idet][lr-1]=ic;
         
     }
-     
+ // ============================================================================================== 
     public void updateAvsT() {
         
         DetectorCollection<H2F> dc2a = bandPix[idet].strips.hmap2.get("H2_a_Hist");       
         
         H2F h2;
         
-        c = mode1.getCanvas("AvsT");  c.clear(); c.divide(2,bandPix.length);       
+        c = mode1.getCanvas("AvsT");  c.clear(); c.divide(2,bandPix.length-1);       
        
         int n=0;
         
@@ -185,7 +192,7 @@ public class BANDMode1App extends FCApplication {
         c.repaint();
         
     }
-    
+ // ==============================================================================================
     public void updateLOGRAT() {
         
         DetectorCollection<H2F> dc2t = bandPix[idet].strips.hmap2.get("H2_t_Hist");       

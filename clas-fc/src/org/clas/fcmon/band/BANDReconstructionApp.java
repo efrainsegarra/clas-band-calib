@@ -340,6 +340,7 @@ public class BANDReconstructionApp extends FCApplication {
 						// filling twice... But, quoting Florian, we shouldn't have
 						// this happening...
 						bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,6).fill(tdif,ip);
+					
 					}
 				} else {
 					tdc = new float[1];
