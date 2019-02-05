@@ -533,10 +533,10 @@ public class BANDReconstructionApp extends FCApplication {
 				float td = tdcs.getItem(is,il,0,ip).get(0)-tdcs.getItem(is,il,1,ip).get(0);
 				bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is, 0, 0).fill(td,ip,1.0);  
 
-				//if(adcs.hasItem(is,il,0,ip)&&adcs.hasItem(is,il,1,ip)) {
-				//float lograt = (float) Math.log10(adcs.getItem(is,il,0,ip).get(0)/adcs.getItem(is,il,1,ip).get(0));
-				//bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is, ip, 2).fill(td,lograt);
-				//}    
+				if(adcs.hasItem(is,il,0,ip)&&adcs.hasItem(is,il,1,ip)) {
+					float lograt = (float) Math.log10(adcs.getItem(is,il,0,ip).get(0)/adcs.getItem(is,il,1,ip).get(0));
+					bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is, ip, 2).fill(td,lograt);
+				}    
 			}
 		}
 
