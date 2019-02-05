@@ -212,11 +212,11 @@ public class BANDPixels {
                 
                 H2_a_Hist.add(is, il, 1, new H2F("a_raw_"+iid+1,      300,   0., amax[id],500, -tmax[id],tmax[id]));
                 H2_a_Hist.add(is, il, 3, new H2F("a_ped_"+iid+3,      1000, -500.,  500., nstr[is-1], 1., nend)); 
-                H2_a_Hist.add(is, il, 5, new H2F("a_fadc_"+iid+5,     200,   0., 100., nstr[is-1], 1., nend));			// this is used for mode1:sum 2D graph where x axis is samples(4ns/ch)
+                H2_a_Hist.add(is, il, 5, new H2F("a_fadc_"+iid+5,     30,   0., 100., nstr[is-1], 1., nend));			// this is used for mode1:sum 2D graph where x axis is samples(4ns/ch)
                 																										// and y-axis is which PMT in the sector/layer for left and right side
                               
             
-                H2_a_Hist.add(is, il, 6, new H2F("a_fadc_"+iid+6,     100, -20.,  20., nstr[is-1], 1., nend));
+                H2_a_Hist.add(is, il, 6, new H2F("a_fadc_"+iid+6,     50,   0.,  300., nstr[is-1], 1., nend));
                 H1_a_Sevd.add(is, il, 0, new H1F("a_sed_"+iid+0,                       nstr[is-1], 1., nend));
                 H2_a_Sevd.add(is, il, 0, new H2F("a_sed_fadc_"+iid+0, 100,   0., 100., nstr[is-1], 1., nend));
                 H2_a_Sevd.add(is, il, 1, new H2F("a_sed_fadc_"+iid+1, 100,   0., 100., nstr[is-1], 1., nend));
