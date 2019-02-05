@@ -45,8 +45,10 @@ public class BANDTdcApp extends FCApplication {
         H2F h2a = bandPix[ilm].strips.hmap2.get("H2_t_Hist").get(is,1,0); h2a.setTitleY(tit+" PMT"); h2a.setTitleX("L PMT TDC");
         H2F h2b = bandPix[ilm].strips.hmap2.get("H2_t_Hist").get(is,2,0); h2b.setTitleY(tit+" PMT"); h2b.setTitleX("R PMT TDC");
         H2F h2c = bandPix[ilm].strips.hmap2.get("H2_t_Hist").get(is,0,0); h2c.setTitleY(tit+" BAR"); h2c.setTitleX("TDIF");
-        canvasConfig(c,0,0.,bandPix[0].tmax[ilm],1.,nstr+1.,true).draw(h2a);
-        canvasConfig(c,1,0.,bandPix[0].tmax[ilm],1.,nstr+1.,true).draw(h2b);
+        //canvasConfig(c,0,0.,bandPix[0].tmax[ilm],1.,nstr+1.,true).draw(h2a);
+        //canvasConfig(c,1,0.,bandPix[0].tmax[ilm],1.,nstr+1.,true).draw(h2b);
+        canvasConfig(c,0,0.,500,1.,nstr+1.,true).draw(h2a);
+        canvasConfig(c,1,0.,500,1.,nstr+1.,true).draw(h2b);
         canvasConfig(c,2, -35.,  35.,1.,nstr+1.,true).draw(h2c);
         
         F1D f1 = new F1D("p0","[a]",0.,4000.); f1.setParameter(0,ic+1);
@@ -78,8 +80,12 @@ public class BANDTdcApp extends FCApplication {
         
         if (lr==1) h1a.setFillColor(col2);
         if (lr==2) h1b.setFillColor(col2);
-        c.cd(6); h1a.setOptStat(Integer.parseInt("1000100")); h1a.setTitle(""); c.draw(h1a);  
-        c.cd(7); h1b.setOptStat(Integer.parseInt("1000100")); h1b.setTitle(""); c.draw(h1b); 
+        c.cd(6); h1a.setOptStat(Integer.parseInt("1000100")); h1a.setTitle("");
+        canvasConfig(c,6,0,500,0,h1a.getMax()*1.2,false).draw(h1a);
+        
+        c.cd(7); h1b.setOptStat(Integer.parseInt("1000100")); h1b.setTitle("");
+        canvasConfig(c,7,0,500,0,h1b.getMax()*1.2,false).draw(h1b);
+        
         c.cd(8); h1c.setOptStat(Integer.parseInt("1000100")); h1c.setTitle(""); c.draw(h1c);      
         
         ics=ic;

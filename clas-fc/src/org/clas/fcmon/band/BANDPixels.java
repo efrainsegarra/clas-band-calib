@@ -208,7 +208,7 @@ public class BANDPixels {
                 H2_a_Hist.add(is, il, 0, new H2F("a_raw_"+iid+0,      400,   0., amax[id],nstr[is-1], 1., nend));
                 H2_a_Hist.add(is, il, 7, new H2F("a_raw_overflowInc_"+iid+0,      400,   0., amax[id],nstr[is-1], 1., nend));
                
-                H2_t_Hist.add(is, il, 0, new H2F("a_raw_"+iid+0,      500,   -tmax[id], tmax[id], nstr[is-1], 1., nend));
+                H2_t_Hist.add(is, il, 0, new H2F("a_raw_"+iid+0,      1000,   -tmax[id], tmax[id], nstr[is-1], 1., nend));
                 
                 H2_a_Hist.add(is, il, 1, new H2F("a_raw_"+iid+1,      300,   0., amax[id],500, -tmax[id],tmax[id]));
                 H2_a_Hist.add(is, il, 3, new H2F("a_ped_"+iid+3,      1000, -500.,  500., nstr[is-1], 1., nend)); 
