@@ -615,7 +615,7 @@ public class BANDReconstructionApp extends FCApplication {
 				
 				if( app.sourceData == true ){
 					if( (Math.abs(tt_L-tt_R+2) > 2) || 
-							(Math.abs(ad_L-ad_R-58) > 200) ||
+							(Math.abs(ad_L-ad_R) > 200) ||
 								(Math.abs(at_L-at_R) > 2) ) continue;
 				}
 				
@@ -653,7 +653,9 @@ public class BANDReconstructionApp extends FCApplication {
 					double refTime_a = (atRef_L+atRef_R)/2.;
 					double refTime_t = (ttRef_L+ttRef_R)/2.;
 					
-					if( Math.sqrt(adRef_L*adRef_R) < 13000 ) continue;
+					if( app.cosmicData == true) {
+						if( Math.sqrt(adRef_L*adRef_R) < 13000 ) continue;
+					}
 					
 					// Fill ToF - Ref histograms:
 					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,ip,0).fill(gm,tof_a-refTime_a);
