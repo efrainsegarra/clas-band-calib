@@ -106,7 +106,7 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 		
 		if( app.cosmicData  == true) {
 			
-			file = new File(String.format("../band_analysis/hvScan/calibOutput/run_%d-adcFit.txt",runno));
+    		file = new File(String.format("/work/band/calibOutput/run_%d-adcFit.txt",runno));
 			// Try to open a text file, otherwise do not try to analyze
 			try(PrintWriter output = new PrintWriter(file)) {
 				output.println("#Sector\tLayer\tComponent\tOrder\tMean\tSigma\n");
@@ -177,7 +177,7 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
     	
     	if (reg.getIntegral()/over.getIntegral() < overflow_ratio) {fit_amp = h.getMax()*0.3;} //Overflow peak is usually smaller than global peak
         	
-    	F1D f1 = new F1D("f1", "[amp]*landau(x,[mean],[sigma]) +[exp_amp]*exp([p]*x)", 500, x_fit_max);
+    	F1D f1 = new F1D("f1", "[amp]*landau(x,[mean],[sigma]) +[exp_amp]*exp([p]*x)", 500, 50000);
         f1.setParameter(0, fit_amp);
         f1.setParameter(1, h.getMean() );
         f1.setParameter(2, h.getRMS()*0.5 );

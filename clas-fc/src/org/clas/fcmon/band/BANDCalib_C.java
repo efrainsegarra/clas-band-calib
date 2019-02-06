@@ -95,7 +95,7 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
     	
     	if( app.cosmicData  == true) {
     		
-    		file = new File(String.format("../band_analysis/hvScan/calibOutput/run_%d-tdcFit.txt",runno));
+    		file = new File(String.format("/work/band/calibOutput/run_%d-tdcFit.txt",runno));
 			// Try to open a text file, otherwise do not try to analyze
 			try(PrintWriter output = new PrintWriter(file)) {
 				
