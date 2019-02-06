@@ -119,7 +119,7 @@ public class BANDCalib_Atten extends FCApplication implements CalibrationConstan
         else if(sector==2||sector==5) bar_length = 202.0; //cm
         else if(sector==3||sector==4) bar_length =  51.0; //cm
         double mu = 2*bar_length/1000./sigma;
-        calib.setDoubleValue(mu, "mu", sector, lidx, pidx);
+        calib.setDoubleValue(mu, "mu[m]", sector, lidx, pidx);
     }
 
     

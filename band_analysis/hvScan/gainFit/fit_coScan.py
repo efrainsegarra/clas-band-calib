@@ -34,14 +34,14 @@ pts /= 1500.
 
 
 plt.figure(1)
-plt.errorbar(HV_L,gm,marker='o',color='red',label='Left PMT',yerr=errors)
-plt.errorbar(HV_R,gm,marker='o',color='blue',label='Right PMT',yerr=errors)
-plt.errorbar(HV_L2,gm2,marker='o',color='violet',label='Left PMT',yerr=errors)
-plt.errorbar(HV_R2,gm2,marker='o',color='green',label='Right PMT',yerr=errors)
-plt.plot(pts,Al*np.power(pts,Bl),color='red')
-plt.plot(pts,Ar*np.power(pts,Br),color='blue')
-plt.plot(pts,Al2*np.power(pts,Bl2),color='violet')
-plt.plot(pts,Ar2*np.power(pts,Br2),color='green')
+#plt.errorbar(HV_L,gm,marker='o',color='red',label='Left PMT',yerr=errors,linestyle='')
+#plt.errorbar(HV_R,gm,marker='o',color='blue',label='Right PMT',yerr=errors,linestyle='')
+plt.errorbar(HV_L2,gm2,marker='o',color='red',label='Left PMT',yerr=errors2,linestyle='')
+plt.errorbar(HV_R2,gm2,marker='o',color='blue',label='Right PMT',yerr=errors2,linestyle='')
+#plt.plot(pts,Al*np.power(pts,Bl),color='red')
+#plt.plot(pts,Ar*np.power(pts,Br),color='blue')
+plt.plot(pts,Al2*np.power(pts,Bl2),color='red')
+plt.plot(pts,Ar2*np.power(pts,Br2),color='blue')
 plt.legend(numpoints=1,loc='best')
 plt.xlabel('HV [V]')
 plt.ylabel(r'$\sqrt{ADC_L*ADC_R}$')
@@ -49,7 +49,9 @@ plt.ylabel(r'$\sqrt{ADC_L*ADC_R}$')
 #print Al,Bl
 #print Ar,Br
 
-print "HV for PMT L to put 1MeVee at ADC 2000: ", np.power(2000./Al,1./Bl)*1500.
-print "HV for PMT R to put 1MeVee at ADC 2000: ", np.power(2000./Ar,1./Br)*1500.
+print "HV for PMT L to put 1MeVee at ADC 2000: ", np.power(2000./Al2,1./Bl2)*1500.
+print "HV for PMT R to put 1MeVee at ADC 2000: ", np.power(2000./Ar2,1./Br2)*1500.
+
+print Al2,Bl2,Ar2,Br2
 
 plt.show()
