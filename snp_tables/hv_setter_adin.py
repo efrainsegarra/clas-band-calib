@@ -6,8 +6,14 @@ Created on Wed Jan 9 09:44:45 2019
 @author: adinhrnjic
 """
 import decimal
+import sys
 
-infiles = [open("output{}.txt".format(x),'rb') for x in range(1,7)]
+if len(sys.argv)!=2:
+	print 'Invalid number of arguments. Please use:\n\tpython hv_setter_adin.py [FixedOutput.txt]'
+	exit(-1)
+	
+
+infiles = [open(sys.argv[1])]
 
 variables = [0,0,0,0,0]
 # sector, layer, component, left_hv, right_hv
@@ -46,22 +52,6 @@ for layer in layers:
                     temp = layer + number + side
                     all_pmts[temp]=default_voltage
 
-print(all_pmts.pop('516A_L', None))
-print(all_pmts.pop('516A_R', None))
-print(all_pmts.pop('516B_L', None))
-print(all_pmts.pop('516B_R', None))
-print(all_pmts.pop('517_L', None))
-print(all_pmts.pop('517_R', None))
-print(all_pmts.pop('518_L', None))
-print(all_pmts.pop('518_R', None))
-print(all_pmts.pop('516A_L', None))
-print(all_pmts.pop('516A_R', None))
-print(all_pmts.pop('516B_L', None))
-print(all_pmts.pop('516B_R', None))
-print(all_pmts.pop('517_L', None))
-print(all_pmts.pop('517_R', None))
-print(all_pmts.pop('518_L', None))
-print(all_pmts.pop('518_R', None))
 
 for file in infiles:
     next(file)
