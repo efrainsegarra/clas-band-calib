@@ -177,6 +177,7 @@ public class BANDPixels {
         DetectorCollection<H2F> H2_a_Sevd = new DetectorCollection<H2F>();
         DetectorCollection<H2F> H2_t_Sevd = new DetectorCollection<H2F>();
         DetectorCollection<H2F> H2_at_Hist = new DetectorCollection<H2F>();
+        DetectorCollection<H1F> H1_a_Hist = new DetectorCollection<H1F>();
         
         // README:
         /*	Storage of histograms: we have 2D and 1D histograms for ADC/TDC information, 
@@ -260,6 +261,8 @@ public class BANDPixels {
                 for( int ip = 1 ; ip<nstr[is-1]+1; ip++) {
                 		// FADC-TDC diff plot: x-axis is the ADC of the PMT and y-axis is the FADC-TDC time difference 
                 	H2_at_Hist.add(is, ip, lr-1, new H2F("fadc_tdc_diff_"+iid,	410,0.,4100,	200,-110,-70));
+                
+                	H1_a_Hist.add(is, 0, ip   , new H1F("a_ln_R",100,-1,1));
                 }
                 
                 // Histograms not used by calib suite, but for monitoring software
@@ -287,6 +290,7 @@ public class BANDPixels {
         }         
         
         strips.addH1DMap("H1_a_Sevd",  H1_a_Sevd);
+        strips.addH1DMap("H1_a_Hist",  H1_a_Hist);
         strips.addH1DMap("H1_t_Sevd",  H1_t_Sevd);
         strips.addH2DMap("H2_a_Hist",  H2_a_Hist);
         strips.addH2DMap("H2_t_Hist",  H2_t_Hist);
