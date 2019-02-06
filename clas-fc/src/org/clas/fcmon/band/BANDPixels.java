@@ -219,7 +219,7 @@ public class BANDPixels {
             	// bar in the sector
             H2_a_Hist.add(is, 0, 0,	new H2F("fadc_gm_"+iid,		400,0.,8000.,	nstr[is-1],1.,nend));	
             
-            H2_a_Hist.add(is, 0, 14,new H2F("fadc_diff_"+iid,	500,-500.,500.,	nstr[is-1],1.,nend));	
+            H2_a_Hist.add(is, 0, 14,new H2F("fadc_diff_"+iid,	100,-500.,500.,	nstr[is-1],1.,nend));	
             
             
 	        	// L-R FADC plot: x-axis is TDC time difference for L-R given from our FADC digital signal
@@ -236,10 +236,18 @@ public class BANDPixels {
             		//  ToF - Ref vs GM: x-axis is GM of sqrt(L*R) ADC and y-axis is (L+R)/2. - RF time using 
             		//	times from FADC
             	iid = Integer.toString(is)+"_S_"+Integer.toString(id)+"_L_"+Integer.toString(ip)+"_C_"+"_0_LR";
-            	H2_a_Hist.add(is, ip, 0, new H2F("fadc_gm_tof_"+iid,		400,0.,amax[id],	500,-5.,5.));
+            	if( (is == 3 || is == 4) && id!=4 ) {
+            		H2_a_Hist.add(is, ip, 0, new H2F("fadc_gm_tof_"+iid,		100,0.,30000,	200,7.,27.));
 	            	//  ToF - Ref vs GM: x-axis is GM of sqrt(L*R) ADC and y-axis is (L+R)/2. - RF time using 
 	        		//	times from TDC
-            	H2_t_Hist.add(is, ip, 0, new H2F("tdc_gm_tof_"+iid,		400,0.,amax[id],	500,-5.,5.));
+            		H2_t_Hist.add(is, ip, 0, new H2F("tdc_gm_tof_"+iid,		100,0.,30000,	200,7.,27.));
+            	}
+            	else {
+	            	H2_a_Hist.add(is, ip, 0, new H2F("fadc_gm_tof_"+iid,		100,0.,30000,	200,-5.,15.));
+		            	//  ToF - Ref vs GM: x-axis is GM of sqrt(L*R) ADC and y-axis is (L+R)/2. - RF time using 
+		        		//	times from TDC
+	            	H2_t_Hist.add(is, ip, 0, new H2F("tdc_gm_tof_"+iid,		100,0.,30000,	200,-5.,15.));
+            	}
             	
             	
             }
@@ -260,9 +268,10 @@ public class BANDPixels {
                 // Loop over all the bars for the L side and R side individually:	
                 for( int ip = 1 ; ip<nstr[is-1]+1; ip++) {
                 		// FADC-TDC diff plot: x-axis is the ADC of the PMT and y-axis is the FADC-TDC time difference 
-                	H2_at_Hist.add(is, ip, lr-1, new H2F("fadc_tdc_diff_"+iid,	410,0.,4100,	200,-110,-70));
-                
+
+                	H2_at_Hist.add(is, ip, lr-1, new H2F("fadc_tdc_diff_"+iid,	100,0.,30000,	400,-190,-30));
                 	H1_a_Hist.add(is, 0, ip   , new H1F("a_ln_R",100,-1,1));
+
                 }
                 
                 // Histograms not used by calib suite, but for monitoring software

@@ -3,6 +3,7 @@
 #include <string>
 #include <cstdio>
 #include <fstream>
+#include <algorithm>
 
 #include "TFile.h"
 #include "TTree.h"
@@ -16,6 +17,9 @@
 #include "TCanvas.h"
 #include "TImage.h"
 #include "TStyle.h"
+
+
+const double quenchFact = 1500;
 
 using namespace std;
 void find_gain(int numRuns, TGraph * data, std::vector<double> * HVs, double &A, double &B, double &Aerr, double &Berr, double &HV_15000);
@@ -60,6 +64,8 @@ int main(int argc, char ** argv)
 	if (inFile.is_open() == true){
 		while ( inFile >> sector >> layer >> component >> order >> hv >> mean >> sigma ) {
 
+			hv /= quenchFact;
+
 			if( mean < 0 || sigma < 0 ) continue;
 			int ID = sector*10000 + layer*1000 + component*100 +order*10;
 
@@ -87,14 +93,14 @@ int main(int argc, char ** argv)
 				Bars.push_back( bar );
 			}
 
-			cout << ID << " " << " " << sector << " " << layer << " " << component << " " << order << " "<< hv << " " << mean <<  " " << sigma <<"\n";
+			//cout << ID << " " << " " << sector << " " << layer << " " << component << " " << order << " "<< hv << " " << mean <<  " " << sigma <<"\n";
 		}
 	}
 
 
 	ofstream outFile;
 	outFile.open( argv[2] );
-	outFile << " Sector " << " Layer " << " Component " << " HV left " << " HV right " << std::endl;
+	outFile << "#Sector " << " Layer " << " Component " << " HV left " << " HV right " << std::endl;
 	for( int i = 0 ; i < Bars.size() ; i++){
 		BarInfo bar = Bars.at(i);
 
@@ -110,6 +116,7 @@ int main(int argc, char ** argv)
 		A_l = mL.at(0);
 
 		find_gain( hL.size() , &dataL, &hL, A_l, B_l, Aerr_l, Berr_l, HV_l );
+		cout << bar.sector << " " << bar.layer << " " << bar.component << " " << bar.order << " " << HV_l << " " << "\n";
 
 		TCanvas *c = new TCanvas;
 		TString name;
@@ -150,20 +157,22 @@ int main(int argc, char ** argv)
 void find_gain(int numRuns, TGraph * data, std::vector<double> * HVs, double &A, double &B, double &Aerr, double &Berr, double &HV_15000)
 {
 
-	TF1 myFunc("myFunc","[0]*(x^[1])", HVs->at(0) , HVs->at(numRuns-1) );
+	TF1 myFunc("myFunc","[0]*(x^[1])", 400/quenchFact , 1600/quenchFact );
 
 	myFunc.SetParameter(0,A);
 	myFunc.SetParameter(1,7);
 
-	TFitResultPtr fitRes = data->Fit(&myFunc,"QES","",HVs->at(0)-400.,HVs->at(numRuns-1)+400.);
-	cout << "\n\tGain Functional for PMT is:\tA = " << fitRes->Parameter(0) << "\t\tB [GAIN] = " << fitRes->Parameter(1) << " with range: " << HVs->at(0)-200. << " to " << HVs->at(numRuns-1)+200. << "\n";
+	//cout << "\n" << data->getTitle() << "\n";
+	TFitResultPtr fitRes = data->Fit(&myFunc,"QES","",400./quenchFact,1600./quenchFact);
+	cout << "\n\tGain Functional for PMT is:\tA = " << fitRes->Parameter(0) << "\t\tB [GAIN] = " << fitRes->Parameter(1) << " with range: " << 400./quenchFact << " to " << 1600./quenchFact << "\n";
 
 	A = fitRes->Parameter(0);
 	Aerr = fitRes->ParError(0);
 	B = fitRes->Parameter(1);
 	Berr = fitRes->ParError(1);
 
-	HV_15000 = pow(18000./A,1./B);
-	cout << "\t\tHV at ADC 18000: " << HV_15000 << "\n";
+	HV_15000 = pow(15000./A,1./B)*quenchFact;
+	cout << "\t\tHV at ADC 15000: " << HV_15000 << "\n";
+	cout << "\t\t\tADC at HV 1321, 1301 :" << A*pow(1321./quenchFact,B) << " " <<  A*pow(1301./quenchFact,B) << "\n";
 
 }

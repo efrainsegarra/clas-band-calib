@@ -1,7 +1,7 @@
 .DELETE_ON_ERROR:
 
 CXX         := g++
-CXXFLAGS    := -O2 -Wall -fPIC
+CXXFLAGS    := -std=c++11 -O2 -Wall -fPIC
 LD          := g++
 LDFLAGS     := -O2
 

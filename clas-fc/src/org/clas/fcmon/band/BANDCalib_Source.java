@@ -78,9 +78,6 @@ public class BANDCalib_Source extends FCApplication implements CalibrationConsta
         
      }
 
-    
-    
-    
 
     public void updateCanvas(DetectorDescriptor dd) {
         
