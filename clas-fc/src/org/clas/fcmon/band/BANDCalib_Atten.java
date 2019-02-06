@@ -20,6 +20,7 @@ import org.jlab.detector.calib.utils.CalibrationConstantsView;
 //import org.root.histogram.H1D;
 import org.jlab.groot.graphics.EmbeddedCanvas;
 import org.jlab.groot.math.F1D;
+import org.jlab.utils.groups.IndexedList;
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.fitter.DataFitter;
 
@@ -53,7 +54,7 @@ public class BANDCalib_Atten extends FCApplication implements CalibrationConstan
         this.is2=is2;
         
         calib = new CalibrationConstants(3,
-                "nameMe/F:nameMeToo/F");
+                "sigma/F:nameMeToo/F");
         calib.setName("/calibration/band/nameMeThree");
         calib.setPrecision(3);
         
@@ -86,12 +87,9 @@ public class BANDCalib_Atten extends FCApplication implements CalibrationConstan
     				int lidx = (layer+1);
     		        int pidx = (paddle+1);
     		        calib.addEntry(sector,lidx,pidx);
-        			
-    		        	// Fit both sides of paddle
-    		        for( int lr = 1 ; lr < 3 ; lr++) {									// loop over left/right PMT in paddle
         				
-    		        	fit();
-        			}
+    		        fit(layer,sector,paddle);
+        			
     		       //System.out.println("Completed Layer "+ lidx + ", Sector "+ sector + " , Component " + pidx);
             	} 
     		}        		
@@ -100,9 +98,22 @@ public class BANDCalib_Atten extends FCApplication implements CalibrationConstan
         calib.fireTableDataChanged();
     }
     
-    public void fit(){ 
-        
-     }
+    public void fit(int layer,int sector,int paddle){ 
+    	H1F h1 = bandPix[layer].strips.hmap1.get("H1_a_Hist").get(sector,0,paddle+1);
+    	double maxVal = h1.getMax()*1;
+    	F1D f1 = new F1D("f1", "[amp]*gaus(x,[mean],[sigma])", -1, 1);
+    	f1.setParameter(0,maxVal);
+    	f1.setParameter(1,0);
+    	f1.setParameter(2,0.5);
+    	f1.setParLimits(0, maxVal*(1-0.3), maxVal*(1+0.3));
+    	f1.setParLimits(1, -0.3 , 0.3 );
+    	DataFitter.fit(f1, h1, "REQ");
+    	double sigma = h1.getFunction().getParameter(2);
+    	
+    	int lidx = (layer+1);
+        int pidx = (paddle+1);
+    	calib.setDoubleValue(sigma, "sigma", sector, lidx, pidx);
+    }
 
     
     
@@ -110,6 +121,8 @@ public class BANDCalib_Atten extends FCApplication implements CalibrationConstan
 
     public void updateCanvas(DetectorDescriptor dd) {
         
+    	IndexedList<List<Float>>          fadc_int = new IndexedList<List<Float>>(4);
+    	
         this.getDetIndices(dd); 
         
         int lr = dd.getOrder()+1;
@@ -123,12 +136,19 @@ public class BANDCalib_Atten extends FCApplication implements CalibrationConstan
         c.clear(); c.divide(2, 4);
         c.setAxisFontSize(12);
 
+        H1F h1;
+        
+        for( int ip = 1 ; ip<nstr+1; ip++) {
+        	c.cd(ip-1);
+        	h1 = bandPix[layer].strips.hmap1.get("H1_a_Hist").get(sector,0,ip);
+        	h1.setTitle("SEC:"+sector+", BAR:"+ip);
+        	h1.setTitleX("ln(R_i)");
+        	c.draw(h1);
+        }
+        
         c.repaint();
         //End of plotting
     }
-    
-    
-    
     
     public void stateChanged(ChangeEvent e) {
         int i = ccview.getTabbedPane().getSelectedIndex();
