@@ -606,6 +606,9 @@ public class BANDReconstructionApp extends FCApplication {
 				double ad_R = fadc_int.getItem(is,il,1,ip).get(adcIdxR);
 				double at_R = fadc_time.getItem(is,il,1,ip).get(adcIdxR);
 				double tt_R = tdc_time.getItem(is,il,1,ip).get(tdcIdxR);
+				
+				double ln_R_atten = Math.log(ad_L/ad_R);
+				
 				if( at_L == 0 || at_R== 0 ) continue;
 				if( tt_L == 0 || tt_R== 0 ) continue;
 					// geometric mean
@@ -627,7 +630,8 @@ public class BANDReconstructionApp extends FCApplication {
 				bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,0,0).fill(tt_L-tt_R,ip);
 					// Fill ADC correlation plot
 				bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,14).fill(ad_L-ad_R,ip);
-
+					// Fill histogram for 
+				bandPix[il-1].strips.hmap1.get("H1_a_Hist").get(is,0,ip).fill(ln_R_atten);
 				
 				// Take the top bar in the 2nd sector for now as a defined reference, and if it
 				// doesn't fire then we just don't fill the below histograms

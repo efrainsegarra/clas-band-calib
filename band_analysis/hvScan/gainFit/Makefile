@@ -4,7 +4,7 @@ LFLAGS:=`root-config --libs`
 all: gainfitter
 
 gainfitter: gainfitter.cpp
-	g++ $(CFLAGS) $(LFLAGS) $^ -o $@
+	g++ -std=c++11 $(CFLAGS) $(LFLAGS) $^ -o $@
 
 
 .PHONY: all clean
