@@ -54,7 +54,7 @@ public class BANDCalib_Atten extends FCApplication implements CalibrationConstan
         this.is2=is2;
         
         calib = new CalibrationConstants(3,
-                "sigma/F:nameMeToo/F");
+                "sigma/F:mu[m]/F");
         calib.setName("/calibration/band/nameMeThree");
         calib.setPrecision(3);
         
@@ -108,11 +108,18 @@ public class BANDCalib_Atten extends FCApplication implements CalibrationConstan
     	f1.setParLimits(0, maxVal*(1-0.3), maxVal*(1+0.3));
     	f1.setParLimits(1, -0.3 , 0.3 );
     	DataFitter.fit(f1, h1, "REQ");
-    	double sigma = h1.getFunction().getParameter(2);
+    	double sigma = Math.abs(h1.getFunction().getParameter(2));
     	
     	int lidx = (layer+1);
         int pidx = (paddle+1);
     	calib.setDoubleValue(sigma, "sigma", sector, lidx, pidx);
+    	
+    	double bar_length = 0;
+        if     (sector==1)            bar_length = 164.0; //cm
+        else if(sector==2||sector==5) bar_length = 202.0; //cm
+        else if(sector==3||sector==4) bar_length =  51.0; //cm
+        double mu = 2*bar_length/1000./sigma;
+        calib.setDoubleValue(mu, "mu", sector, lidx, pidx);
     }
 
     
