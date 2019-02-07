@@ -159,7 +159,10 @@ with open('BAND_HV.snp','w+') as file:
     for pmt in all_pmts:
         file.write('B_DET_BAND_HV_%s:vset 1 %s\n' % (pmt,'%.15e' % decimal.Decimal(all_pmts[pmt])))
         file.write('B_DET_BAND_HV_%s:vmax 1 %s\n' % (pmt,'%.15e' % decimal.Decimal(1900)))
-        file.write('B_DET_BAND_HV_%s:iset 1 %s\n' % (pmt,'%.15e' % decimal.Decimal(300)))
+        if( 'V' in pmt ):
+		file.write('B_DET_BAND_HV_%s:iset 1 %s\n' % (pmt,'%.15e' % decimal.Decimal(500)))
+	else:
+		file.write('B_DET_BAND_HV_%s:iset 1 %s\n' % (pmt,'%.15e' % decimal.Decimal(300)))
         file.write('B_DET_BAND_HV_%s:trip 1 %s\n' % (pmt,'%.15e' % decimal.Decimal(0)))
         file.write('B_DET_BAND_HV_%s:rup 1 %s\n' % (pmt,'%.15e' % decimal.Decimal(50)))
         file.write('B_DET_BAND_HV_%s:rdn 1 %s\n' % (pmt,'%.15e' % decimal.Decimal(50)))
