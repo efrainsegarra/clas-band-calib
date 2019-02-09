@@ -236,9 +236,6 @@ public class BANDHvApp extends FCEpics implements ActionListener {
 		isCurrentSector = sectorSelected;
 		isCurrentLayer  = layerSelected;
 	}
-	else{
-		canvas.repaint();
-	}
 
 
     }
