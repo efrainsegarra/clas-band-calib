@@ -228,13 +228,18 @@ public class BANDHvApp extends FCEpics implements ActionListener {
         channelSelected = BANDConstants.getBar(app.detectorIndex, dd.getSector(), dd.getComponent())+1; 
         orderSelected   = dd.getOrder();
 
-	update1DScalers(engine1DCanvas.getCanvas("HV"),0);   
 	
 	if( dd.getLayer()  < 6 ){
 		if (epicsEnabled) updateStatus(sectorSelected,layerSelected,channelSelected);
 
+		update1DScalers(engine1DCanvas.getCanvas("HV"),0);   
+
 		isCurrentSector = sectorSelected;
 		isCurrentLayer  = layerSelected;
+	}
+	else{
+		engine1DCanvas.getCanvas("HV").clear();
+		engine1DCanvas.getCanvas("HV").repaint();
 	}
 
 
