@@ -248,6 +248,10 @@ public class BANDPixels {
 		        		//	times from TDC
 	            	H2_t_Hist.add(is, ip, 0, new H2F("tdc_gm_tof_"+iid,		100,0.,30000,	200,-5.,15.));
             	}
+			
+		for( int lr = 1 ; lr < 3 ; lr++){
+			H2_at_Hist.add( is, ip, lr+1 , new H2F("rawTDC_rawADC_"+iid,	60,0,600, 100,0,10000) );
+		}
             	
             	
             }

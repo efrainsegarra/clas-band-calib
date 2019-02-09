@@ -88,7 +88,8 @@ public class BANDMon extends DetectorMonitor {
 		app.init();
 		app.getDetectorView().setFPS(10);
 		app.setSelectedTab(0); 
-		app.setTDCOffset(1200);
+		//app.setTDCOffset(1200);
+		app.setTDCOffset(0);
 		monitor.bandDet.initButtons();
 	}
 

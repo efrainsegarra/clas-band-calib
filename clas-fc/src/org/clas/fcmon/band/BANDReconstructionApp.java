@@ -585,6 +585,9 @@ public class BANDReconstructionApp extends FCApplication {
 						//  fill the raw TDC,ADC strip data for counting color
 					bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,0,lr+1).fill(tt,ip);
 					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,5+lr+1).fill(ad,ip);
+
+						// fill raw TDC,ADC:
+					bandPix[il-1].strips.hmap2.get("H2_at_Hist").get(is,ip,(lr+1)+1).fill(at,tt);
 				}
 			}
 			
