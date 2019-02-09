@@ -49,8 +49,8 @@ public class FCEpics  {
     String ca_2H01  = "hallb_IPM2H01_CUR";
     
     String   grps[] = {"HV","DISC","FADC"};
-    String   band[] = {"1L","1R","2L","2R","3L","3R","4L","4R","5L","5R"};
-    int     nband[] = {24,24,24,24,24,24,24,24,20,20};
+    String   band[] = {"1L","1R","2L","2R","3L","3R","4L","4R","5L","5R","6"};
+    int     nband[] = {24,24,24,24,24,24,24,24,20,20,24};
  
     
     public int is1,is2;
@@ -239,24 +239,32 @@ public class FCEpics  {
     }	
     
 	public String chanToStr(int channel) {
+		//is the cut channel<10 correct if we need Vetos in BAND? F.H comment at 02/09/19
 	    return (channel<10 ? "0"+Integer.toString(channel):Integer.toString(channel));
 	}
 	
-	public String detAlias(String det, int layer) {
-	    switch (det) {
-	    case "BAND": return det;
-	    case   "EC": return (layer<4) ? "PCAL":"ECAL";
-	    }
-	    return "";
+	public String detAlias(String det, int layer) { 
+	    return "BAND";
 	}
 	
 	public String getPvString(String det, int grp, int sector, int layer, int channel, String action) {
 		
-	    String pv = "B_DET_"+detAlias(det,layer)+"_"+grps[grp]+"_SEC"+sector+"_"+layToStr(det,layer)+"_E"+chanToStr(channel);
-	    
-	    switch (det) {
-	    case "BAND": pv = "B_DET_"+detAlias(det,layer)+"_"+grps[grp]+"_"+BANDConstants.getHvAlias(layToStr(det,layer), channel);
+	    String pv = "default";
+	   //Group is either 0 or 2. Group = 0 is HV string and group = 2 os FADC string. Sector is not used in this function!!!
+	    //Everything is done in terms of layers and channels
+	  //layer = 1 & 2 is layer 1 with 24 PMTs total on L and R of a bar respectively
+    	//layer = 3 & 4 is layer 2 with 24 PMTs total on L and R of a bar respectively
+    	//layer = 5 & 6 is layer 3 with 24 PMTs total on L and R of a bar respectively
+    	//layer = 7 & 8 is layer 4 with 24 PMTs total on L and R of a bar respectively
+    	//layer = 9 & 10  is layer 5 with 20 PMTs total on  L and R of a bar respectively (missing 2 long and 2 short
+	  // System.out.println(grp +" "+ sector + " " + layer + " " + channel);
+	   if (det=="BAND") {
+	      pv = "B_DET_"+detAlias(det,layer)+"_"+grps[grp]+"_"+BANDConstants.getHvAlias(layToStr(det,layer), channel);
+	   //   System.out.println("getpv String in case BAND: " + pv);
 	    }
+	   else {
+		   System.out.println("Error in FCEpics: getpvString(). det == BAND is not true. Check det string");
+	   }
 //	    System.out.println(sector+" "+layer+" "+channel+" "+pv+":"+action);
 	    return pv+":"+action;
 	} 

@@ -31,18 +31,30 @@ public class BANDConstants {
     
     public static String getHvAlias(String l, int c) {
     	int[]     map = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,11,12,13,14,15,16,17,18};
-    	int[]    map5 = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,11,12,13,14,15};
+    	int[]    map5 = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,11,12,13,14,15};    	
     	String[]  smap= {"","","","","","","","","","","A","A","A","A","A","A","B","B","B","B","B","B","",""};
     	String[] smap5= {"","","","","","","","","","","A","A","A","A","A","B","B","B","B","B"};
     	
+    //	System.out.println("getHvAlias l=" + l + " , c= " + c);
     	String i1 = l.substring(0,1);
-  
-    	int  chan = Integer.parseInt(i1)==5?map5[c-1]:map[c-1];
-    	String i2 = chan<10 ? "0"+Integer.toString(chan):Integer.toString(chan);
-    	String i3 = Integer.parseInt(i1)==5?smap5[c-1]:smap[c-1];
-    	String i4 = "_"+l.substring(1,2);
+    	if (i1=="6") { //Veto Layer
+    		i1="V";
+    		//c = 1-16 Vetos 1-10,11A-16A,
+    		//c = 17-22 Vetos 11B-16B
+    		//c = 23-24 Vetos 17 and 18  	
+    		int  chan = map[c-1];
+    		String i2 = chan<10 ? "0"+Integer.toString(chan):Integer.toString(chan);
+    		String i3 = smap[c-1];
+    		return i1+i2+i3;
+    	}
+    	else { //other layers l is 1L,1R,2L,2R,3L,3R,4L,4R,5L or 5R
+    	    int  chan = Integer.parseInt(i1)==5?map5[c-1]:map[c-1];
+    	    String i2 = chan<10 ? "0"+Integer.toString(chan):Integer.toString(chan);
+    	    String i3 = Integer.parseInt(i1)==5?smap5[c-1]:smap[c-1];
+    	    String i4 = "_"+l.substring(1,2);
     	
-    	return i1+i2+i3+i4;
+    	    return i1+i2+i3+i4;
+    	}
     }
     
     public static int getBar(int id, int s, int c) {
