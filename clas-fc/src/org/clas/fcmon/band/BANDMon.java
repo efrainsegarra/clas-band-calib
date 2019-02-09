@@ -35,6 +35,7 @@ public class BANDMon extends DetectorMonitor {
 	BANDCalib_C					bandCalib_c = null;
 	BANDCalib_Res				bandCalib_res = null;
 	BANDCalib_Atten				bandCalib_atten = null;
+    	BANDHvApp                  bandHv = null;
 
 	int 		analyzedBefore = 0;
 
@@ -149,6 +150,10 @@ public class BANDMon extends DetectorMonitor {
 		bandCalib_atten.setApplicationClass(app); 
 		bandCalib_atten.init(is1,is2);
 
+		bandHv = new BANDHvApp("HV",mondet);
+		bandHv.setMonitoringClass(this);
+		bandHv.setApplicationClass(app);  
+		bandHv.init();
 
 		if(app.xMsgHost=="localhost") app.startEpics();
 	}
@@ -169,6 +174,7 @@ public class BANDMon extends DetectorMonitor {
 		app.addCanvas(bandCalib_atten.getName(),             	bandCalib_atten.getCanvas());
 
 
+        	app.addFrame(bandHv.getName(),                bandHv.getPanel());
 
 
 		//app.addFrame(bandScalers.getName(),      bandScalers.getPanel());
@@ -271,7 +277,7 @@ public class BANDMon extends DetectorMonitor {
 			//From DetectorView2D.DetectorViewLayer2D.drawLayer: Update color map of shape
 			bandDet.update(shape);
 			//        if (app.getSelectedTabName().equals("Scalers")) bandScalers.updateDetectorView(shape);
-			//        if (app.getSelectedTabName().equals("HV"))           bandHv.updateDetectorView(shape);
+			if (app.getSelectedTabName().equals("HV"))           bandHv.updateDetectorView(shape);
 		}
 
 	@Override
@@ -295,6 +301,7 @@ public class BANDMon extends DetectorMonitor {
 				case "Time Walk":			bandCalib_tw.updateCanvas(dd); break; 
 				case "Resolution":			bandCalib_res.updateCanvas(dd); break; 
 				case "Attenuation":                   bandCalib_atten.updateCanvas(dd); break; 
+        			case "HV":                              bandHv.updateCanvas(dd); break;
 
 			} 
 		}
@@ -364,6 +371,11 @@ public class BANDMon extends DetectorMonitor {
 	@Override
 		public void initEpics(Boolean doEpics) {
 			// TODO Auto-generated method stub
+			System.out.println("monitor.initEpics():Initializing EPICS Channel Access");
+			if (app.xMsgHost=="localhost") {bandHv.online=false;}
+			if ( doEpics) {bandHv.startEPICS();}
+			if (!doEpics) {bandHv.stopEPICS();}
+			
 		}
 
 }
