@@ -236,6 +236,9 @@ public class BANDHvApp extends FCEpics implements ActionListener {
 		isCurrentSector = sectorSelected;
 		isCurrentLayer  = layerSelected;
 	}
+	else{
+		canvas.repaint();
+	}
 
 
     }
@@ -259,14 +262,10 @@ public class BANDHvApp extends FCEpics implements ActionListener {
 		h = H1_HV.get(is, off+2, 0); h.setTitleX("LAY "+il+" R PMT"); h.setTitleY("VOLTS");
 		h.setFillColor(33); canvas.cd(1);    canvas.draw(h);
 
-		
 		c = H1_HV.get(is, lr+off, 0).histClone("Copy"); c.reset() ; 
 		c.setBinContent(ip, H1_HV.get(is, lr+off, 0).getBinContent(ip));
 		c.setFillColor(2);  canvas.cd(lr-1); canvas.draw(c,"same");
 		
-		c = H1_HV.get(is, lr+off, 2).histClone("Copy"); c.reset() ; 
-		c.setBinContent(ip, H1_HV.get(is, lr+off, 2).getBinContent(ip));
-		c.setFillColor(2);  canvas.cd(lr-1+2); canvas.draw(c,"same");
 	}
 	
         
@@ -275,31 +274,6 @@ public class BANDHvApp extends FCEpics implements ActionListener {
     
     
     public void updateDetectorView(DetectorShape2D shape) {
-    	
-        ColorPalette palette3 = new ColorPalette(3);
-        ColorPalette palette4 = new ColorPalette(4);
-                   
-        ColorPalette pal = palette4;
-        
-        DetectorDescriptor dd = shape.getDescriptor(); 
-        
-
-	int is = sectorSelected;
-        int lr = orderSelected+1;
-        int ip = BANDConstants.getBar(app.detectorIndex, dd.getSector(), dd.getComponent())+1; 
-	int off = 2*app.detectorIndex;
-    
-	if( dd.getLayer() < 6){
-		float z = (float) H1_HV.get(is, lr+off, 2).getBinContent(ip) ;
-		float zmin = 300 ; float zmax = 400;
-		if (app.omap==3) {
-			double colorfraction=(z-zmin)/(zmax-zmin);
-		    app.getDetectorView().getView().zmax = zmin;
-		    app.getDetectorView().getView().zmin = zmax;
-		    Color col = pal.getRange(colorfraction);
-		    shape.setColor(col.getRed(),col.getGreen(),col.getBlue());              
-		}
-	}
     } 
     
     @Override
