@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
 
+import javax.lang.model.element.Element;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -22,6 +23,8 @@ import org.jlab.detector.base.DetectorCollection;
 import org.jlab.detector.base.DetectorDescriptor;
 
 import org.jlab.groot.graphics.EmbeddedCanvas;
+
+
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.data.H2F;
 
@@ -133,7 +136,9 @@ public class BANDHvApp extends FCEpics implements ActionListener {
         System.out.println("BANDHvApp.initHistos():");
         for (int is=is1; is<is2 ; is++) {
             for (int il=1 ; il<layMap.get(detName).length+1 ; il++){
-                int nb=nlayMap.get(detName)[il-1]; int mx=nb+1;
+                int nb=nlayMap.get(detName)[il-1];
+                int mx=nb+1;
+                System.out.println(is + " " + il + " " + nb + " " + mx);
                 H1_HV.add(is, il, 0, new H1F("HV_vset"+is+"_"+il, nb,1,mx));                
                 H1_HV.add(is, il, 1, new H1F("HV_vmon"+is+"_"+il, nb,1,mx));                
                 H1_HV.add(is, il, 2, new H1F("HV_imon"+is+"_"+il, nb,1,mx));                
@@ -141,6 +146,7 @@ public class BANDHvApp extends FCEpics implements ActionListener {
                 H2_HV.add(is, il, 1, new H2F("HV_vmon"+is+"_"+il, nb,1,mx,nmax,0,nmax));                
                 H2_HV.add(is, il, 2, new H2F("HV_imon"+is+"_"+il, nb,1,mx,nmax,0,nmax));                
             }
+            
         }
     }
         
@@ -150,6 +156,18 @@ public class BANDHvApp extends FCEpics implements ActionListener {
         for (int is=is1; is<is2 ; is++) {
             for (int il=1; il<layMap.get(detName).length+1 ; il++) {
                 for (int ic=1; ic<nlayMap.get(detName)[il-1]+1; ic++) {
+                	//is is going from 1 to 1 (seems there is no sector division is1=1 is2=2 from FCEpics
+                	//il is going 1 - 10
+                	//ic 1 - 24 for il 1-8 and 1-20 for il 9-10
+                	//I am assuming the following
+                	//il 1 & 2 is layer 1 with 24 PMTs total on each side of a bar
+                	//il 3 & 4 is layer 2 with 24 PMTs total on each side of a bar
+                	//il 5 & 6 is layer 3 with 24 PMTs total on each side of a bar
+                	//il 7 & 8 is layer 4 with 24 PMTs total on each side of a bar
+                	//il 9 & 10 is layer 5 with 20 PMTs total on each side of a bar (missing 2 long and 2 short
+                	//il 11 is veto layer with ic = 1-16 Vetos 1-10,11A-16A,
+            		//ic = 17-22 Vetos 11B-16B and ic = 23-24 Vetos 17 and 18  
+                //	System.out.println("is:" + is + " , il: " + il + " , ic " + ic + " " + is1 + " " + is2);
                     app.fifo1.add(is, il, ic, new LinkedList<Double>());
                     app.fifo2.add(is, il, ic, new LinkedList<Double>());
                     app.fifo3.add(is, il, ic, new LinkedList<Double>());
@@ -189,6 +207,7 @@ public class BANDHvApp extends FCEpics implements ActionListener {
     public void fillHistos() {
         
         for (int is=is1; is<is2 ; is++) {
+        	//do the following for layer 1 - 6 il goes from 1-11
             for (int il=1; il<layMap.get(detName).length+1 ; il++) {
                 H1_HV.get(is, il, 0).reset(); H2_HV.get(is, il, 0).reset();
                 H1_HV.get(is, il, 1).reset(); H2_HV.get(is, il, 1).reset();
@@ -243,14 +262,43 @@ public class BANDHvApp extends FCEpics implements ActionListener {
         layerSelected   = dd.getOrder()+1+2*app.detectorIndex;
         channelSelected = BANDConstants.getBar(app.detectorIndex, dd.getSector(), dd.getComponent())+1; 
         orderSelected   = dd.getOrder();
+      
+        if (app.detectorIndex == 5) {
+        	//Veto numbering: layer number 11 for all
+        	//channelSelected is going from 1-24
+        	//chan 1-16 Vetos 1-10,11A-16A,
+        	//chan 17-22 Vetos 11B-16B
+        	//chan 23-24 Vetos 17 and 18 
+        	 layerSelected = 2*app.detectorIndex+1; //everything is layer 11 
+        	 if (channelSelected <= 16 || channelSelected >=23) {
+        		 orderSelected = 0; //left side
+        	 }
+        	 else		 {
+        		 orderSelected = 1; //right side
+        	 }
+             update1DScalers(engine1DCanvas.getCanvas("HV"),0);   
+             update2DScalers(engine2DCanvas.getCanvas("Stripcharts"),0);
+             
+             if (epicsEnabled) updateStatus(sectorSelected,layerSelected,channelSelected);
+
+     	
+     		isCurrentSector = sectorSelected;
+     		isCurrentLayer  = layerSelected;
+     		   	
+        }
         
+        else {
+        	
         update1DScalers(engine1DCanvas.getCanvas("HV"),0);   
         update2DScalers(engine2DCanvas.getCanvas("Stripcharts"),0);
         
         if (epicsEnabled) updateStatus(sectorSelected,layerSelected,channelSelected);
 
-        isCurrentSector = sectorSelected;
-        isCurrentLayer  = layerSelected;
+	
+		isCurrentSector = sectorSelected;
+		isCurrentLayer  = layerSelected;
+        }
+
     }
     
     public void update1DScalers(EmbeddedCanvas canvas, int flag) {
@@ -260,39 +308,66 @@ public class BANDHvApp extends FCEpics implements ActionListener {
         
         int is = sectorSelected;
         int lr = orderSelected+1;
-        int ip = channelSelected-1; 
-        
+        int ip = channelSelected-1; //chan goes back from 1-24 to 0-23 indexes
+        //left side lr = 1
+        //right side lr = 2
+       
         if (lr==0||lr>layMap.get(detName).length) return;
         
-        int  il = app.detectorIndex+1;
-        int off = 2*app.detectorIndex;
+        
+        int  il = app.detectorIndex+1; //layer is going from 1-6 now
+        int off = 2*app.detectorIndex; //off is 0,2,4,6,8,10
              
-        canvas.divide(4, 1);
+       
+        if  (il == 6 ) { //for Veto layers 
+          canvas.divide(2, 1);
+          h = H1_HV.get(is, 1+off, 0); h.setTitleX("LAY "+il+" VETOS"); h.setTitleY("VOLTS");
+          h.setFillColor(33); canvas.cd(0); canvas.draw(h);
+          
+          h = H1_HV.get(is, 1+off, 1); h.setTitleX("LAY "+il+" VETOS"); h.setTitleY("VOLTS");
+          h.setFillColor(32); canvas.cd(0); canvas.draw(h,"same");
+          
+          h = H1_HV.get(is, 1+off, 2); h.setTitleX("LAY "+il+" VETOS"); h.setTitleY("MICROAMPS");
+          h.setFillColor(32); canvas.cd(1); canvas.draw(h);
+          
+          c = H1_HV.get(is, 1+off, 0).histClone("Copy"); c.reset() ; 
+          c.setBinContent(ip, H1_HV.get(is, 1+off, 0).getBinContent(ip));
+          c.setFillColor(2);  canvas.cd(0); canvas.draw(c,"same");
         
-        h = H1_HV.get(is, 1+off, 0); h.setTitleX("LAY "+il+" L PMT"); h.setTitleY("VOLTS");
-        h.setFillColor(33); canvas.cd(0); canvas.draw(h);
-        h = H1_HV.get(is, 2+off, 0); h.setTitleX("LAY "+il+" R PMT"); h.setTitleY("VOLTS");
-        h.setFillColor(33); canvas.cd(1);    canvas.draw(h);
+          c = H1_HV.get(is, 1+off, 2).histClone("Copy"); c.reset() ; 
+          c.setBinContent(ip, H1_HV.get(is, 1+off, 2).getBinContent(ip));
+          c.setFillColor(2);  canvas.cd(1); canvas.draw(c,"same");
         
-        h = H1_HV.get(is, 1+off, 1); h.setTitleX("LAY "+il+" L PMT"); h.setTitleY("VOLTS");
-        h.setFillColor(32); canvas.cd(0); canvas.draw(h,"same");
-        h = H1_HV.get(is, 2+off, 1); h.setTitleX("LAY "+il+" R PMT"); h.setTitleY("VOLTS");
-        h.setFillColor(32); canvas.cd(1);    canvas.draw(h,"same");
+          canvas.repaint();
+          
+        }
+        else  {
+          canvas.divide(4, 1);
+          h = H1_HV.get(is, 1+off, 0); h.setTitleX("LAY "+il+" L PMT"); h.setTitleY("VOLTS");
+          h.setFillColor(33); canvas.cd(0); canvas.draw(h);
+          h = H1_HV.get(is, 2+off, 0); h.setTitleX("LAY "+il+" R PMT"); h.setTitleY("VOLTS");
+          h.setFillColor(33); canvas.cd(1);    canvas.draw(h);
+        
+          h = H1_HV.get(is, 1+off, 1); h.setTitleX("LAY "+il+" L PMT"); h.setTitleY("VOLTS");
+          h.setFillColor(32); canvas.cd(0); canvas.draw(h,"same");
+          h = H1_HV.get(is, 2+off, 1); h.setTitleX("LAY "+il+" R PMT"); h.setTitleY("VOLTS");
+          h.setFillColor(32); canvas.cd(1);    canvas.draw(h,"same");
 
-        h = H1_HV.get(is, 1+off, 2); h.setTitleX("LAY "+il+" L PMT"); h.setTitleY("MICROAMPS");
-        h.setFillColor(32); canvas.cd(2); canvas.draw(h);
-        h = H1_HV.get(is, 2+off, 2); h.setTitleX("LAY "+il+" R PMT"); h.setTitleY("MICROAMPS");
-        h.setFillColor(32); canvas.cd(3); canvas.draw(h);
+          h = H1_HV.get(is, 1+off, 2); h.setTitleX("LAY "+il+" L PMT"); h.setTitleY("MICROAMPS");
+          h.setFillColor(32); canvas.cd(2); canvas.draw(h);
+          h = H1_HV.get(is, 2+off, 2); h.setTitleX("LAY "+il+" R PMT"); h.setTitleY("MICROAMPS");
+          h.setFillColor(32); canvas.cd(3); canvas.draw(h);
         
-        c = H1_HV.get(is, lr+off, 0).histClone("Copy"); c.reset() ; 
-        c.setBinContent(ip, H1_HV.get(is, lr+off, 0).getBinContent(ip));
-        c.setFillColor(2);  canvas.cd(lr-1); canvas.draw(c,"same");
+          c = H1_HV.get(is, lr+off, 0).histClone("Copy"); c.reset() ; 
+          c.setBinContent(ip, H1_HV.get(is, lr+off, 0).getBinContent(ip));
+          c.setFillColor(2);  canvas.cd(lr-1); canvas.draw(c,"same");
         
-        c = H1_HV.get(is, lr+off, 2).histClone("Copy"); c.reset() ; 
-        c.setBinContent(ip, H1_HV.get(is, lr+off, 2).getBinContent(ip));
-        c.setFillColor(2);  canvas.cd(lr-1+2); canvas.draw(c,"same");
+          c = H1_HV.get(is, lr+off, 2).histClone("Copy"); c.reset() ; 
+          c.setBinContent(ip, H1_HV.get(is, lr+off, 2).getBinContent(ip));
+          c.setFillColor(2);  canvas.cd(lr-1+2); canvas.draw(c,"same");
         
-        canvas.repaint();
+          canvas.repaint();
+        } 
     }
     
     public void update2DScalers(EmbeddedCanvas canvas, int flag) {
@@ -304,24 +379,41 @@ public class BANDHvApp extends FCEpics implements ActionListener {
         //Don't redraw unless timer fires or new sector selected
         if (flag==0&&(is==isCurrentSector)) return;  
         
-        int  il = app.detectorIndex+1;
-        int off = 2*app.detectorIndex;
-        
-        canvas.divide(4, 1);
-        
-        h = H2_HV.get(is, 1+off, 0); h.setTitleX("LAY "+il+" L PMT"); h.setTitleY("TIME");
-        canvas.cd(0); canvas.draw(h);
-        h = H2_HV.get(is, 2+off, 0); h.setTitleX("LAY "+il+" R PMT"); h.setTitleY("TIME");
-        canvas.cd(1);    canvas.draw(h);
+        int  il = app.detectorIndex+1; //layer is going from 1-6 now
+        int off = 2*app.detectorIndex; //off is 0,2,4,6,8,10
 
-        h = H2_HV.get(is, 1+off, 2); h.setTitleX("LAY "+il+" L PMT"); h.setTitleY("TIME");
-        canvas.cd(2); canvas.draw(h);
-        h = H2_HV.get(is, 2+off, 2); h.setTitleX("LAY "+il+" R PMT"); h.setTitleY("TIME");
-        canvas.cd(3); canvas.draw(h);
+        if  (il == 6 ) { //for Veto layers 
+            canvas.divide(2, 1);
+            h = H2_HV.get(is, 1+off, 0); h.setTitleX("LAY "+il+" VETOS"); h.setTitleY("TIME");
+            canvas.cd(0); canvas.draw(h);
+           
+     
+            h = H2_HV.get(is, 1+off, 2); h.setTitleX("LAY "+il+" VETOS"); h.setTitleY("TIME");
+            canvas.cd(1); canvas.draw(h);
+           
+          
+            canvas.repaint();
+            
+          }
+        else {
         
-        canvas.repaint();
+          canvas.divide(4, 1);
         
+          h = H2_HV.get(is, 1+off, 0); h.setTitleX("LAY "+il+" L PMT"); h.setTitleY("TIME");
+          canvas.cd(0); canvas.draw(h);
+          h = H2_HV.get(is, 2+off, 0); h.setTitleX("LAY "+il+" R PMT"); h.setTitleY("TIME");
+          canvas.cd(1);    canvas.draw(h);
+   
+          h = H2_HV.get(is, 1+off, 2); h.setTitleX("LAY "+il+" L PMT"); h.setTitleY("TIME");
+          canvas.cd(2); canvas.draw(h);
+          h = H2_HV.get(is, 2+off, 2); h.setTitleX("LAY "+il+" R PMT"); h.setTitleY("TIME");
+          canvas.cd(3); canvas.draw(h);
+        
+          canvas.repaint();
+        }
+       
         isCurrentSector = is;
+      
         
     }
     
@@ -338,6 +430,7 @@ public class BANDHvApp extends FCEpics implements ActionListener {
         int il = dd.getOrder()+1;
         int ip = dd.getComponent(); 
                     
+       
         float z = (float) H1_HV.get(is, il, 2).getBinContent(ip) ;
         float zmin = 300 ; float zmax = 400;
         if (app.omap==3) {
