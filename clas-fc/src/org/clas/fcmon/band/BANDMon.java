@@ -240,6 +240,7 @@ public class BANDMon extends DetectorMonitor {
 					bandCalib_c.runno = app.run;
 					bandCalib_tw.runno = app.run;
 					bandCalib_res.runno = app.run;
+					bandCalib_atten.runno = app.run;
 					for (int idet=0; idet<bandPix.length; idet++) bandRecon.makeMaps(idet); 
 					System.out.println("End of run");      
 					if( analyzedBefore == 0 && (app.cosmicData == true)) {
@@ -248,7 +249,7 @@ public class BANDMon extends DetectorMonitor {
 						app.addFrame(bandCalib_tw.getName(),             bandCalib_tw.getCalibPane());
 						//app.addFrame(bandCalib_source.getName(),             bandCalib_source.getCalibPane());
 						//app.addFrame(bandCalib_res.getName(),             bandCalib_res.getCalibPane());
-						//app.addFrame(bandCalib_atten.getName(),             bandCalib_atten.getCalibPane());
+						app.addFrame(bandCalib_atten.getName(),             bandCalib_atten.getCalibPane());
 						analyzedBefore = 1;
 					}
 					//bandCalib_tw.analyze();

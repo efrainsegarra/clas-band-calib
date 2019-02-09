@@ -217,18 +217,18 @@ public class BANDPixels {
             
             	// Geometric mean plot: x-axis is GM of sqrt(L*R) ADC and y-axis identifies which
             	// bar in the sector
-            H2_a_Hist.add(is, 0, 0,	new H2F("fadc_gm_"+iid,		400,0.,8000.,	nstr[is-1],1.,nend));	
+            H2_a_Hist.add(is, 0, 0,	new H2F("fadc_gm_"+iid,		600,0.,12000.,	nstr[is-1],1.,nend));	
             
             H2_a_Hist.add(is, 0, 14,new H2F("fadc_diff_"+iid,	100,-500.,500.,	nstr[is-1],1.,nend));	
             
             
 	        	// L-R FADC plot: x-axis is TDC time difference for L-R given from our FADC digital signal
 	        	// y-axis identifies which bar in the sector
-            H2_a_Hist.add(is, 0, 1, new H2F("fadc_tdif_"+iid,  400, -20.,20.,		nstr[is-1], 1., nend));
+            H2_a_Hist.add(is, 0, 1, new H2F("fadc_tdif_"+iid,  625, -62.5,62.5,		nstr[is-1], 1., nend));
             
             	// L-R TDC plot: x-axis is TDC time difference for L-R given from our TDC modules
             	// y-axis identifies which bar in the sector
-            H2_t_Hist.add(is, 0, 0, new H2F("tdc_tdif_"+iid,	400,-20.,20.,		nstr[is-1],1.,nend));
+            H2_t_Hist.add(is, 0, 0, new H2F("tdc_tdif_"+iid, 469,-46.9,46.9,		nstr[is-1],1.,nend));
             
             
             // Loop over all bars in a sector

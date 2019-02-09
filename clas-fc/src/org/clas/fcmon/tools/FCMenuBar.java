@@ -54,7 +54,7 @@ public class FCMenuBar extends JMenuBar  {
         //JMenuItem          sd3 = new JMenuItem("clondaq3");
         //JMenuItem          sd4 = new JMenuItem("clondaq4");
         //JMenuItem          sd5 = new JMenuItem("clondaq5");
-        //JMenuItem          sd6 = new JMenuItem("clondaq6");
+        JMenuItem          sd6 = new JMenuItem("clondaq6");
         JMenuItem           x0 = new JMenuItem("EVIO");
         JMenuItem           x1 = new JMenuItem("HIPO");
     
@@ -81,7 +81,7 @@ public class FCMenuBar extends JMenuBar  {
             //ET_open.add(sd3);
             //ET_open.add(sd4);
             //ET_open.add(sd5);
-            //ET_open.add(sd6);
+            ET_open.add(sd6);
      
             XM_open.add(x0);
             XM_open.add(x1);
@@ -92,7 +92,7 @@ public class FCMenuBar extends JMenuBar  {
            //sd3.addActionListener(this);     
            //sd4.addActionListener(this);     
            //sd5.addActionListener(this);     
-           //sd6.addActionListener(this);     
+           sd6.addActionListener(this);     
             x0.addActionListener(this);      
             x1.addActionListener(this);   
           

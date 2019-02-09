@@ -43,63 +43,71 @@ struct find_bar{
 
 int main(int argc, char ** argv)
 {
-	if (argc != 3)
+	if (argc < 3)
 	{
 		cerr << "Wrong number of arguments. Instead use:\n"
-			<< "\tgainfitter /path/to/gain/test/txt /path/to/output/file/txt\n";
+			<< "\tgainfitter /path/to/output/file/txt /path/to/all/input/files/\n";
 		return -1;
 	}
 
-	ifstream inFile;
-	inFile.open( argv[1] );
-	char line[256];
-	inFile.getline( line, 256 );
-	double hv, mean, sigma;
-	double hvleft, hvright, leftMean, leftSigma, rightMean, rightSigma;
-	int layer, sector, component, order;
 
 	std::vector< BarInfo > Bars;
 	std::vector< double > HVs;
 	std::vector< double > HVerr;
-	if (inFile.is_open() == true){
-		while ( inFile >> sector >> layer >> component >> order >> hv >> mean >> sigma ) {
+	
+	const int files = argc - 2;
+	for( int fi = 0 ; fi < files ; fi++){
+		ifstream inFile;
+		inFile.open( argv[fi+2] );
+		char line[256];
+			// skips leading line with the #
+		inFile.getline( line, 256 );
+		double hv, mean, sigma;
+		double hvleft, hvright, leftMean, leftSigma, rightMean, rightSigma;
+		int layer, sector, component, order;
 
-			hv /= quenchFact;
+		if (inFile.is_open() == true){
+			while ( inFile >> sector >> layer >> component >> order >> hv >> mean >> sigma ) {
 
-			if( mean < 0 || sigma < 0 ) continue;
-			int ID = sector*10000 + layer*1000 + component*100 +order*10;
+				if( layer == 6 ) continue;
 
-			std::vector< BarInfo >::iterator it;
-			it = std::find_if( Bars.begin(), Bars.end(), find_bar( ID ) );
-			// If I've already started saving this bar
-			if( it != Bars.end() ){
-				int idx = std::distance( Bars.begin() , it );
-				BarInfo bar = Bars.at(idx);
-				Bars.at(idx).hv.push_back( hv);
-				Bars.at(idx).means.push_back( mean );
-				Bars.at(idx).meanserr.push_back( sigma );
+				hv /= quenchFact;
+
+				if( mean < 0 || sigma < 0 ) continue;
+				int ID = sector*10000 + layer*1000 + component*100 +order*10;
+
+				std::vector< BarInfo >::iterator it;
+				it = std::find_if( Bars.begin(), Bars.end(), find_bar( ID ) );
+				// If I've already started saving this bar
+				if( it != Bars.end() ){
+					int idx = std::distance( Bars.begin() , it );
+					BarInfo bar = Bars.at(idx);
+					Bars.at(idx).hv.push_back( hv);
+					Bars.at(idx).means.push_back( mean );
+					Bars.at(idx).meanserr.push_back( sigma );
+				}
+				else{	// Otherwise create and add new bar
+					BarInfo bar;
+					bar.id = ID;
+					bar.sector = sector;
+					bar.layer = layer;
+					bar.component = component;
+					bar.order = order;
+					bar.hv.push_back(hv);
+					bar.means.push_back(mean);
+					bar.meanserr.push_back(sigma);
+
+					Bars.push_back( bar );
+				}
+
+				//cout << ID << " " << " " << sector << " " << layer << " " << component << " " << order << " "<< hv << " " << mean <<  " " << sigma <<"\n";
 			}
-			else{	// Otherwise create and add new bar
-				BarInfo bar;
-				bar.id = ID;
-				bar.sector = sector;
-				bar.layer = layer;
-				bar.component = component;
-				bar.order = order;
-				bar.hv.push_back(hv);
-				bar.means.push_back(mean);
-				bar.meanserr.push_back(sigma);
-
-				Bars.push_back( bar );
-			}
-
-			//cout << ID << " " << " " << sector << " " << layer << " " << component << " " << order << " "<< hv << " " << mean <<  " " << sigma <<"\n";
 		}
 	}
 
 
 	ofstream outFile;
-	outFile.open( argv[2] );
+	outFile.open( argv[1] );
 	outFile << "#Sector " << " Layer " << " Component " << " HV left " << " HV right " << std::endl;
 	for( int i = 0 ; i < Bars.size() ; i++){
 		BarInfo bar = Bars.at(i);

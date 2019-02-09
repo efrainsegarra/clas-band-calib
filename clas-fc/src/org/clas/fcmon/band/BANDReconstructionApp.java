@@ -41,7 +41,7 @@ public class BANDReconstructionApp extends FCApplication {
 	
 	IndexedList<List<Float>>          tdc_time = new IndexedList<List<Float>>(4);
 	IndexedList<List<Float>>          fadc_int = new IndexedList<List<Float>>(4);
-	IndexedList<List<Float>>          fadc_time = new IndexedList<List<Float>>(4);
+	IndexedList<List<Double>>          fadc_time = new IndexedList<List<Double>>(4);
 	IndexedList<List<Float>>          overflow = new IndexedList<List<Float>>(4);
 	IndexedList<List<Float>>          fadc_height = new IndexedList<List<Float>>(4);
 	
@@ -199,7 +199,7 @@ public class BANDReconstructionApp extends FCApplication {
 				int  lr = bank.getByte("order",i);
 				int  ip = bank.getShort("component",i);
 				int adc = bank.getInt("ADC",i);
-				float t = bank.getFloat("time",i);               
+				double t = bank.getFloat("time",i);               
 				int ped = bank.getShort("ped", i);
 
 				if(isGoodSector(is)) {
@@ -208,8 +208,8 @@ public class BANDReconstructionApp extends FCApplication {
 					if(adc>0) {
 						if(!fadc_int.hasItem(is,il,lr,ip)) fadc_int.add(new ArrayList<Float>(),is,il,lr,ip);
 						fadc_int.getItem(is,il,lr,ip).add((float) adc); 
-						if(!fadc_time.hasItem(is,il,lr,ip)) fadc_time.add(new ArrayList<Float>(),is,il,lr,ip);
-						fadc_time.getItem(is,il,lr,ip).add((float) t); 
+						if(!fadc_time.hasItem(is,il,lr,ip)) fadc_time.add(new ArrayList<Double>(),is,il,lr,ip);
+						fadc_time.getItem(is,il,lr,ip).add((double) t); 
 						//if(!fadc_height.hasItem(is,il,lr,ip)) fadc_height.add(new ArrayList<Float>(),is,il,lr,ip);
 						//fadc_height.getItem(is,il,lr,ip).add((float) ap); 
 						if (!lapmt.hasItem(is,il,ip)) {
@@ -229,7 +229,7 @@ public class BANDReconstructionApp extends FCApplication {
 						tdc = new float[list.size()];
 						for (int ii=0; ii<tdcc.length; ii++) {
 							tdc[ii] = tdcc[ii]-app.phaseCorrection*4;  
-							float tdif = tdc[ii]-BANDConstants.TOFFSET[lr]-t;
+							double tdif = (double) tdc[ii] -BANDConstants.TOFFSET[lr]-t;
 							//bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,lr+1,6).fill(tdif,ip);
 						}
 					} else {
@@ -264,7 +264,9 @@ public class BANDReconstructionApp extends FCApplication {
 
 	public void updateEvioData(DataEvent event) {
 
-		float      tps =  (float) 0.025;//0.02345;
+		//float      tps =  (float) 0.025;//0.02345;
+		//float	   tps =  (float) 0.02345;
+		final float tps = 0.02345f;
 		float     tdcd = 0;
 
 		tdc_time.clear();
@@ -325,7 +327,7 @@ public class BANDReconstructionApp extends FCApplication {
 				int ad = ddd.getADCData(0).getADC();
 				int pd = ddd.getADCData(0).getPedestal();
 				int t0 = ddd.getADCData(0).getTimeCourse();
-				float tf = (float) ddd.getADCData(0).getTime();
+				double tf = (double) ddd.getADCData(0).getTime();
 				float ph = (float) ddd.getADCData(0).getHeight()-pd;
 				short[]    pulse = ddd.getADCData(0).getPulseArray();
 
@@ -354,8 +356,8 @@ public class BANDReconstructionApp extends FCApplication {
 				fadc_height.getItem(is,il,lr,ip).add((float)ph); 
 
 				// Add FADC time based on unique ID
-				if (!fadc_time.hasItem(is,il,lr,ip))fadc_time.add(new ArrayList<Float>(),is,il,lr,ip);
-				fadc_time.getItem(is,il,lr,ip).add((float)tf);
+				if (!fadc_time.hasItem(is,il,lr,ip))fadc_time.add(new ArrayList<Double>(),is,il,lr,ip);
+				fadc_time.getItem(is,il,lr,ip).add((double)tf);
 
 				// Add unique paddles that fired ADC
 				if (!lapmt.hasItem(is,il,ip)) {
@@ -375,7 +377,7 @@ public class BANDReconstructionApp extends FCApplication {
 					for (int ii=0; ii<tdcc.length; ii++) {
 						// Correct each TDC by phase correction to compare to FADC time 
 						tdc[ii] = tdcc[ii]-app.phaseCorrection*4;  
-						float tdif = tdc[ii]-BANDConstants.TOFFSET[lr]-tf;
+						double tdif = ( (double) tdc[ii] ) -BANDConstants.TOFFSET[lr]-tf;
 						// FOR EACH TDC HIT, fill fadc-tdc time.
 						// This means if there are multiple ADCs, we do the 
 						// filling twice... But, quoting Florian, we shouldn't have
@@ -407,7 +409,7 @@ public class BANDReconstructionApp extends FCApplication {
 				if (pd>0) bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,7+lr+1).fill(this.pedref-pd, ip);
 
 				// Fill a bunch of histograms
-				fill(il-1, is, lr+1, ip, ad, tdc, tf, ph);
+				fill(il-1, is, lr+1, ip, ad, tdc, (float) tf, ph);
 					//  layer is by definition 1-6, so need to subtract 1 for indexing
 					//  lr is right now 0, and I expect it to be 1,2, which is why I add 1 here
 					//  ip is bar number
@@ -562,10 +564,10 @@ public class BANDReconstructionApp extends FCApplication {
 					// Now with chosen idx, find the idx of TDC that matches to FADC time
 					int tdcIdx = getTDCidx(is,il,ip,lr,adcIdx);
 					// Now we have our chosen ADC idx and matched TDC idx, so we can write any histograms:
-					double ad = fadc_int.getItem(is,il,lr,ip).get(adcIdx);
+					float ad = fadc_int.getItem(is,il,lr,ip).get(adcIdx);
 					double at = fadc_time.getItem(is,il,lr,ip).get(adcIdx);
-					double tt = tdc_time.getItem(is,il,lr,ip).get(tdcIdx);
-					double ap = fadc_height.getItem(is,il,lr,ip).get(adcIdx);
+					float tt = tdc_time.getItem(is,il,lr,ip).get(tdcIdx);
+					float ap = fadc_height.getItem(is,il,lr,ip).get(adcIdx);
 					
 					if( at==0 ) continue;
 					if( tt==0 ) continue;
@@ -578,7 +580,7 @@ public class BANDReconstructionApp extends FCApplication {
 					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,1+lr+1).fill(ad,ip);
 					
 						// fill the left FADC-TDC vs ADC histogram
-					bandPix[il-1].strips.hmap2.get("H2_at_Hist").get(is,ip,lr).fill(ad,at-tt);
+					bandPix[il-1].strips.hmap2.get("H2_at_Hist").get(is,ip,lr).fill(ad,at- (double) tt);
 					
 						//  fill the raw TDC,ADC strip data for counting color
 					bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,0,lr+1).fill(tt,ip);
@@ -599,13 +601,13 @@ public class BANDReconstructionApp extends FCApplication {
 				int tdcIdxL = getTDCidx(is,il,ip,0,adcIdxL);
 				int tdcIdxR = getTDCidx(is,il,ip,1,adcIdxR);
 				
-				double ad_L = fadc_int.getItem(is,il,0,ip).get(adcIdxL);
+				float ad_L = fadc_int.getItem(is,il,0,ip).get(adcIdxL);
 				double at_L = fadc_time.getItem(is,il,0,ip).get(adcIdxL);
-				double tt_L = tdc_time.getItem(is,il,0,ip).get(tdcIdxL);
+				float tt_L = tdc_time.getItem(is,il,0,ip).get(tdcIdxL);
 				
-				double ad_R = fadc_int.getItem(is,il,1,ip).get(adcIdxR);
+				float ad_R = fadc_int.getItem(is,il,1,ip).get(adcIdxR);
 				double at_R = fadc_time.getItem(is,il,1,ip).get(adcIdxR);
-				double tt_R = tdc_time.getItem(is,il,1,ip).get(tdcIdxR);
+				float tt_R = tdc_time.getItem(is,il,1,ip).get(tdcIdxR);
 				
 				double ln_R_atten = Math.log(ad_L/ad_R);
 				
@@ -614,7 +616,7 @@ public class BANDReconstructionApp extends FCApplication {
 					// geometric mean
 				double gm = Math.sqrt( ad_L * ad_R ); 
 				double tof_a = (at_L+at_R)/2.;
-				double tof_t = (tt_L+tt_R)/2.;
+				float tof_t = (tt_L+tt_R)/2.f;
 				
 				if( app.sourceData == true ){
 					if( (Math.abs(tt_L-tt_R+2) > 2) || 
@@ -647,15 +649,15 @@ public class BANDReconstructionApp extends FCApplication {
 					int tdcIdxRefR = getTDCidx(refSec,il,refComp,1,adcIdxRefR);
 					
 					double atRef_L = fadc_time.getItem(refSec,il,0,refComp).get(adcIdxRefL);
-					double ttRef_L = tdc_time.getItem(refSec,il,0,refComp).get(tdcIdxRefL);
+					float ttRef_L = tdc_time.getItem(refSec,il,0,refComp).get(tdcIdxRefL);
 					double atRef_R = fadc_time.getItem(refSec,il,1,refComp).get(adcIdxRefR);
-					double ttRef_R = tdc_time.getItem(refSec,il,1,refComp).get(tdcIdxRefR);
+					float ttRef_R = tdc_time.getItem(refSec,il,1,refComp).get(tdcIdxRefR);
 					
-					double adRef_L = fadc_int.getItem(refSec,il,0,refComp).get(adcIdxRefL);
-					double adRef_R = fadc_int.getItem(refSec,il,1,refComp).get(adcIdxRefR);
+					float adRef_L = fadc_int.getItem(refSec,il,0,refComp).get(adcIdxRefL);
+					float adRef_R = fadc_int.getItem(refSec,il,1,refComp).get(adcIdxRefR);
 					
 					double refTime_a = (atRef_L+atRef_R)/2.;
-					double refTime_t = (ttRef_L+ttRef_R)/2.;
+					float refTime_t = (ttRef_L+ttRef_R)/2.f;
 					
 					if( app.cosmicData == true) {
 						if( Math.sqrt(adRef_L*adRef_R) < 13000 ) continue;
