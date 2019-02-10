@@ -247,7 +247,7 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 		int nstr = bandPix[layer].nstr[sector-1];
 		int min=0, max=nstr;
 
-		c.clear(); c.divide(2,2);
+		c.clear(); c.divide(2,3);
 		c.setAxisFontSize(12);
 
 
@@ -320,8 +320,13 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 		}
 
 		c.cd(2);
-		c.draw( bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,component+1,2) );
+		c.draw( bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,0,15));
 		c.cd(3);
+		c.draw( bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,0,16));
+		
+		c.cd(4);
+		c.draw( bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,component+1,2) );
+		c.cd(5);
 		c.draw( bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,component+1,3) );
 
 

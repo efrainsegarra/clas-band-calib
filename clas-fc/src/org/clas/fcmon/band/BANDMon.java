@@ -126,30 +126,30 @@ public class BANDMon extends DetectorMonitor {
 		bandCalib_hv.setApplicationClass(app); 
 		bandCalib_hv.init(is1,is2);
 				
-		bandCalib_tw = new BANDCalib_TW("Time Walk",bandPix);        
-		bandCalib_tw.setMonitoringClass(this);
-		bandCalib_tw.setApplicationClass(app); 
-		bandCalib_tw.init(is1,is2);
+		//bandCalib_tw = new BANDCalib_TW("Time Walk",bandPix);        
+		//bandCalib_tw.setMonitoringClass(this);
+		//bandCalib_tw.setApplicationClass(app); 
+		//bandCalib_tw.init(is1,is2);
 
 		bandCalib_c = new BANDCalib_C("Cosmic: T.S. & S.o.L.",bandPix);        
 		bandCalib_c.setMonitoringClass(this);
 		bandCalib_c.setApplicationClass(app); 
 		bandCalib_c.init(is1,is2);
 		
-		bandCalib_source = new BANDCalib_Source("Source: 1MeVee",bandPix);
-		bandCalib_source.setMonitoringClass(this);
-		bandCalib_source.setApplicationClass(app); 
-		bandCalib_source.init(is1,is2);
+		//bandCalib_source = new BANDCalib_Source("Source: 1MeVee",bandPix);
+		//bandCalib_source.setMonitoringClass(this);
+		//bandCalib_source.setApplicationClass(app); 
+		//bandCalib_source.init(is1,is2);
 		
-		bandCalib_res = new BANDCalib_Res("Resolution",bandPix);
-		bandCalib_res.setMonitoringClass(this);
-		bandCalib_res.setApplicationClass(app); 
-		bandCalib_res.init(is1,is2);
+		//bandCalib_res = new BANDCalib_Res("Resolution",bandPix);
+		//bandCalib_res.setMonitoringClass(this);
+		//bandCalib_res.setApplicationClass(app); 
+		//bandCalib_res.init(is1,is2);
 
-		bandCalib_atten = new BANDCalib_Atten("Attenuation",bandPix);        
-		bandCalib_atten.setMonitoringClass(this);
-		bandCalib_atten.setApplicationClass(app); 
-		bandCalib_atten.init(is1,is2);
+		//bandCalib_atten = new BANDCalib_Atten("Attenuation",bandPix);        
+		//bandCalib_atten.setMonitoringClass(this);
+		//bandCalib_atten.setApplicationClass(app); 
+		//bandCalib_atten.init(is1,is2);
 
 		bandHv = new BANDHvApp("HV",mondet);
 		bandHv.setMonitoringClass(this);
@@ -169,10 +169,10 @@ public class BANDMon extends DetectorMonitor {
 		//app.addCanvas(bandCalib_tw.getName(),             		bandCalib_tw.getCanvas());
 		app.addCanvas(bandCalib_hv.getName(),             		bandCalib_hv.getCanvas());
 		app.addCanvas(bandCalib_c.getName(),             		bandCalib_c.getCanvas());
-		app.addCanvas(bandCalib_source.getName(),             	bandCalib_source.getCanvas());
-		app.addCanvas(bandCalib_tw.getName(),             	bandCalib_tw.getCanvas());
-		app.addCanvas(bandCalib_res.getName(),             	bandCalib_res.getCanvas());
-		app.addCanvas(bandCalib_atten.getName(),             	bandCalib_atten.getCanvas());
+		//app.addCanvas(bandCalib_source.getName(),             	bandCalib_source.getCanvas());
+		//app.addCanvas(bandCalib_tw.getName(),             	bandCalib_tw.getCanvas());
+		//app.addCanvas(bandCalib_res.getName(),             	bandCalib_res.getCanvas());
+		//app.addCanvas(bandCalib_atten.getName(),             	bandCalib_atten.getCanvas());
 
 
         	app.addFrame(bandHv.getName(),                bandHv.getPanel());
