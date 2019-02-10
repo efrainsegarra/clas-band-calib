@@ -293,8 +293,9 @@ public class BANDReconstructionApp extends FCApplication {
 			// This offset is arb. defined by looking at data, because our 
 			// 1190 TDC offset is far too large, and our real data starts ~1.2microseconds
 			// after our hardware offset.
-			tdcd   = ddd.getTDCData(0).getTime()*tps-app.tdcOffset;  
-
+			tdcd   = ddd.getTDCData(0).getTime()*tps;
+			System.out.println("TDC Info: "+tdcd+" SLCO: "+is+" "+il+" "+ip+" "+lr);
+			
 			// Make sure that tdc time is > 0 -- < 0 is non-physical
 			// since app.tdcOffset is less than our real TDC offset
 			if(isGoodSector(is)&&tdcd>0) {
@@ -331,6 +332,7 @@ public class BANDReconstructionApp extends FCApplication {
 				float ph = (float) ddd.getADCData(0).getHeight()-pd;
 				short[]    pulse = ddd.getADCData(0).getPulseArray();
 
+				System.out.println("ADC Info: "+ad+"/"+tf+" SLCO: "+is+" "+il+" "+ip+" "+lr);
 				
 					// Check for overflow of PMT digitized pulse, which
 					// caps at 4095. If there is overflow, fill a different
@@ -554,124 +556,73 @@ public class BANDReconstructionApp extends FCApplication {
 
 			for( int lr = 0 ; lr < 2 ; lr++) {
 				// Get information for the current side:
-				if(fadc_int.hasItem(is,il,lr,ip) && fadc_time.hasItem(is,il,lr,ip) 
-						&& tdc_time.hasItem(is,il,lr,ip)) {
-					
-					// Loop over all ADCs to find the highest ADC pulse
+				
+				if( tdc_time.hasItem(is,il,lr,ip) ) {
+					// Get TDC info
+					for( int idx = 0; idx < tdc_time.getItem(is,il,lr,ip).size(); idx++) {
+						float tt = tdc_time.getItem(is,il,lr,ip).get(idx);
+							// fill raw TDC histograms
+						bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,0,lr+1).fill(tt,ip);
+					}
+				}
+				if( fadc_int.hasItem(is,il,lr,ip) && fadc_time.hasItem(is,il,lr,ip)) {
+					// Get FADC info
 					int adcIdx = getADCidx(is,il,ip,lr);
-					if( adcIdx == -1) continue;
-					
-					// Now with chosen idx, find the idx of TDC that matches to FADC time
-					int tdcIdx = getTDCidx(is,il,ip,lr,adcIdx);
-					// Now we have our chosen ADC idx and matched TDC idx, so we can write any histograms:
 					float ad = fadc_int.getItem(is,il,lr,ip).get(adcIdx);
-					double at = fadc_time.getItem(is,il,lr,ip).get(adcIdx);
-					float tt = tdc_time.getItem(is,il,lr,ip).get(tdcIdx);
 					float ap = fadc_height.getItem(is,il,lr,ip).get(adcIdx);
+					double at = fadc_time.getItem(is,il,0,ip).get(adcIdx);
 					
-					if( at==0 ) continue;
-					if( tt==0 ) continue;
-						// fill the left adc w/ overflow histogram
-					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,3+lr+1).fill(ad,ip);
-					if( overflow.getItem(is,il,lr,ip).get(adcIdx) == 1) {
+					// fill raw ADC histograms
+	        		// time:
+	        		bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,14+lr+1).fill(at, ip);
+					// adc with overflow:
+	        		bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,3+lr+1).fill(ad,ip);
+	        		if( overflow.getItem(is,il,lr,ip).get(adcIdx) == 1) {
 						continue;
 					}
-						// fill the left adc w/o overflow histogram
-					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,1+lr+1).fill(ad,ip);
-					
-						// fill the left FADC-TDC vs ADC histogram
-					bandPix[il-1].strips.hmap2.get("H2_at_Hist").get(is,ip,lr).fill(ad,at- (double) tt);
-					
-						//  fill the raw TDC,ADC strip data for counting color
-					bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,0,lr+1).fill(tt,ip);
-					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,5+lr+1).fill(ad,ip);
-
-						// fill raw TDC,ADC:
-					bandPix[il-1].strips.hmap2.get("H2_at_Hist").get(is,ip,(lr+1)+1).fill(at,tt);
+        			// adc without overflow
+	        		bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,1+lr+1).fill(ad, ip);
+	        		
+	        		// If I also have TDC information, fill correlation plots
+	        		if( tdc_time.hasItem(is,il,lr,ip)) {
+	        			int tdcIdx = getTDCidx(is,il,ip,lr,adcIdx);
+	        			float tt = tdc_time.getItem(is,il,lr,ip).get(tdcIdx);
+	        			bandPix[il-1].strips.hmap2.get("H2_at_Hist").get(is,ip,lr).fill(ad,at- (double) tt);
+	        		}
 				}
+				
+			}
+				// If I have TDCs for BOTH sides of a bar
+			if( tdc_time.hasItem(is,il,0,ip) && tdc_time.hasItem(is,il,1,ip) ) {
+				for( int idxL = 0; idxL < tdc_time.getItem(is,il,0,ip).size(); idxL++) {
+					for( int idxR = 0; idxR < tdc_time.getItem(is,il,1,ip).size(); idxR++) {
+						
+						float ttL = tdc_time.getItem(is,il,0,ip).get(idxL);
+						float ttR = tdc_time.getItem(is,il,1,ip).get(idxR);
+							// Fill TDC L-R difference
+						bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,0,0).fill(ttL-ttR,ip);
+					}
+				}
+				
 			}
 			
-			
-			// Get information for both sides:
+			// If I have ADCs for BOTH sides of a bar
 			if(		fadc_int.hasItem(is,il,0,ip) && fadc_time.hasItem(is,il,0,ip) &&
-					fadc_int.hasItem(is,il,1,ip) && fadc_time.hasItem(is,il,1,ip) &&
-					tdc_time.hasItem(is,il,0,ip) && tdc_time.hasItem(is,il,1,ip) 		) {
+					fadc_int.hasItem(is,il,1,ip) && fadc_time.hasItem(is,il,1,ip)	) {
 				
 				int adcIdxL = getADCidx(is,il,ip,0);
 				int adcIdxR = getADCidx(is,il,ip,1);
 				if( adcIdxL == -1 || adcIdxR == -1) continue;
 				
-				int tdcIdxL = getTDCidx(is,il,ip,0,adcIdxL);
-				int tdcIdxR = getTDCidx(is,il,ip,1,adcIdxR);
-				
 				float ad_L = fadc_int.getItem(is,il,0,ip).get(adcIdxL);
 				double at_L = fadc_time.getItem(is,il,0,ip).get(adcIdxL);
-				float tt_L = tdc_time.getItem(is,il,0,ip).get(tdcIdxL);
 				
 				float ad_R = fadc_int.getItem(is,il,1,ip).get(adcIdxR);
 				double at_R = fadc_time.getItem(is,il,1,ip).get(adcIdxR);
-				float tt_R = tdc_time.getItem(is,il,1,ip).get(tdcIdxR);
 				
-				double ln_R_atten = Math.log(ad_L/ad_R);
-				
-				if( at_L == 0 || at_R== 0 ) continue;
-				if( tt_L == 0 || tt_R== 0 ) continue;
-					// geometric mean
-				double gm = Math.sqrt( ad_L * ad_R ); 
-				double tof_a = (at_L+at_R)/2.;
-				float tof_t = (tt_L+tt_R)/2.f;
-				
-				if( app.sourceData == true ){
-					if( (Math.abs(tt_L-tt_R+2) > 2) || 
-							(Math.abs(ad_L-ad_R) > 200) ||
-								(Math.abs(at_L-at_R) > 2) ) continue;
-				}
-				
-					// Fill geometric mean histogram
-				bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,0).fill(gm,ip);
 					// Fill L-R time from FADC
 				bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,1).fill(at_L-at_R,ip);
-					// Fill L-R time from TDC
-				bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,0,0).fill(tt_L-tt_R,ip);
-					// Fill ADC correlation plot
-				bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,14).fill(ad_L-ad_R,ip);
-					// Fill histogram for 
-				bandPix[il-1].strips.hmap1.get("H1_a_Hist").get(is,0,ip).fill(ln_R_atten);
-				
-				// Take the top bar in the 2nd sector for now as a defined reference, and if it
-				// doesn't fire then we just don't fill the below histograms
-				int refSec = 2; int refComp = 1;
-				if( fadc_int.hasItem(refSec,il,0,refComp) &&  fadc_int.hasItem(refSec,il,1,refComp) &&
-					fadc_time.hasItem(refSec,il,0,refComp)&&  fadc_time.hasItem(refSec,il,1,refComp)&&
-					tdc_time.hasItem(refSec,il,0,refComp) && tdc_time.hasItem(refSec,il,1,refComp) ) {
-					
-					int adcIdxRefL = getADCidx(refSec,il,refComp,0);
-					int adcIdxRefR = getADCidx(refSec,il,refComp,1);
-					if( adcIdxRefL == -1 || adcIdxRefR == -1) continue;
-					int tdcIdxRefL = getTDCidx(refSec,il,refComp,0,adcIdxRefL);
-					int tdcIdxRefR = getTDCidx(refSec,il,refComp,1,adcIdxRefR);
-					
-					double atRef_L = fadc_time.getItem(refSec,il,0,refComp).get(adcIdxRefL);
-					float ttRef_L = tdc_time.getItem(refSec,il,0,refComp).get(tdcIdxRefL);
-					double atRef_R = fadc_time.getItem(refSec,il,1,refComp).get(adcIdxRefR);
-					float ttRef_R = tdc_time.getItem(refSec,il,1,refComp).get(tdcIdxRefR);
-					
-					float adRef_L = fadc_int.getItem(refSec,il,0,refComp).get(adcIdxRefL);
-					float adRef_R = fadc_int.getItem(refSec,il,1,refComp).get(adcIdxRefR);
-					
-					double refTime_a = (atRef_L+atRef_R)/2.;
-					float refTime_t = (ttRef_L+ttRef_R)/2.f;
-					
-					if( app.cosmicData == true) {
-						if( Math.sqrt(adRef_L*adRef_R) < 13000 ) continue;
-					}
-					
-					// Fill ToF - Ref histograms:
-					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,ip,0).fill(gm,tof_a-refTime_a);
-					bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,ip,0).fill(gm,tof_t-refTime_t);
-					
-				}
-				
+
 				
 			}
 					

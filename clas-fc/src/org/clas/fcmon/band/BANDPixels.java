@@ -222,6 +222,7 @@ public class BANDPixels {
             H2_a_Hist.add(is, 0, 14,new H2F("fadc_diff_"+iid,	100,-500.,500.,	nstr[is-1],1.,nend));	
             
             
+            
 	        	// L-R FADC plot: x-axis is TDC time difference for L-R given from our FADC digital signal
 	        	// y-axis identifies which bar in the sector
             H2_a_Hist.add(is, 0, 1, new H2F("fadc_tdif_"+iid,  625, -62.5,62.5,		nstr[is-1], 1., nend));
@@ -268,6 +269,10 @@ public class BANDPixels {
                 	// ADC plot that throws out overflow: x-axis is ADC spectrum, not including any overflow events
         			// and y-axis identifies which bar in the sector -- only L side and only R side separately
                 H2_a_Hist.add(is, 0, 3+lr, new H2F("fadc_adcOver_"+iid,		200,0.,amax[id],		nstr[is-1], 1., nend));
+                
+                H2_a_Hist.add(is, 0, 14+lr,new H2F("fadc_rawT_"+iid,	40,0,400,	nstr[is-1],1.,nend));
+
+                
                 
                 // Loop over all the bars for the L side and R side individually:	
                 for( int ip = 1 ; ip<nstr[is-1]+1; ip++) {
