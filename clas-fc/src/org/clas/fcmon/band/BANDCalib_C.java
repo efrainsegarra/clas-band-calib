@@ -182,9 +182,18 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
 		c.clear(); //c.divide(2, 2);
 		c.setAxisFontSize(12);
 
-		c.divide(1,2);
+		c.divide(2,2);
 
+		H1F h1a;
 		c.cd(0);
+		h1a = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(is,0,1).sliceY(ic);
+		c.draw(h1a);
+		
+		c.cd(1);
+		h1a = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(is,0,2).sliceY(ic);
+		c.draw(h1a);
+		
+		c.cd(2);
 		H1F h1c;
 		h1c = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(is,0,0).sliceY(ic); 
 		h1c.setOptStat(Integer.parseInt("1000100")); 
@@ -200,7 +209,7 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
 			c.draw(gr_l2,"same");
 		}
 
-		c.cd(1);
+		c.cd(3);
 		h1c = bandPix[ilmap].strips.hmap2.get("H2_a_Hist").get(is,0,1).sliceY(ic); 
 		h1c.setTitleX("FADC L-R BAR "+(ic+1)+" TDIF");   h1c.setFillColor(2);
 		h1c.setOptStat(Integer.parseInt("1000100")); 
