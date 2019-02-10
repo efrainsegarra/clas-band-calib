@@ -619,9 +619,13 @@ public class BANDReconstructionApp extends FCApplication {
 	        		
 	        		// If I also have TDC information, fill correlation plots
 	        		if( tdc_time.hasItem(is,il,lr,ip)) {
+	        			System.out.println("\t\t\tYAY WE HAVE BOTH FOR A SINGLE BAR");
+	        			
 	        			int tdcIdx = getTDCidx(is,il,ip,lr,adcIdx);
 	        			float tt = tdc_time.getItem(is,il,lr,ip).get(tdcIdx);
-	        			bandPix[il-1].strips.hmap2.get("H2_at_Hist").get(is,ip,lr).fill(ad,at- (double) tt);
+	        			
+	        			bandPix[il-1].strips.hmap2.get("H2_at_Hist").get(is,ip,1+lr+1).fill(at,tt);
+
 	        		}
 				}
 				
