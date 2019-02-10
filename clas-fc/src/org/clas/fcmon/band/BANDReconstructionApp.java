@@ -298,13 +298,14 @@ public class BANDReconstructionApp extends FCApplication {
 			
 			// Make sure that tdc time is > 0 -- < 0 is non-physical
 			// since app.tdcOffset is less than our real TDC offset
-			if(isGoodSector(is)&&tdcd>0) {
+			if(tdcd>0) {
 
 					// Search in an array if we already have a TDC entry for a certain
 					// sector,layer,component,LR, and if we don't, create a new array
 					// and either way, add the current TDC time to the array.
 				if(!tdc_time.hasItem(is,il,lr-2,ip)) tdc_time.add(new ArrayList<Float>(),is,il,lr-2,ip);
-				tdc_time.getItem(is,il,lr-2,ip).add(tdcd);           
+				tdc_time.getItem(is,il,lr-2,ip).add(tdcd);    
+				System.out.println("\tTDC info saved: "+tdc_time.getItem(is,il,lr-2,ip).get(0));
 
 					// Add unique paddles that fired TDC
 				if (!ltpmt.hasItem(is,il,ip)) {
@@ -353,6 +354,7 @@ public class BANDReconstructionApp extends FCApplication {
 				// Add ADCs based on unique ID
 				if (!fadc_int.hasItem(is,il,lr,ip))fadc_int.add(new ArrayList<Float>(),is,il,lr,ip);
 				fadc_int.getItem(is,il,lr,ip).add((float)ad); 
+				System.out.println("\tFADC info saved: "+fadc_int.getItem(is,il,lr,ip).get(0));
 				
 				if (!fadc_height.hasItem(is,il,lr,ip))fadc_height.add(new ArrayList<Float>(),is,il,lr,ip);
 				fadc_height.getItem(is,il,lr,ip).add((float)ph); 
@@ -360,6 +362,7 @@ public class BANDReconstructionApp extends FCApplication {
 				// Add FADC time based on unique ID
 				if (!fadc_time.hasItem(is,il,lr,ip))fadc_time.add(new ArrayList<Double>(),is,il,lr,ip);
 				fadc_time.getItem(is,il,lr,ip).add((double)tf);
+				System.out.println("\tFADC info saved: "+fadc_time.getItem(is,il,lr,ip).get(0));
 
 				// Add unique paddles that fired ADC
 				if (!lapmt.hasItem(is,il,ip)) {
@@ -548,7 +551,9 @@ public class BANDReconstructionApp extends FCApplication {
 		// Loop over all the unique bars that fired in our FADC module  -- we could do the
 		// same for our TDC module, but if we don't have any FADC bar, then the event is useless.
 		// Maybe we could recover the event if doesn't have TDC, but let's move on...
-		for (Map.Entry<Long,List<Integer>>  entry : lapmt.getMap().entrySet()){ 
+		System.out.println("******** PROCESSING ALL HITS IN THIS EVENT *********");
+		
+		for (Map.Entry<Long,List<Integer>>  entry : ltpmt.getMap().entrySet()){ 
 			long hash = entry.getKey();
 			int is = ig.getIndex(hash, 0); // Sector goes from 1-5
 			int il = ig.getIndex(hash, 1); // Layer goes from 1-6
@@ -561,16 +566,45 @@ public class BANDReconstructionApp extends FCApplication {
 					// Get TDC info
 					for( int idx = 0; idx < tdc_time.getItem(is,il,lr,ip).size(); idx++) {
 						float tt = tdc_time.getItem(is,il,lr,ip).get(idx);
+						System.out.println("\t\tTDC info grabbed for "+is+" "+il+" "+ip+" "+lr+" : "+tt);
 							// fill raw TDC histograms
 						bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,0,lr+1).fill(tt,ip);
 					}
 				}
+			}
+			
+			// If I have TDCs for BOTH sides of a bar
+			if( tdc_time.hasItem(is,il,0,ip) && tdc_time.hasItem(is,il,1,ip) ) {
+				for( int idxL = 0; idxL < tdc_time.getItem(is,il,0,ip).size(); idxL++) {
+					for( int idxR = 0; idxR < tdc_time.getItem(is,il,1,ip).size(); idxR++) {
+						
+						float ttL = tdc_time.getItem(is,il,0,ip).get(idxL);
+						float ttR = tdc_time.getItem(is,il,1,ip).get(idxR);
+							// Fill TDC L-R difference
+						bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,0,0).fill(ttL-ttR,ip);
+					}
+				}
+				
+			}
+			
+		}
+		
+		for (Map.Entry<Long,List<Integer>>  entry : lapmt.getMap().entrySet()){ 
+			long hash = entry.getKey();
+			int is = ig.getIndex(hash, 0); // Sector goes from 1-5
+			int il = ig.getIndex(hash, 1); // Layer goes from 1-6
+			int ip = ig.getIndex(hash, 2); // Paddle starts at 1
+			
+			for( int lr = 0 ; lr < 2 ; lr++) {
+				
 				if( fadc_int.hasItem(is,il,lr,ip) && fadc_time.hasItem(is,il,lr,ip)) {
 					// Get FADC info
 					int adcIdx = getADCidx(is,il,ip,lr);
 					float ad = fadc_int.getItem(is,il,lr,ip).get(adcIdx);
 					float ap = fadc_height.getItem(is,il,lr,ip).get(adcIdx);
-					double at = fadc_time.getItem(is,il,0,ip).get(adcIdx);
+					double at = fadc_time.getItem(is,il,lr,ip).get(adcIdx);
+					System.out.println("\t\tFADC info grabbed for "+is+" "+il+" "+ip+" "+lr+" : "+ad+"/"+at);
+
 					
 					// fill raw ADC histograms
 	        		// time:
@@ -592,19 +626,7 @@ public class BANDReconstructionApp extends FCApplication {
 				}
 				
 			}
-				// If I have TDCs for BOTH sides of a bar
-			if( tdc_time.hasItem(is,il,0,ip) && tdc_time.hasItem(is,il,1,ip) ) {
-				for( int idxL = 0; idxL < tdc_time.getItem(is,il,0,ip).size(); idxL++) {
-					for( int idxR = 0; idxR < tdc_time.getItem(is,il,1,ip).size(); idxR++) {
-						
-						float ttL = tdc_time.getItem(is,il,0,ip).get(idxL);
-						float ttR = tdc_time.getItem(is,il,1,ip).get(idxR);
-							// Fill TDC L-R difference
-						bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,0,0).fill(ttL-ttR,ip);
-					}
-				}
-				
-			}
+			
 			
 			// If I have ADCs for BOTH sides of a bar
 			if(		fadc_int.hasItem(is,il,0,ip) && fadc_time.hasItem(is,il,0,ip) &&
