@@ -175,7 +175,7 @@ public class BANDMon extends DetectorMonitor {
 		//app.addCanvas(bandCalib_atten.getName(),             	bandCalib_atten.getCanvas());
 
 
-        	app.addFrame(bandHv.getName(),                bandHv.getPanel());
+        	//app.addFrame(bandHv.getName(),                bandHv.getPanel());
 
 
 		//app.addFrame(bandScalers.getName(),      bandScalers.getPanel());
@@ -260,12 +260,12 @@ public class BANDMon extends DetectorMonitor {
 						analyzedBefore = 1;
 					}
 					//bandCalib_tw.analyze();
-					bandCalib_hv.analyze();
-					bandCalib_c.analyze();
-					bandCalib_source.analyze();
-					bandCalib_tw.analyze();
-					bandCalib_res.analyze();
-					bandCalib_atten.analyze();
+					//bandCalib_hv.analyze();
+					//bandCalib_c.analyze();
+					//bandCalib_source.analyze();
+					//bandCalib_tw.analyze();
+					//bandCalib_res.analyze();
+					//bandCalib_atten.analyze();
 					
 					
 					//bandCalib.engines[0].analyze();

@@ -123,7 +123,7 @@ public class BANDHvApp extends FCEpics implements ActionListener {
         public void actionPerformed(ActionEvent evt) {
             fillFifos();
             fillHistos(); 
-            update1DScalers(engine1DCanvas.getCanvas("HV"),1);   
+            //update1DScalers(engine1DCanvas.getCanvas("HV"),1);   
        }
     } 
     

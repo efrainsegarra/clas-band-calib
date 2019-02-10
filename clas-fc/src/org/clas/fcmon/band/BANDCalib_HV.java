@@ -266,12 +266,12 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 		// Draw one including overflow samples
 		h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,4).sliceY(component);
 		h.setOptStat(Integer.parseInt("1000100")); 
-		h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(34); c.draw(h);
+		h.setTitle("ADC L"); h.setTitleY("Entries"); h.setFillColor(34); c.draw(h);
 
 		// Draw one without overflow samples
 		h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,2).sliceY(component);
 		h.setOptStat(Integer.parseInt("1000100"));
-		h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); c.draw(h,"same");
+		h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); c.draw(h,"same");
 
 		// 32 is the color red
 		c.cd(1);
@@ -279,11 +279,11 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 		//Plot right overflow
 		h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,5).sliceY(component);
 		h.setOptStat(Integer.parseInt("1000100")); 
-		h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(34); c.draw(h);
+		h.setTitle("ADC R"); h.setTitleY("Entries"); h.setFillColor(34); c.draw(h);
 		//Plot right histogram													// 34 is the color light blue
 		h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,3).sliceY(component);
 		h.setOptStat(Integer.parseInt("1000100")); 
-		h.setTitleX(alab); h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); c.draw(h,"same");
+		h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); c.draw(h,"same");
 		// 32 is the color red
 
 
@@ -320,14 +320,24 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 		}
 
 		c.cd(2);
-		c.draw( bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,0,15));
+		h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,15).sliceY(component);
+		h.setTitle("FADC Raw Time L");
+		c.draw(h);
+		
 		c.cd(3);
-		c.draw( bandPix[layer].strips.hmap2.get("H2_a_Hist").get(is,0,16));
+		h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,16).sliceY(component);
+		h.setTitle("FADC Raw Time R");
+		c.draw(h);
 		
 		c.cd(4);
-		c.draw( bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,component+1,2) );
+		H2F g = bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,component+1,2);
+		g.setTitle("TDC Raw Time vs FADC Raw Time, L");
+		c.draw(g);
+		
 		c.cd(5);
-		c.draw( bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,component+1,3) );
+		g =  bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,component+1,3);
+		g.setTitle("TDC Raw Time vs FADC Raw Time, R");
+		c.draw(g);
 
 
 		c.repaint();

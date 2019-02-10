@@ -181,7 +181,7 @@ public class MonitorApp extends JFrame implements ActionListener {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.displayControl.setFPS(2);
         eventControl.setXmsgHost(this.xMsgHost);
-        this.setSelectedTab(2);
+        this.setSelectedTab(1);
     }
     
     public void initGraphics() {
