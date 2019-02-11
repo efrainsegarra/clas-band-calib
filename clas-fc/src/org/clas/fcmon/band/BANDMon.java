@@ -121,7 +121,7 @@ public class BANDMon extends DetectorMonitor {
 		bandRecon.setMonitoringClass(this);
 		bandRecon.setApplicationClass(app);	    
 
-		bandCalib_hv = new BANDCalib_HV("Cosmic: Gain",bandPix);        
+		bandCalib_hv = new BANDCalib_HV("Single PMT Plots",bandPix);        
 		bandCalib_hv.setMonitoringClass(this);
 		bandCalib_hv.setApplicationClass(app); 
 		bandCalib_hv.init(is1,is2);
@@ -131,7 +131,7 @@ public class BANDMon extends DetectorMonitor {
 		//bandCalib_tw.setApplicationClass(app); 
 		//bandCalib_tw.init(is1,is2);
 
-		bandCalib_c = new BANDCalib_C("Cosmic: T.S. & S.o.L.",bandPix);        
+		bandCalib_c = new BANDCalib_C("Multi PMT/Bar Plots",bandPix);        
 		bandCalib_c.setMonitoringClass(this);
 		bandCalib_c.setApplicationClass(app); 
 		bandCalib_c.init(is1,is2);
@@ -296,13 +296,9 @@ public class BANDMon extends DetectorMonitor {
 
 			switch (app.getSelectedTabName()) {
 
-				case "Cosmic: Gain":               bandCalib_hv.updateCanvas(dd); break; 
-				case "Cosmic: T.S. & S.o.L.":                bandCalib_c.updateCanvas(dd); break; 
-				case "Source: 1MeVee":			bandCalib_source.updateCanvas(dd); break; 
-				case "Time Walk":			bandCalib_tw.updateCanvas(dd); break; 
-				case "Resolution":			bandCalib_res.updateCanvas(dd); break; 
-				case "Attenuation":                   bandCalib_atten.updateCanvas(dd); break; 
-        			case "HV":                              bandHv.updateCanvas(dd); break;
+				case "Single PMT Plots":               bandCalib_hv.updateCanvas(dd); break; 
+				case "Multi PMT/Bar Plots":                bandCalib_c.updateCanvas(dd); break; 
+				
 
 			} 
 		}

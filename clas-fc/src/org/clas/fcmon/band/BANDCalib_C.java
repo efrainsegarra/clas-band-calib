@@ -185,71 +185,69 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
 
 		c.divide(2,4);
 
-		H1F h1a;
+		
+		// Draw projection of all TDCs for L side and R side
 		c.cd(0);
-		h1a = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(sector,0,1).sliceY(component);
-		h1a.setTitle("Raw TDC L");
+		H1F h1a = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(sector,0,1).projectionX();
+		h1a.add(bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(sector,0,2).projectionX()  );
+		h1a.setTitle("All Bars: Raw TDC Time L & R combined");
+		h1a.setOptStat(Integer.parseInt("1000100")); 
 		c.draw(h1a);
-		
+		// 		draw projection of all TDC mean time 
 		c.cd(1);
-		h1a = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(sector,0,2).sliceY(component);
-		h1a.setTitle("Raw TDC R");
+		h1a = bandPix[layer].strips.hmap2.get("H2_t_Hist").get(sector,0,3).sliceY(component) ;
+		h1a.setTitle("Single Bar: Raw TDC (L+R)/2 (no reference time subtracted)");
+		h1a.setOptStat(Integer.parseInt("1000100")); 
 		c.draw(h1a);
+		/*
+		c.cd(1);
+		h1a = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,15).projectionX() ;
+		h1a.add(bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,16).projectionX() );
+		h1a.setTitle("All Bars: Raw FADC Time L & R combined");
+		h1a.setOptStat(Integer.parseInt("1000100")); 
+		c.draw(h1a);
+		*/
 		
+		
+		// Draw TDC L-R time difference
 		c.cd(2);
 		H1F h1c;
 		h1c = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(sector,0,0).sliceY(component); 
 		h1c.setOptStat(Integer.parseInt("1000100")); 
-		h1c.setTitle("TDC L-R Time");
+		h1c.setTitle("Single Bar: TDC L-R Time");
 		h1c.setFillColor(2);
 		c.draw(h1c);
-
-
-		GraphErrors gr_l1 = td_col_gr_l1.get(layer,sector,component);
-		GraphErrors gr_l2 = td_col_gr_l2.get(layer,sector,component);
-
-		if( gr_l1 != null && gr_l2 != null) {
-			c.draw(gr_l1,"same");
-			c.draw(gr_l2,"same");
-		}
-
+		//		and same for FADC time difference
 		c.cd(3);
-		h1c = bandPix[ilmap].strips.hmap2.get("H2_a_Hist").get(is,0,1).sliceY(ic); 
+		h1c = bandPix[ilmap].strips.hmap2.get("H2_a_Hist").get(sector,0,1).sliceY(component); 
 		h1c.setFillColor(2);
-		h1c.setTitle("FADC L-R Time");
+		h1c.setTitle("Single Bar: FADC L-R Time");
 		h1c.setOptStat(Integer.parseInt("1000100")); 
 		c.draw(h1c);
+		
 
-		gr_l1 = fa_col_gr_l1.get(layer,sector,component);
-		gr_l2 = fa_col_gr_l2.get(layer,sector,component);
-
-		if( gr_l1 != null && gr_l2 != null) {
-			c.draw(gr_l1,"same");
-			c.draw(gr_l2,"same");
-		}
-
+		
+		// Draw correlation of TDC time and FADC time from L side, single component
 		c.cd(4);
-		h1a = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(sector,0,1).projectionX();
-		h1a.add(bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(sector,0,2).projectionX()  );
-		h1a.setTitle("All Raw TDCs for Sector (L & R)");
-		c.draw(h1a);
-		
+		H2F g = bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,component+1,2);
+		g.setTitle("All PMTs: TDC Raw Time vs FADC Raw Time, L");
+		c.draw(g);
+		//			same for R side, single component
 		c.cd(5);
-		
-		h1a = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,15).projectionX() ;
-		h1a.add(bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,16).projectionX() );
-		h1a.setTitle("All Raw FADCs for Sector (L & R)");
-		c.draw(h1a);
-
-		
-		c.cd(6);
-		H2F g =  bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,0,0);
-		g.setTitle("FADC Integral vs TDC Raw Time, L");
+		g =  bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,component+1,3);
+		g.setTitle("All PMTs: TDC Raw Time vs FADC Raw Time, R");
 		c.draw(g);
 		
+	
+		// Draw correlation of ADC integral and TDC time for L side, all components
+		c.cd(6);
+		g =  bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,0,0);
+		g.setTitle("All PMTs: FADC Integral vs TDC Raw Time, L"); 
+		c.draw(g);
+		// 			and R side, all components
 		c.cd(7);
 		g =  bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,0,1);
-		g.setTitle("FADC Integral vs TDC Raw Time, L");
+		g.setTitle("All PMTs: FADC Integral vs TDC Raw Time, R");
 		c.draw(g);
 		
 		

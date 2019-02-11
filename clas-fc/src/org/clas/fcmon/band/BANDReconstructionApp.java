@@ -298,7 +298,7 @@ public class BANDReconstructionApp extends FCApplication {
 			
 			// Make sure that tdc time is > 0 -- < 0 is non-physical
 			// since app.tdcOffset is less than our real TDC offset
-			if(tdcd>0) {
+			if(tdcd>-1) {
 
 					// Search in an array if we already have a TDC entry for a certain
 					// sector,layer,component,LR, and if we don't, create a new array
@@ -582,6 +582,7 @@ public class BANDReconstructionApp extends FCApplication {
 						float ttR = tdc_time.getItem(is,il,1,ip).get(idxR);
 							// Fill TDC L-R difference
 						bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,0,0).fill(ttL-ttR,ip);
+	        			bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,0,3).fill((ttL+ttR)/2.,ip);
 					}
 				}
 				
@@ -627,6 +628,7 @@ public class BANDReconstructionApp extends FCApplication {
 	        			
 	        			bandPix[il-1].strips.hmap2.get("H2_at_Hist").get(is,ip,1+lr+1).fill(at,tt);
 	        			bandPix[il-1].strips.hmap2.get("H2_at_Hist").get(is,0,lr).fill(ad,tt);
+	        			
 
 
 	        		}
@@ -652,6 +654,7 @@ public class BANDReconstructionApp extends FCApplication {
 					// Fill L-R time from FADC
 				bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,1).fill(at_L-at_R,ip);
 
+			
 				
 			}
 					

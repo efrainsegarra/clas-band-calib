@@ -230,7 +230,7 @@ public class BANDPixels {
             	// L-R TDC plot: x-axis is TDC time difference for L-R given from our TDC modules
             	// y-axis identifies which bar in the sector
             H2_t_Hist.add(is, 0, 0, new H2F("tdc_tdif_"+iid, 47,-46.9,46.9,		nstr[is-1],1.,nend));
-            
+            H2_t_Hist.add(is, 0, 3, new H2F("tdcMeanTime"+iid,500,250,850,		nstr[is-1],1.,nend));
             
             // Loop over all bars in a sector
             for( int ip = 1 ; ip<nstr[is-1]+1; ip++) {

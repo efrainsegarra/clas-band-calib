@@ -261,83 +261,56 @@ public class BANDCalib_HV extends FCApplication implements CalibrationConstantsL
 
 
 		alab = tit+otab[0]+(component+1)+calTitles[0];
+		
+		// Draw ADC with overflow for L PMT, single component
 		c.cd(0);          
-
-		// Draw one including overflow samples
 		h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,4).sliceY(component);
 		h.setOptStat(Integer.parseInt("1000100")); 
-		h.setTitle("ADC L"); h.setTitleY("Entries"); h.setFillColor(34); c.draw(h);
-
-		// Draw one without overflow samples
+		h.setTitle("Single PMT: ADC L"); h.setTitleY("Entries"); h.setFillColor(34); c.draw(h);
+		// 			and one without overflow samples for L PMT, single component
 		h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,2).sliceY(component);
 		h.setOptStat(Integer.parseInt("1000100"));
 		h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); c.draw(h,"same");
 
-		// 32 is the color red
+		// Draw ADC with overflow for R PMT, single component
 		c.cd(1);
 		alab = tit+otab[1]+(component+1)+calTitles[0];  
-		//Plot right overflow
 		h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,5).sliceY(component);
 		h.setOptStat(Integer.parseInt("1000100")); 
-		h.setTitle("ADC R"); h.setTitleY("Entries"); h.setFillColor(34); c.draw(h);
-		//Plot right histogram													// 34 is the color light blue
+		h.setTitle("Single PMT: ADC R"); h.setTitleY("Entries"); h.setFillColor(34); c.draw(h);
+		// 			and one without overflow samples for R PMT, single component
 		h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,3).sliceY(component);
 		h.setOptStat(Integer.parseInt("1000100")); 
 		h.setTitle(""); h.setTitleY("Entries"); h.setFillColor(32); c.draw(h,"same");
-		// 32 is the color red
 
 
-
-		// Draw fits on the 2 canvases
-		F1D f1 = adcFitL.get(layer,is,component);
-		F1D f2 = adcFitR.get(layer,is,component);
-
-		c.cd(0);
-		if( f1 != null){
-			f1.setLineColor(4);
-			f1.setLineWidth(4);
-			c.draw(f1,"same");
-		}
-		if( f2 != null){
-			f2.setLineColor(5);
-			f2.setLineWidth(4);
-			f2.setLineStyle(2);
-			c.draw(f2,"same");
-		}
-
-		c.cd(1);
-			// need to grab 2 more copies in order to paint them differently
-		if( f1 != null){
-			f1.setLineColor(5);
-			f1.setLineWidth(4);
-			f1.setLineStyle(2);
-			c.draw(f1,"same");
-		}
-		if( f2 != null){
-			f2.setLineColor(4);
-			f2.setLineWidth(4);
-			c.draw(f2,"same");
-		}
-
+		// Draw raw FADC time for single component for L PMT
 		c.cd(2);
 		h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,15).sliceY(component);
-		h.setTitle("FADC Raw Time L");
+		h.setOptStat(Integer.parseInt("1000100")); 
+		h.setTitle("Single PMT: FADC Raw Time L");
 		c.draw(h);
-		
+		// 			Draw raw FADC time for single component for R PMT
 		c.cd(3);
 		h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,16).sliceY(component);
-		h.setTitle("FADC Raw Time R");
+		h.setTitle("Single PMT: FADC Raw Time R");
+		h.setOptStat(Integer.parseInt("1000100")); 
 		c.draw(h);
 		
+		// Draw raw TDC for single component for L PMT
 		c.cd(4);
-		H2F g = bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,component+1,2);
-		g.setTitle("TDC Raw Time vs FADC Raw Time, L");
-		c.draw(g);
-		
+		H1F h1a = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(sector,0,1).sliceY(component);
+		h1a.setTitle("Single PMT: Raw TDC L");
+		h1a.setOptStat(Integer.parseInt("1000100")); 
+		c.draw(h1a);
+		// 				Draw raw TDC for single component for R PMT
 		c.cd(5);
-		g =  bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,component+1,3);
-		g.setTitle("TDC Raw Time vs FADC Raw Time, R");
-		c.draw(g);
+		h1a = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(sector,0,2).sliceY(component);
+		h1a.setTitle("Single PMT: Raw TDC R");
+		h1a.setOptStat(Integer.parseInt("1000100")); 
+		c.draw(h1a);
+		
+		
 
 
 		c.repaint();
