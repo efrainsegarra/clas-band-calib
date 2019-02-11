@@ -600,6 +600,7 @@ public class BANDReconstructionApp extends FCApplication {
 				if( fadc_int.hasItem(is,il,lr,ip) && fadc_time.hasItem(is,il,lr,ip)) {
 					// Get FADC info
 					int adcIdx = getADCidx(is,il,ip,lr);
+					if( adcIdx == -1) continue;
 					float ad = fadc_int.getItem(is,il,lr,ip).get(adcIdx);
 					float ap = fadc_height.getItem(is,il,lr,ip).get(adcIdx);
 					double at = fadc_time.getItem(is,il,lr,ip).get(adcIdx);
@@ -625,6 +626,8 @@ public class BANDReconstructionApp extends FCApplication {
 	        			float tt = tdc_time.getItem(is,il,lr,ip).get(tdcIdx);
 	        			
 	        			bandPix[il-1].strips.hmap2.get("H2_at_Hist").get(is,ip,1+lr+1).fill(at,tt);
+	        			bandPix[il-1].strips.hmap2.get("H2_at_Hist").get(is,0,lr).fill(ad,tt);
+
 
 	        		}
 				}
@@ -710,7 +713,7 @@ public class BANDReconstructionApp extends FCApplication {
 	public int getADCidx(int sector, int layer, int component, int order) {
 		// Loop over all ADCs to find the highest ADC pulse
 		int chosenIdx =  -1;
-		double highest = 0;
+		double highest = -1;
 		for( int idx = 0; idx < fadc_int.getItem(sector,layer,order,component).size(); idx++) {
 			double currADC = fadc_int.getItem(sector,layer,order,component).get(idx);
 			if( currADC > highest) {
@@ -724,7 +727,7 @@ public class BANDReconstructionApp extends FCApplication {
 	public int getTDCidx(int sector, int layer, int component, int order, int ADCidx) {
 		// Now with chosen idx, find the idx of TDC that matches to FADC time
 		int idxTDC = -1;
-		double minT = 1e5;
+		double minT = 3e5;
 		for( int idx = 0; idx < tdc_time.getItem(sector,layer,order,component).size(); idx++) {
 			double currTD = tdc_time.getItem(sector,layer,order,component).get(idx) - 
 								fadc_time.getItem(sector,layer,order,component).get(ADCidx);

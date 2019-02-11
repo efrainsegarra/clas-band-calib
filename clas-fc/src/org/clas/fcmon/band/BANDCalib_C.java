@@ -28,6 +28,7 @@ import org.jlab.groot.math.F1D;
 import edu.umd.cs.findbugs.detect.StaticCalendarDetector;
 
 import org.jlab.groot.data.H1F;
+import org.jlab.groot.data.H2F;
 import org.jlab.groot.fitter.DataFitter;
 import org.jlab.groot.data.GraphErrors;
 
@@ -182,7 +183,7 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
 		c.clear(); //c.divide(2, 2);
 		c.setAxisFontSize(12);
 
-		c.divide(2,3);
+		c.divide(2,4);
 
 		H1F h1a;
 		c.cd(0);
@@ -241,6 +242,18 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
 		c.draw(h1a);
 
 		
+		c.cd(6);
+		H2F g =  bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,0,0);
+		g.setTitle("FADC Integral vs TDC Raw Time, L");
+		c.draw(g);
+		
+		c.cd(7);
+		g =  bandPix[layer].strips.hmap2.get("H2_at_Hist").get(sector,0,1);
+		g.setTitle("FADC Integral vs TDC Raw Time, L");
+		c.draw(g);
+		
+		
+
 		
 
 		c.repaint();

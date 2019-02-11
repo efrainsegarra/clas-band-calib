@@ -225,11 +225,11 @@ public class BANDPixels {
             
 	        	// L-R FADC plot: x-axis is TDC time difference for L-R given from our FADC digital signal
 	        	// y-axis identifies which bar in the sector
-            H2_a_Hist.add(is, 0, 1, new H2F("fadc_tdif_"+iid,  625, -62.5,62.5,		nstr[is-1], 1., nend));
+            H2_a_Hist.add(is, 0, 1, new H2F("fadc_tdif_"+iid,  60, -62.5,62.5,		nstr[is-1], 1., nend));
             
             	// L-R TDC plot: x-axis is TDC time difference for L-R given from our TDC modules
             	// y-axis identifies which bar in the sector
-            H2_t_Hist.add(is, 0, 0, new H2F("tdc_tdif_"+iid, 469,-46.9,46.9,		nstr[is-1],1.,nend));
+            H2_t_Hist.add(is, 0, 0, new H2F("tdc_tdif_"+iid, 47,-46.9,46.9,		nstr[is-1],1.,nend));
             
             
             // Loop over all bars in a sector
@@ -251,7 +251,7 @@ public class BANDPixels {
             	}
 			
 		for( int lr = 1 ; lr < 3 ; lr++){
-			H2_at_Hist.add( is, ip, lr+1 , new H2F("rawTDC_rawADC_"+iid,	60,0,400, 100,0,2500) );
+			H2_at_Hist.add( is, ip, lr+1 , new H2F("rawTDC_rawADC_"+iid,	40,0,400, 150,0,1500) );
 		}
             	
             	
@@ -264,28 +264,30 @@ public class BANDPixels {
 
 	            	// ADC plot that throws out overflow: x-axis is ADC spectrum, not including any overflow events
             		// and y-axis identifies which bar in the sector -- only L side and only R side separately
-                H2_a_Hist.add(is, 0, 1+lr, new H2F("fadc_adc_"+iid,			200,0.,amax[id],		nstr[is-1], 1., nend));
+                H2_a_Hist.add(is, 0, 1+lr, new H2F("fadc_adc_"+iid,			300,0.,30000,		nstr[is-1], 1., nend));
              	
                 	// ADC plot that throws out overflow: x-axis is ADC spectrum, not including any overflow events
         			// and y-axis identifies which bar in the sector -- only L side and only R side separately
-                H2_a_Hist.add(is, 0, 3+lr, new H2F("fadc_adcOver_"+iid,		200,0.,amax[id],		nstr[is-1], 1., nend));
+                H2_a_Hist.add(is, 0, 3+lr, new H2F("fadc_adcOver_"+iid,		300,0.,30000,		nstr[is-1], 1., nend));
                 
                 H2_a_Hist.add(is, 0, 14+lr,new H2F("fadc_rawT_"+iid,	40,0,400,	nstr[is-1],1.,nend));
 
-                
+    			H2_at_Hist.add( is, 0, lr-1 , new H2F("rawADCInt_rawTDCTime"+iid,	75,0,15000, 75,0,1500) );
+
                 
                 // Loop over all the bars for the L side and R side individually:	
                 for( int ip = 1 ; ip<nstr[is-1]+1; ip++) {
                 		// FADC-TDC diff plot: x-axis is the ADC of the PMT and y-axis is the FADC-TDC time difference 
 
-                	H2_at_Hist.add(is, ip, lr-1, new H2F("fadc_tdc_diff_"+iid,	100,0.,30000,	400,-190,-30));
+                	H2_at_Hist.add(is, ip, lr-1, new H2F("fadc_tdc_diff_"+iid,	300,0.,30000,	400,-190,-30));
+                	
                 	H1_a_Hist.add(is, 0, ip   , new H1F("a_ln_R",100,-1,1));
 
                 }
                 
                 // Histograms not used by calib suite, but for monitoring software
                 	// First two are raw ADC,TDC for coloring in the bandMon
-                H2_t_Hist.add(is, 0, lr, new H2F("t_raw_"+iid+0,      100,   0, 2500, nstr[is-1], 1., nend));
+                H2_t_Hist.add(is, 0, lr, new H2F("t_raw_"+iid+0,      100,   0, 1500, nstr[is-1], 1., nend));
                 H2_a_Hist.add(is, 0, 5+lr, new H2F("a_raw_"+iid+1,      100,   0., amax[id], nstr[is-1], 1., nend));
                 H2_a_Hist.add(is, 0, 7+lr, new H2F("a_ped_"+iid+3,      1000, -500.,  500., nstr[is-1], 1., nend)); 
                 H2_a_Hist.add(is, 0, 9+lr, new H2F("a_fadc_"+iid+5,     1000,   0., 1000., nstr[is-1], 1., nend));
