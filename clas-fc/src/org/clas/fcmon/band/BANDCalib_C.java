@@ -182,7 +182,7 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
 		c.clear(); //c.divide(2, 2);
 		c.setAxisFontSize(12);
 
-		c.divide(2,2);
+		c.divide(2,3);
 
 		H1F h1a;
 		c.cd(0);
@@ -227,6 +227,21 @@ public class BANDCalib_C extends FCApplication implements CalibrationConstantsLi
 			c.draw(gr_l2,"same");
 		}
 
+		c.cd(4);
+		h1a = bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(sector,0,1).projectionX();
+		h1a.add(bandPix[ilmap].strips.hmap2.get("H2_t_Hist").get(sector,0,2).projectionX()  );
+		h1a.setTitle("All Raw TDCs for Sector (L & R)");
+		c.draw(h1a);
+		
+		c.cd(5);
+		
+		h1a = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,15).projectionX() ;
+		h1a.add(bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,0,16).projectionX() );
+		h1a.setTitle("All Raw FADCs for Sector (L & R)");
+		c.draw(h1a);
+
+		
+		
 
 		c.repaint();
 		//End of plotting
