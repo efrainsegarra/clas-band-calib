@@ -251,7 +251,7 @@ public class BANDPixels {
             	}
 			
 		for( int lr = 1 ; lr < 3 ; lr++){
-			H2_at_Hist.add( is, ip, lr+1 , new H2F("rawTDC_rawADC_"+iid,	40,0,400, 150,0,1500) );
+			H2_at_Hist.add( is, ip, lr+1 , new H2F("rawTDC_rawADC_"+iid,	40,0,400, 400,1200,1600) );
 		}
             	
             	
@@ -270,9 +270,9 @@ public class BANDPixels {
         			// and y-axis identifies which bar in the sector -- only L side and only R side separately
                 H2_a_Hist.add(is, 0, 3+lr, new H2F("fadc_adcOver_"+iid,		300,0.,30000,		nstr[is-1], 1., nend));
                 
-                H2_a_Hist.add(is, 0, 14+lr,new H2F("fadc_rawT_"+iid,	40,0,400,	nstr[is-1],1.,nend));
+                H2_a_Hist.add(is, 0, 14+lr,new H2F("fadc_rawT_"+iid,	400,0,400,	nstr[is-1],1.,nend));
 
-    			H2_at_Hist.add( is, 0, lr-1 , new H2F("rawADCInt_rawTDCTime"+iid,	75,0,15000, 75,0,1500) );
+    			H2_at_Hist.add( is, 0, lr-1 , new H2F("rawADCInt_rawTDCTime"+iid,	75,0,15000, 400,1200,1600) );
 
                 
                 // Loop over all the bars for the L side and R side individually:	
@@ -287,7 +287,7 @@ public class BANDPixels {
                 
                 // Histograms not used by calib suite, but for monitoring software
                 	// First two are raw ADC,TDC for coloring in the bandMon
-                H2_t_Hist.add(is, 0, lr, new H2F("t_raw_"+iid+0,      100,   0, 1500, nstr[is-1], 1., nend));
+                H2_t_Hist.add(is, 0, lr, new H2F("t_raw_"+iid+0,      400,   1200, 1600, nstr[is-1], 1., nend));
                 H2_a_Hist.add(is, 0, 5+lr, new H2F("a_raw_"+iid+1,      100,   0., amax[id], nstr[is-1], 1., nend));
                 H2_a_Hist.add(is, 0, 7+lr, new H2F("a_ped_"+iid+3,      1000, -500.,  500., nstr[is-1], 1., nend)); 
                 H2_a_Hist.add(is, 0, 9+lr, new H2F("a_fadc_"+iid+5,     1000,   0., 1000., nstr[is-1], 1., nend));
