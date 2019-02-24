@@ -294,7 +294,7 @@ public class BANDReconstructionApp extends FCApplication {
 			// 1190 TDC offset is far too large, and our real data starts ~1.2microseconds
 			// after our hardware offset.
 			tdcd   = ddd.getTDCData(0).getTime()*tps;
-			System.out.println("TDC Info: "+tdcd+" SLCO: "+is+" "+il+" "+ip+" "+lr);
+			//System.out.println("TDC Info: "+tdcd+" SLCO: "+is+" "+il+" "+ip+" "+lr);
 			
 			// Make sure that tdc time is > 0 -- < 0 is non-physical
 			// since app.tdcOffset is less than our real TDC offset
@@ -305,7 +305,7 @@ public class BANDReconstructionApp extends FCApplication {
 					// and either way, add the current TDC time to the array.
 				if(!tdc_time.hasItem(is,il,lr-2,ip)) tdc_time.add(new ArrayList<Float>(),is,il,lr-2,ip);
 				tdc_time.getItem(is,il,lr-2,ip).add(tdcd);    
-				System.out.println("\tTDC info saved: "+tdc_time.getItem(is,il,lr-2,ip).get(0));
+				//System.out.println("\tTDC info saved: "+tdc_time.getItem(is,il,lr-2,ip).get(0));
 
 					// Add unique paddles that fired TDC
 				if (!ltpmt.hasItem(is,il,ip)) {
@@ -333,7 +333,7 @@ public class BANDReconstructionApp extends FCApplication {
 				float ph = (float) ddd.getADCData(0).getHeight()-pd;
 				short[]    pulse = ddd.getADCData(0).getPulseArray();
 
-				System.out.println("ADC Info: "+ad+"/"+tf+" SLCO: "+is+" "+il+" "+ip+" "+lr);
+				//System.out.println("ADC Info: "+ad+"/"+tf+" SLCO: "+is+" "+il+" "+ip+" "+lr);
 				
 					// Check for overflow of PMT digitized pulse, which
 					// caps at 4095. If there is overflow, fill a different
@@ -354,7 +354,7 @@ public class BANDReconstructionApp extends FCApplication {
 				// Add ADCs based on unique ID
 				if (!fadc_int.hasItem(is,il,lr,ip))fadc_int.add(new ArrayList<Float>(),is,il,lr,ip);
 				fadc_int.getItem(is,il,lr,ip).add((float)ad); 
-				System.out.println("\tFADC info saved: "+fadc_int.getItem(is,il,lr,ip).get(0));
+				//System.out.println("\tFADC info saved: "+fadc_int.getItem(is,il,lr,ip).get(0));
 				
 				if (!fadc_height.hasItem(is,il,lr,ip))fadc_height.add(new ArrayList<Float>(),is,il,lr,ip);
 				fadc_height.getItem(is,il,lr,ip).add((float)ph); 
@@ -362,7 +362,7 @@ public class BANDReconstructionApp extends FCApplication {
 				// Add FADC time based on unique ID
 				if (!fadc_time.hasItem(is,il,lr,ip))fadc_time.add(new ArrayList<Double>(),is,il,lr,ip);
 				fadc_time.getItem(is,il,lr,ip).add((double)tf);
-				System.out.println("\tFADC info saved: "+fadc_time.getItem(is,il,lr,ip).get(0));
+				//System.out.println("\tFADC info saved: "+fadc_time.getItem(is,il,lr,ip).get(0));
 
 				// Add unique paddles that fired ADC
 				if (!lapmt.hasItem(is,il,ip)) {
@@ -553,6 +553,15 @@ public class BANDReconstructionApp extends FCApplication {
 		// Maybe we could recover the event if doesn't have TDC, but let's move on...
 		System.out.println("******** PROCESSING ALL HITS IN THIS EVENT *********");
 		
+		// Ask how many bars fired in event:
+		int nBars_fadc = lapmt.getMap().entrySet().size();
+		int nBars_tdc  = ltpmt.getMap().entrySet().size();
+		System.out.println("\tNumber of bars fired in this event (tdc,adc): "+nBars_tdc+" "+nBars_fadc);
+	
+		if( app.laserData == true ){
+			if( nBars_fadc < 100 || nBars_tdc < 100 ) return;	
+		}
+
 		for (Map.Entry<Long,List<Integer>>  entry : ltpmt.getMap().entrySet()){ 
 			long hash = entry.getKey();
 			int is = ig.getIndex(hash, 0); // Sector goes from 1-5
@@ -566,7 +575,7 @@ public class BANDReconstructionApp extends FCApplication {
 					// Get TDC info
 					for( int idx = 0; idx < tdc_time.getItem(is,il,lr,ip).size(); idx++) {
 						float tt = tdc_time.getItem(is,il,lr,ip).get(idx);
-						System.out.println("\t\tTDC info grabbed for "+is+" "+il+" "+ip+" "+lr+" : "+tt);
+						//System.out.println("\t\tTDC info grabbed for "+is+" "+il+" "+ip+" "+lr+" : "+tt);
 							// fill raw TDC histograms
 						bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,0,lr+1).fill(tt,ip);
 					}
@@ -605,7 +614,7 @@ public class BANDReconstructionApp extends FCApplication {
 					float ad = fadc_int.getItem(is,il,lr,ip).get(adcIdx);
 					float ap = fadc_height.getItem(is,il,lr,ip).get(adcIdx);
 					double at = fadc_time.getItem(is,il,lr,ip).get(adcIdx);
-					System.out.println("\t\tFADC info grabbed for "+is+" "+il+" "+ip+" "+lr+" : "+ad+"/"+at);
+					//System.out.println("\t\tFADC info grabbed for "+is+" "+il+" "+ip+" "+lr+" : "+ad+"/"+at);
 
 					
 					// fill raw ADC histograms
@@ -621,7 +630,7 @@ public class BANDReconstructionApp extends FCApplication {
 	        		
 	        		// If I also have TDC information, fill correlation plots
 	        		if( tdc_time.hasItem(is,il,lr,ip)) {
-	        			System.out.println("\t\t\tYAY WE HAVE BOTH FOR A SINGLE BAR");
+	        			//System.out.println("\t\t\tYAY WE HAVE BOTH FOR A SINGLE BAR");
 	        			
 	        			int tdcIdx = getTDCidx(is,il,ip,lr,adcIdx);
 	        			float tt = tdc_time.getItem(is,il,lr,ip).get(tdcIdx);
