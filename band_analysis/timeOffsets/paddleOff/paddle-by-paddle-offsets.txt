@@ -1,4 +1,3 @@
-#Sector	Layer	Component	paddle_Offset	resolution
 1	1	1	-2.472109	0.259842
 1	1	2	-1.414223	0.286511
 1	1	3	-2.148020	0.293276

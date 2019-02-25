@@ -41,7 +41,10 @@ public class BANDCalib_Res extends FCApplication implements CalibrationConstants
 
 	int is1,is2;
 
-	public DetectorCollection<ArrayList<H1F>> projections = new DetectorCollection<ArrayList<H1F>>();
+	public DetectorCollection<ArrayList<H1F>> projections	 = new DetectorCollection<ArrayList<H1F>>();
+	public DetectorCollection<ArrayList<Double>> adc_min	 = new DetectorCollection<ArrayList<Double>>();
+	public DetectorCollection<ArrayList<Double>> adc_mean	 = new DetectorCollection<ArrayList<Double>>();
+	public DetectorCollection<ArrayList<Double>> adc_max	 = new DetectorCollection<ArrayList<Double>>();
 
 
 
@@ -145,6 +148,11 @@ public class BANDCalib_Res extends FCApplication implements CalibrationConstants
 		// Grab projections based on number of events
 		ArrayList<H1F> slices = h.getSlicesX();
 		ArrayList<H1F> saved = new ArrayList<H1F>();
+	
+		ArrayList<Double> MINS	= new ArrayList<Double>();
+		ArrayList<Double> MAXS 	= new ArrayList<Double>();
+		ArrayList<Double> MEANS = new ArrayList<Double>();
+
 		int scale = (30000/300);
 		int startBin = 5; //500 ADC channel = (30000/300)*5
 		int stopBin = 250; //25000 ADC channel = (30000/300)*250
@@ -161,6 +169,11 @@ public class BANDCalib_Res extends FCApplication implements CalibrationConstants
 				H1F copy = temp.histClone("Proj from ADC: "+minBin*scale+" to "+maxBin*scale+" with "+temp.integral()+" events");
 				copy.setTitle("Proj from ADC: "+minBin*scale+" to "+maxBin*scale+" with "+temp.integral()+" events");
 				saved.add(copy);
+
+				MINS.add(	(double) (minBin*scale)		);
+				MEANS.add(	((double)(minBin*scale)	+(double)(maxBin*scale)	)/2.);
+				MAXS.add(	(double) (maxBin*scale)		);
+		
 				temp.reset();
 				slice.reset();
 				minBin = i;
@@ -172,11 +185,17 @@ public class BANDCalib_Res extends FCApplication implements CalibrationConstants
 
 		// For all the saved projections, fit them
 		projections.add(sector,lidx,pidx, saved);
+		adc_min.add(sector,lidx,pidx,	MINS);
+		adc_mean.add(sector,lidx,pidx,	MEANS);
+		adc_max.add(sector,lidx,pidx,	MAXS);
 
 		double meanOffset = 0.;
 		double meanOffErr = 0.;
 		double meanRes = 0.;
 		double meanResErr = 0.;
+		double minADC = 0.;
+		double meanADC = 0.;
+		double maxADC = 0.;
 		for( int i = 0; i < saved.size(); i++) {
 			F1D f1 = new F1D("f1", "[amp]*gaus(x,[mean],[sigma])",
 					saved.get(i).getxAxis().min(),saved.get(i).getxAxis().max() );
@@ -188,19 +207,23 @@ public class BANDCalib_Res extends FCApplication implements CalibrationConstants
 			f1.setLineColor(2);
 
 			DataFitter.fit(f1, saved.get(i), "REQ");
-			meanOffset 	+= saved.get(i).getFunction().getParameter(1);
-			meanRes		+= saved.get(i).getFunction().getParameter(2);
+			meanOffset 	= saved.get(i).getFunction().getParameter(1);
+			meanRes		= saved.get(i).getFunction().getParameter(2);
+
+			minADC		= MINS.get(i);
+			meanADC		= MEANS.get(i);
+			maxADC		= MAXS.get(i);
+
+			if( Double.isNaN( meanOffset ) || Double.isNaN(meanRes) ){
+				meanOffset = 0.;
+				meanRes = 0.;
+			}
+			
+			FILE.println(String.format("%d\t%d\t%d\t%f\t%f\t%f\t%f\t%f",sector,lidx,pidx,meanOffset,meanRes,minADC,meanADC,maxADC));        
 
 		}
-		meanOffset /= (double)saved.size();
-		meanRes    /= (double)saved.size();
 
-		if( Double.isNaN( meanOffset ) || Double.isNaN(meanRes) ){
-			meanOffset = 0.;
-			meanRes = 0.;
-		}
 
-		FILE.println(String.format("%d\t%d\t%d\t%f\t%f",sector,lidx,pidx,meanOffset,meanRes));        
 
 
 	}

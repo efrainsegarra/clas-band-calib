@@ -88,7 +88,7 @@ public class BANDCalib_Atten extends FCApplication implements CalibrationConstan
 		if( app.cosmicData == true){
 
 			
-			file = new File(String.format("../band_analysis/hvScan/calibOutput/run_%d-attenFit.txt",runno));
+			file = new File(String.format("../band_analysis/attenuation/run_%d-attenFit.txt",runno));
 			//file = new File(String.format("/work/band/calibOutput/run_%d-adcFit.txt",runno));
 			// Try to open a text file, otherwise do not try to analyze
 			try(PrintWriter output = new PrintWriter(file)) {
@@ -148,6 +148,8 @@ public class BANDCalib_Atten extends FCApplication implements CalibrationConstan
 		else if(sector==3||sector==4) bar_length =  51.0; //cm
 		double mu = 2*bar_length/1000./sigma;
 		calib.setDoubleValue(mu, "mu[m]", sector, lidx, pidx);
+
+		if( Double.isInfinite(mu) ) mu = 0.;
 
 		FILE.println(String.format( "%d\t%d\t%d\t%f",sector,layer+1,pidx,mu  ) );
 	}
