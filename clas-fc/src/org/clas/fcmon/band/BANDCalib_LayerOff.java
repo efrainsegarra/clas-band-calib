@@ -30,7 +30,7 @@ import org.jlab.groot.fitter.ParallelSliceFitter;
 
 import java.lang.Double;
 
-public class BANDCalib_Res extends FCApplication implements CalibrationConstantsListener,ChangeListener{
+public class BANDCalib_LayerOff extends FCApplication implements CalibrationConstantsListener,ChangeListener{
 
 	EmbeddedCanvas c = this.getCanvas(this.getName()); 
 	CalibrationConstantsView      ccview = new CalibrationConstantsView();
@@ -40,6 +40,7 @@ public class BANDCalib_Res extends FCApplication implements CalibrationConstants
 	int runno;
 
 	int is1,is2;
+	int analyzed = 0;
 
 	public DetectorCollection<ArrayList<H1F>> projections = new DetectorCollection<ArrayList<H1F>>();
 
@@ -57,7 +58,7 @@ public class BANDCalib_Res extends FCApplication implements CalibrationConstants
 	//public DetectorCollection<F1D> adcFitR = new DetectorCollection<F1D>();
 
 
-	public BANDCalib_Res(String name, BANDPixels[] bandPix) {
+	public BANDCalib_LayerOff(String name, BANDPixels[] bandPix) {
 		super(name,bandPix);    
 	}
 
@@ -93,17 +94,16 @@ public class BANDCalib_Res extends FCApplication implements CalibrationConstants
 	}  
 
 	public void analyze() {
+		if( app.laserData == true ){
 
-		if( app.laserData == true){
-
-			file = new File(String.format("../band_analysis/timeOffsets/paddleOff/run_%d.txt",runno));
+			file = new File(String.format("../band_analysis/timeOffsets/layerOff/run_%d.txt",runno));
 			
 			try(PrintWriter output = new PrintWriter(file)) {
 	
-				output.println("#Sector\tLayer\tComponent\tpaddle_Offset\tresolution");
+				output.println("#Sector\tLayer\tComponent\tlayer_Offset\tresolution");
 			
+				analyzed = 1;
 
-				// Loop over all layers
 				for( int layer = 0 ; layer<bandPix.length ; layer++) {
 
 					// Loop over all sectors in a layer
@@ -116,31 +116,30 @@ public class BANDCalib_Res extends FCApplication implements CalibrationConstants
 							int lidx = (layer+1);
 							int pidx = (paddle+1);
 							calib.addEntry(sector,lidx,pidx);
-							// layer 0:5, sector 1:5, paddle 0:whatever
-							fit(layer, sector, paddle,output);//x_fit_range);
-							//System.out.println("Done with Layer "+ lidx + ", Sector "+ sector + " , Component " + pidx);
+
+							fit(sector, layer, paddle,output);//x_fit_range);
+
 						} 
 					}        		
-				}   	
+				}
+
 			}
 			catch(FileNotFoundException e){
 				e.printStackTrace();
 			}
-		
-		}
 
-		calib.fireTableDataChanged();
+			calib.fireTableDataChanged();
+		}
 	}
 
 
 
-	public void fit(int layer, int sector, int paddle, PrintWriter FILE){ 
+	public void fit(int sector, int layer,int component, PrintWriter FILE){ 
 
 		int lidx = (layer+1);
-		int pidx = (paddle+1);
+		int pidx = (component+1);
 
-		H2F h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(sector,pidx,0);
-
+		H2F h = bandPix[layer].strips.hmap2.get("H2_a_Hist").get(0,0,0);
 
 		// Grab projections based on number of events
 		ArrayList<H1F> slices = h.getSlicesX();
@@ -188,6 +187,7 @@ public class BANDCalib_Res extends FCApplication implements CalibrationConstants
 			f1.setLineColor(2);
 
 			DataFitter.fit(f1, saved.get(i), "REQ");
+
 			meanOffset 	+= saved.get(i).getFunction().getParameter(1);
 			meanRes		+= saved.get(i).getFunction().getParameter(2);
 
@@ -202,7 +202,6 @@ public class BANDCalib_Res extends FCApplication implements CalibrationConstants
 
 		FILE.println(String.format("%d\t%d\t%d\t%f\t%f",sector,lidx,pidx,meanOffset,meanRes));        
 
-
 	}
 
 
@@ -216,24 +215,35 @@ public class BANDCalib_Res extends FCApplication implements CalibrationConstants
 		int sector = dd.getSector();
 		int component = dd.getComponent();   
 		int layer = dd.getLayer();
-		//int ilm = ilmap;
 		c.clear();
 
-		ArrayList<H1F> saved = projections.get(sector,layer,component+1);
-		if( saved!= null) {
-			int divide = saved.size();
-			c.divide(1, divide);
-
-			for( int i = 0 ; i<saved.size(); i++) {
-				c.cd(i);
-				H1F h = saved.get(i);
-				h.setTitle(h.getTitle());
-				c.draw(h);
-
+		
+		if( analyzed == 0){
+			H2F h2;
+			c.divide(2,3);
+			for( int lay = 0 ; lay < 6 ; lay++){
+				c.cd(lay);
+				h2 = bandPix[lay].strips.hmap2.get("H2_a_Hist").get(0,0,0);
+				//h2.setTitleX("Layer "+layer+" Reference (L+R)/2. - Layer 5 Reference (L+R)/2.");
+				c.draw(h2);
 			}
-
-
 		}
+		else{
+			ArrayList<H1F> saved = projections.get(sector,layer,component+1);
+			if( saved!= null) {
+				int divide = saved.size();
+				c.divide(1, divide);
+				for( int i = 0 ; i<saved.size(); i++) {
+					c.cd(i);
+					H1F h = saved.get(i);
+					h.setTitle(h.getTitle());
+					c.draw(h);
+
+				}
+			}
+		}
+
+
 		c.repaint();  
 
 		//End of plotting

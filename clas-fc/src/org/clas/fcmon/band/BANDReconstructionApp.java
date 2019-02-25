@@ -25,6 +25,16 @@ import org.jlab.io.evio.EvioDataBank;
 //import org.jlab.rec.tof.banks.BaseHitReader;
 //import org.jlab.rec.tof.banks.BaseHitReader.DetectorLocation;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.lang.Integer;
+import java.lang.Double;
+import java.util.Arrays;
 
 public class BANDReconstructionApp extends FCApplication {
 
@@ -33,20 +43,23 @@ public class BANDReconstructionApp extends FCApplication {
 
 	String        BankType = null;
 	int              detID = 0;
-	
+
 
 	Boolean stop = true;
 
 	List<DetectorDataDgtz>        dataList = new ArrayList<DetectorDataDgtz>();
-	
+
 	IndexedList<List<Float>>          tdc_time = new IndexedList<List<Float>>(4);
 	IndexedList<List<Float>>          fadc_int = new IndexedList<List<Float>>(4);
 	IndexedList<List<Double>>          fadc_time = new IndexedList<List<Double>>(4);
 	IndexedList<List<Float>>          overflow = new IndexedList<List<Float>>(4);
 	IndexedList<List<Float>>          fadc_height = new IndexedList<List<Float>>(4);
-	
+
 	IndexedList<List<Integer>>       lapmt = new IndexedList<List<Integer>>(3); 
 	IndexedList<List<Integer>>       ltpmt = new IndexedList<List<Integer>>(3); 
+
+	Map<Integer,Double> FADC_T_OFFSET = new HashMap<Integer,Double>();
+	Map<Integer,Double> TDC_T_OFFSET = new HashMap<Integer,Double>();
 
 	BANDConstants                   bandcc = new BANDConstants();  
 
@@ -70,26 +83,50 @@ public class BANDReconstructionApp extends FCApplication {
 		is2 = BANDConstants.IS2;
 		iis1 = BANDConstants.IS1-1;
 		iis2 = BANDConstants.IS2-1;
+
+		// Load the FADC time offset from calibration file
+		String line = null;
+		try{
+			FileReader fileRead = new FileReader("/work/clas12/segarrae/clas-band-calib/ccdb_tables/vEffective/output/time_offsets.txt");
+			BufferedReader buffRead = new BufferedReader(fileRead);
+			while( (line = buffRead.readLine()) != null ){
+				String[] parLin = line.split("\\t");
+				int key = Integer.parseInt(parLin[0])*100 + Integer.parseInt(parLin[1])*10 + Integer.parseInt(parLin[2]);
+				double fadc_off = Double.parseDouble( parLin[4] ); // offset of L-R from FADC time
+				double tdc_off  = Double.parseDouble( parLin[3] ); // offset of L-R from TDC time
+
+				FADC_T_OFFSET.put(	Integer.valueOf(key),	Double.valueOf(fadc_off) 	);
+				TDC_T_OFFSET.put(	Integer.valueOf(key),	Double.valueOf(tdc_off)		);		
+
+			}
+			buffRead.close();
+		}
+		catch(FileNotFoundException ex){
+			System.out.println("Unable to open file for time offsets");
+		}
+		catch(IOException ex){
+			System.out.println("Error reading file for time offsets");
+		}
 	} 
 
 	public void clearHistograms() {
 
 		for (int idet=0; idet<bandPix.length; idet++) {
 			for (int is=is1 ; is<is2 ; is++) {
-				
+
 				bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,0,0).reset();
 				bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,0,1).reset();
 				bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,0,14).reset();
-				
-	        	nstr[is]=bandcc.bandlay[idet][is];
-	            for( int ip = 1 ; ip<nstr[is-1]+1; ip++) {
-	            	bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,ip,0).reset();
-	            	bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,ip,0).reset();
-	            	
-	            	bandPix[idet].strips.hmap2.get("H2_at_Hist").get(is,ip,0).reset();
-	            	bandPix[idet].strips.hmap2.get("H2_at_Hist").get(is,ip,1).reset();
-	            }
-	            
+
+				nstr[is]=bandcc.bandlay[idet][is];
+				for( int ip = 1 ; ip<nstr[is-1]+1; ip++) {
+					bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is,ip,0).reset();
+					bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,ip,0).reset();
+
+					bandPix[idet].strips.hmap2.get("H2_at_Hist").get(is,ip,0).reset();
+					bandPix[idet].strips.hmap2.get("H2_at_Hist").get(is,ip,1).reset();
+				}
+
 				bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,0,0).reset();
 				bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,0,1).reset();
 				bandPix[idet].strips.hmap2.get("H2_t_Hist").get(is,0,2).reset();
@@ -178,7 +215,7 @@ public class BANDReconstructionApp extends FCApplication {
 				int  ip = bank.getShort("component",i);
 				tdcd = bank.getInt("TDC",i)*tps-app.tdcOffset;  
 
-				
+
 				if(isGoodSector(is)&&tdcd>0) {
 					if(!tdc_time.hasItem(is,il,lr,ip)) tdc_time.add(new ArrayList<Float>(),is,il,lr,ip);
 					tdc_time.getItem(is,il,lr,ip).add(tdcd); 
@@ -204,7 +241,7 @@ public class BANDReconstructionApp extends FCApplication {
 
 				if(isGoodSector(is)) {
 
-					
+
 					if(adc>0) {
 						if(!fadc_int.hasItem(is,il,lr,ip)) fadc_int.add(new ArrayList<Float>(),is,il,lr,ip);
 						fadc_int.getItem(is,il,lr,ip).add((float) adc); 
@@ -222,7 +259,7 @@ public class BANDReconstructionApp extends FCApplication {
 
 
 
-					
+
 					if (tdc_time.hasItem(is,il,lr,ip)) {
 						List<Float> list = new ArrayList<Float>();
 						list = tdc_time.getItem(is,il,lr,ip); tdcc=new Float[list.size()]; list.toArray(tdcc);
@@ -259,7 +296,7 @@ public class BANDReconstructionApp extends FCApplication {
 		if (app.isHipoFileOpen) app.writer.writeEvent(event);       
 
 	}  
-	
+
 	//****************************** EVIO DATA UPDATING *********************************************
 
 	public void updateEvioData(DataEvent event) {
@@ -274,7 +311,7 @@ public class BANDReconstructionApp extends FCApplication {
 		fadc_height.clear();
 		fadc_time.clear();
 		overflow.clear();
-		
+
 		clear(0); clear(1); clear(2); clear(3); clear(4); clear(5);
 		ltpmt.clear() ; lapmt.clear();
 
@@ -288,7 +325,7 @@ public class BANDReconstructionApp extends FCApplication {
 			int il = ddd.getDescriptor().getLayer();  // Layer goes from 1-6
 			int lr = ddd.getDescriptor().getOrder();  // LR for TDC is 2,3
 			int ip = ddd.getDescriptor().getComponent();   // Paddle starts at 1
-			
+
 			// Take TDC channel, convert to nanosecond, and subtract offset.
 			// This offset is arb. defined by looking at data, because our 
 			// 1190 TDC offset is far too large, and our real data starts ~1.2microseconds
@@ -299,13 +336,13 @@ public class BANDReconstructionApp extends FCApplication {
 			// since app.tdcOffset is less than our real TDC offset
 			if(isGoodSector(is)&&tdcd>0) {
 
-					// Search in an array if we already have a TDC entry for a certain
-					// sector,layer,component,LR, and if we don't, create a new array
-					// and either way, add the current TDC time to the array.
+				// Search in an array if we already have a TDC entry for a certain
+				// sector,layer,component,LR, and if we don't, create a new array
+				// and either way, add the current TDC time to the array.
 				if(!tdc_time.hasItem(is,il,lr-2,ip)) tdc_time.add(new ArrayList<Float>(),is,il,lr-2,ip);
 				tdc_time.getItem(is,il,lr-2,ip).add(tdcd);           
 
-					// Add unique paddles that fired TDC
+				// Add unique paddles that fired TDC
 				if (!ltpmt.hasItem(is,il,ip)) {
 					ltpmt.add(new ArrayList<Integer>(),is,il,ip);
 					ltpmt.getItem(is,il,ip).add(ip);
@@ -331,27 +368,27 @@ public class BANDReconstructionApp extends FCApplication {
 				float ph = (float) ddd.getADCData(0).getHeight()-pd;
 				short[]    pulse = ddd.getADCData(0).getPulseArray();
 
-				
-					// Check for overflow of PMT digitized pulse, which
-					// caps at 4095. If there is overflow, fill a different
-					// histogram
-				  int isOver = 0;
-				  for (int ii=0 ; ii< pulse.length ; ii++) {
-					  if( pulse[ii] >= 4095) {
-						  isOver = 1;
-						  break;
-					  }
-				  }
-				  
-				  // Keep track whether or not this ADC value was in overflow for this PMT
-				  if (!overflow.hasItem(is,il,lr,ip))overflow.add(new ArrayList<Float>(),is,il,lr,ip);
-				  overflow.getItem(is,il,lr,ip).add((float)isOver); 
-				  
+
+				// Check for overflow of PMT digitized pulse, which
+				// caps at 4095. If there is overflow, fill a different
+				// histogram
+				int isOver = 0;
+				for (int ii=0 ; ii< pulse.length ; ii++) {
+					if( pulse[ii] >= 4095) {
+						isOver = 1;
+						break;
+					}
+				}
+
+				// Keep track whether or not this ADC value was in overflow for this PMT
+				if (!overflow.hasItem(is,il,lr,ip))overflow.add(new ArrayList<Float>(),is,il,lr,ip);
+				overflow.getItem(is,il,lr,ip).add((float)isOver); 
+
 
 				// Add ADCs based on unique ID
 				if (!fadc_int.hasItem(is,il,lr,ip))fadc_int.add(new ArrayList<Float>(),is,il,lr,ip);
 				fadc_int.getItem(is,il,lr,ip).add((float)ad); 
-				
+
 				if (!fadc_height.hasItem(is,il,lr,ip))fadc_height.add(new ArrayList<Float>(),is,il,lr,ip);
 				fadc_height.getItem(is,il,lr,ip).add((float)ph); 
 
@@ -365,7 +402,7 @@ public class BANDReconstructionApp extends FCApplication {
 					lapmt.getItem(is,il,ip).add(ip);
 				}
 
-				
+
 				Float[] tdcc; float[] tdc;
 				// If we have a corresponding entry in TDC list:
 				if (tdc_time.hasItem(is,il,lr,ip)) {
@@ -387,7 +424,7 @@ public class BANDReconstructionApp extends FCApplication {
 				} else {
 					tdc = new float[1];
 				}
-				
+
 
 				// If we manually set the tet, pedestal, nsa, etc..
 				getMode7(cr,sl,ch);            
@@ -396,7 +433,7 @@ public class BANDReconstructionApp extends FCApplication {
 				// Loop through the waveform and fill a waveform histogram and
 				// fill single event histogram
 				for (int ii=0 ; ii< pulse.length ; ii++) {
-						// We can fill this if there are multiple waveforms per PMT
+					// We can fill this if there are multiple waveforms per PMT
 					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,9+lr+1).fill(ii,ip,pulse[ii]-ped);
 					if (app.isSingleEvent()) {
 						bandPix[il-1].strips.hmap2.get("H2_a_Sevd").get(is,lr+1,0).fill(ii,ip,pulse[ii]-ped);
@@ -410,13 +447,13 @@ public class BANDReconstructionApp extends FCApplication {
 
 				// Fill a bunch of histograms
 				fill(il-1, is, lr+1, ip, ad, tdc, (float) tf, ph);
-					//  layer is by definition 1-6, so need to subtract 1 for indexing
-					//  lr is right now 0, and I expect it to be 1,2, which is why I add 1 here
-					//  ip is bar number
-					//  ad is the FADC integral
-				    //  tdc is array of all tdc's in the event
-					//  tf is the FADC time
-				    //  ph is the FADC peak h
+				//  layer is by definition 1-6, so need to subtract 1 for indexing
+				//  lr is right now 0, and I expect it to be 1,2, which is why I add 1 here
+				//  ip is bar number
+				//  ad is the FADC integral
+				//  tdc is array of all tdc's in the event
+				//  tf is the FADC time
+				//  ph is the FADC peak h
 
 			}       
 		}
@@ -499,15 +536,15 @@ public class BANDReconstructionApp extends FCApplication {
 		if (app.isSingleEvent()) {
 			clearHistograms();
 			/*for (int is=0 ; is<5 ; is++) {
-				for (int il=0 ; il<2 ; il++) {
-					bandPix[idet].strips.hmap1.get("H1_a_Sevd").get(is+1,il+1,0).reset();
-					bandPix[idet].strips.hmap2.get("H2_a_Sevd").get(is+1,il+1,0).reset();
-					bandPix[idet].strips.hmap2.get("H2_a_Sevd").get(is+1,il+1,1).reset();
-					bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is+1,0,5+il+1).reset();
-					bandPix[idet].strips.hmap2.get("H2_t_Sevd").get(is+1,il+1,0).reset();
-				}
-			}
-			*/
+			  for (int il=0 ; il<2 ; il++) {
+			  bandPix[idet].strips.hmap1.get("H1_a_Sevd").get(is+1,il+1,0).reset();
+			  bandPix[idet].strips.hmap2.get("H2_a_Sevd").get(is+1,il+1,0).reset();
+			  bandPix[idet].strips.hmap2.get("H2_a_Sevd").get(is+1,il+1,1).reset();
+			  bandPix[idet].strips.hmap2.get("H2_a_Hist").get(is+1,0,5+il+1).reset();
+			  bandPix[idet].strips.hmap2.get("H2_t_Sevd").get(is+1,il+1,0).reset();
+			  }
+			  }
+			  */
 		}   
 	}
 
@@ -539,10 +576,19 @@ public class BANDReconstructionApp extends FCApplication {
 	public void processCalib() {
 
 		IndexGenerator ig = new IndexGenerator();
+
+		if( app.laserData == true ){
+			int nBars_fadc = lapmt.getMap().entrySet().size();
+			int nBars_tdc  = ltpmt.getMap().entrySet().size();
+			if( nBars_fadc < 100 || nBars_tdc < 100 ) return;
+		}
 		
+		int refSec = 2; int refComp = 1;
+		int refLay = 5;
+
 		// We will decide now that if we don't have an FADC AND a TDC for
 		// a bar, we don't give a shit about that event
-		
+
 		// Loop over all the unique bars that fired in our FADC module  -- we could do the
 		// same for our TDC module, but if we don't have any FADC bar, then the event is useless.
 		// Maybe we could recover the event if doesn't have TDC, but let's move on...
@@ -556,11 +602,11 @@ public class BANDReconstructionApp extends FCApplication {
 				// Get information for the current side:
 				if(fadc_int.hasItem(is,il,lr,ip) && fadc_time.hasItem(is,il,lr,ip) 
 						&& tdc_time.hasItem(is,il,lr,ip)) {
-					
+
 					// Loop over all ADCs to find the highest ADC pulse
 					int adcIdx = getADCidx(is,il,ip,lr);
 					if( adcIdx == -1) continue;
-					
+
 					// Now with chosen idx, find the idx of TDC that matches to FADC time
 					int tdcIdx = getTDCidx(is,il,ip,lr,adcIdx);
 					// Now we have our chosen ADC idx and matched TDC idx, so we can write any histograms:
@@ -568,114 +614,197 @@ public class BANDReconstructionApp extends FCApplication {
 					double at = fadc_time.getItem(is,il,lr,ip).get(adcIdx);
 					float tt = tdc_time.getItem(is,il,lr,ip).get(tdcIdx);
 					float ap = fadc_height.getItem(is,il,lr,ip).get(adcIdx);
-					
+
 					if( at==0 ) continue;
 					if( tt==0 ) continue;
-						// fill the left adc w/ overflow histogram
+					// fill the left adc w/ overflow histogram
 					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,3+lr+1).fill(ad,ip);
 					if( overflow.getItem(is,il,lr,ip).get(adcIdx) == 1) {
 						continue;
 					}
-						// fill the left adc w/o overflow histogram
+					// fill the left adc w/o overflow histogram
 					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,1+lr+1).fill(ad,ip);
-					
-						// fill the left FADC-TDC vs ADC histogram
+
+					// fill the left FADC-TDC vs ADC histogram
 					bandPix[il-1].strips.hmap2.get("H2_at_Hist").get(is,ip,lr).fill(ad,at- (double) tt);
-					
-						//  fill the raw TDC,ADC strip data for counting color
+
+					//  fill the raw TDC,ADC strip data for counting color
 					bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,0,lr+1).fill(tt,ip);
 					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,5+lr+1).fill(ad,ip);
 
-						// fill raw TDC,ADC:
+					// fill raw TDC,ADC:
 					bandPix[il-1].strips.hmap2.get("H2_at_Hist").get(is,ip,(lr+1)+1).fill(at,tt);
 				}
 			}
-			
-			
+
+
 			// Get information for both sides:
 			if(		fadc_int.hasItem(is,il,0,ip) && fadc_time.hasItem(is,il,0,ip) &&
 					fadc_int.hasItem(is,il,1,ip) && fadc_time.hasItem(is,il,1,ip) &&
 					tdc_time.hasItem(is,il,0,ip) && tdc_time.hasItem(is,il,1,ip) 		) {
-				
+
 				int adcIdxL = getADCidx(is,il,ip,0);
 				int adcIdxR = getADCidx(is,il,ip,1);
 				if( adcIdxL == -1 || adcIdxR == -1) continue;
-				
+
 				int tdcIdxL = getTDCidx(is,il,ip,0,adcIdxL);
 				int tdcIdxR = getTDCidx(is,il,ip,1,adcIdxR);
-				
+
 				float ad_L = fadc_int.getItem(is,il,0,ip).get(adcIdxL);
 				double at_L = fadc_time.getItem(is,il,0,ip).get(adcIdxL);
 				float tt_L = tdc_time.getItem(is,il,0,ip).get(tdcIdxL);
-				
+
 				float ad_R = fadc_int.getItem(is,il,1,ip).get(adcIdxR);
 				double at_R = fadc_time.getItem(is,il,1,ip).get(adcIdxR);
 				float tt_R = tdc_time.getItem(is,il,1,ip).get(tdcIdxR);
-				
+
 				double ln_R_atten = Math.log(ad_L/ad_R);
-				
+
 				if( at_L == 0 || at_R== 0 ) continue;
 				if( tt_L == 0 || tt_R== 0 ) continue;
-					// geometric mean
+				// geometric mean
 				double gm = Math.sqrt( ad_L * ad_R ); 
 				double tof_a = (at_L+at_R)/2.;
 				float tof_t = (tt_L+tt_R)/2.f;
-				
+
 				if( app.sourceData == true ){
 					if( (Math.abs(tt_L-tt_R+2) > 2) || 
 							(Math.abs(ad_L-ad_R) > 200) ||
-								(Math.abs(at_L-at_R) > 2) ) continue;
+							(Math.abs(at_L-at_R) > 2) ) continue;
 				}
-				
-					// Fill geometric mean histogram
+
+				// Fill geometric mean histogram
 				bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,0).fill(gm,ip);
-					// Fill L-R time from FADC
+				// Fill L-R time from FADC
 				bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,1).fill(at_L-at_R,ip);
-					// Fill L-R time from TDC
+				// Fill L-R time from TDC
 				bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,0,0).fill(tt_L-tt_R,ip);
-					// Fill ADC correlation plot
+				// Fill ADC correlation plot
 				bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,0,14).fill(ad_L-ad_R,ip);
-					// Fill histogram for 
+				// Fill histogram for 
 				bandPix[il-1].strips.hmap1.get("H1_a_Hist").get(is,0,ip).fill(ln_R_atten);
-				
+
 				// Take the top bar in the 2nd sector for now as a defined reference, and if it
 				// doesn't fire then we just don't fill the below histograms
-				int refSec = 2; int refComp = 1;
 				if( fadc_int.hasItem(refSec,il,0,refComp) &&  fadc_int.hasItem(refSec,il,1,refComp) &&
-					fadc_time.hasItem(refSec,il,0,refComp)&&  fadc_time.hasItem(refSec,il,1,refComp)&&
-					tdc_time.hasItem(refSec,il,0,refComp) && tdc_time.hasItem(refSec,il,1,refComp) ) {
-					
+						fadc_time.hasItem(refSec,il,0,refComp)&&  fadc_time.hasItem(refSec,il,1,refComp)&&
+						tdc_time.hasItem(refSec,il,0,refComp) && tdc_time.hasItem(refSec,il,1,refComp) ) {
+
 					int adcIdxRefL = getADCidx(refSec,il,refComp,0);
 					int adcIdxRefR = getADCidx(refSec,il,refComp,1);
 					if( adcIdxRefL == -1 || adcIdxRefR == -1) continue;
 					int tdcIdxRefL = getTDCidx(refSec,il,refComp,0,adcIdxRefL);
 					int tdcIdxRefR = getTDCidx(refSec,il,refComp,1,adcIdxRefR);
-					
+
 					double atRef_L = fadc_time.getItem(refSec,il,0,refComp).get(adcIdxRefL);
 					float ttRef_L = tdc_time.getItem(refSec,il,0,refComp).get(tdcIdxRefL);
 					double atRef_R = fadc_time.getItem(refSec,il,1,refComp).get(adcIdxRefR);
 					float ttRef_R = tdc_time.getItem(refSec,il,1,refComp).get(tdcIdxRefR);
-					
+
 					float adRef_L = fadc_int.getItem(refSec,il,0,refComp).get(adcIdxRefL);
 					float adRef_R = fadc_int.getItem(refSec,il,1,refComp).get(adcIdxRefR);
-					
+
 					double refTime_a = (atRef_L+atRef_R)/2.;
 					float refTime_t = (ttRef_L+ttRef_R)/2.f;
-					
+
 					if( app.cosmicData == true) {
 						if( Math.sqrt(adRef_L*adRef_R) < 13000 ) continue;
 					}
 					
+					if( app.laserData == true){
+						int barKey = is*100+il*10+ip;
+						tof_a -= Math.abs( FADC_T_OFFSET.get( Integer.valueOf(barKey) ) )/2.;
+						barKey = refSec*100+il*10+refComp;
+						refTime_a -= Math.abs(FADC_T_OFFSET.get( Integer.valueOf(barKey) ) )/2.;
+					}
+
 					// Fill ToF - Ref histograms:
 					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(is,ip,0).fill(gm,tof_a-refTime_a);
 					bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(is,ip,0).fill(gm,tof_t-refTime_t);
-					
+
 				}
-				
-				
+
+
 			}
-					
+
 		}
+	
+		// Look at layer-by-layer offset with the laser data
+		if( app.laserData == true){
+			// For each layer, look at the bar in the second sector, the first paddle, which was our above
+			// reference bar in each layer, and let's compare that to layer 5 as our layer reference for
+			// layer-by-layer offset
+			for( int il = 1 ; il < 7 ; il++){
+				if( 		 fadc_int.hasItem(refSec,il,0,refComp) &&  fadc_int.hasItem(refSec,il,1,refComp) 		&&
+						fadc_time.hasItem(refSec,il,0,refComp) && fadc_time.hasItem(refSec,il,1,refComp) 		&&
+						 tdc_time.hasItem(refSec,il,0,refComp) &&  tdc_time.hasItem(refSec,il,1,refComp)		&&
+					
+						 fadc_int.hasItem(refSec,refLay,0,refComp) &&  fadc_int.hasItem(refSec,refLay,1,refComp)	&&
+						fadc_time.hasItem(refSec,refLay,0,refComp) && fadc_time.hasItem(refSec,refLay,1,refComp)	&&
+						 tdc_time.hasItem(refSec,refLay,0,refComp) &&  tdc_time.hasItem(refSec,refLay,1,refComp)	  ){
+
+					// We have all our references in each layer for both TDC and FADC, so we can look at the global layer-by-layer 
+					// offset w/r to layer 5
+					int adcIdxRefL = getADCidx(refSec,refLay,refComp,0);
+					int adcIdxRefR = getADCidx(refSec,refLay,refComp,1);
+					if( adcIdxRefL == -1 || adcIdxRefR == -1 ) continue;
+					int tdcIdxRefL = getTDCidx(refSec,refLay,refComp,0,adcIdxRefL);
+					int tdcIdxRefR = getTDCidx(refSec,refLay,refComp,1,adcIdxRefR);
+
+
+					double atRef_L 	= fadc_time.getItem(refSec,refLay,0,refComp).get(adcIdxRefL);
+					float ttRef_L 	=  tdc_time.getItem(refSec,refLay,0,refComp).get(tdcIdxRefL);
+					float adRef_L 	=  fadc_int.getItem(refSec,refLay,0,refComp).get(adcIdxRefL);
+
+					double atRef_R 	= fadc_time.getItem(refSec,refLay,1,refComp).get(adcIdxRefR);
+					float ttRef_R 	=  tdc_time.getItem(refSec,refLay,1,refComp).get(tdcIdxRefR);
+					float adRef_R 	=  fadc_int.getItem(refSec,refLay,1,refComp).get(adcIdxRefR);
+
+					double refTime_a 	= (atRef_L+atRef_R)/2.;
+					float refTime_t 	= (ttRef_L+ttRef_R)/2.f;
+					
+					int barKey = refSec*100+refLay*10+refComp;
+					refTime_a -= Math.abs(FADC_T_OFFSET.get( Integer.valueOf(barKey) ) )/2.;
+					
+					if( atRef_L == 0 || atRef_R== 0 ) continue;
+					if( ttRef_L == 0 || ttRef_R== 0 ) continue;
+
+					// Now grab the current layer data
+					int adcIdxL = getADCidx(refSec,il,refComp,0);
+					int adcIdxR = getADCidx(refSec,il,refComp,1);
+					if( adcIdxL == -1 || adcIdxR == -1) continue;
+
+					int tdcIdxL = getTDCidx(refSec,il,refComp,0,adcIdxL);
+					int tdcIdxR = getTDCidx(refSec,il,refComp,1,adcIdxR);
+
+					float ad_L 	=  fadc_int.getItem(refSec,il,0,refComp).get(adcIdxL);
+					double at_L 	= fadc_time.getItem(refSec,il,0,refComp).get(adcIdxL);
+					float tt_L 	=  tdc_time.getItem(refSec,il,0,refComp).get(tdcIdxL);
+
+					float ad_R 	=  fadc_int.getItem(refSec,il,1,refComp).get(adcIdxR);
+					double at_R 	= fadc_time.getItem(refSec,il,1,refComp).get(adcIdxR);
+					float tt_R 	=  tdc_time.getItem(refSec,il,1,refComp).get(tdcIdxR);
+					
+					double tof_a = (at_L+at_R)/2.;
+					float tof_t = (tt_L+tt_R)/2.f;
+					double gm = Math.sqrt( ad_L * ad_R ); 
+					
+					barKey = refSec*100+il*10+refComp;
+					tof_a -= Math.abs(FADC_T_OFFSET.get( Integer.valueOf(barKey) ) )/2.;
+
+					if( at_L == 0 || at_R== 0 ) continue;
+					if( tt_L == 0 || tt_R== 0 ) continue;
+
+					bandPix[il-1].strips.hmap2.get("H2_a_Hist").get(0,0,0).fill(gm,tof_a-refTime_a);
+					bandPix[il-1].strips.hmap2.get("H2_t_Hist").get(0,0,0).fill(gm,tof_t-refTime_t);
+					
+				
+				}
+						
+
+			}
+		}
+		
 
 	} 
 
@@ -708,7 +837,7 @@ public class BANDReconstructionApp extends FCApplication {
 
 	public void makeMaps(int idet) {
 		//  Makes the maps for color drawing and updating color
-		
+
 		DetectorCollection<H2F> H2_a_Hist = new DetectorCollection<H2F>();
 		DetectorCollection<H2F> H2_t_Hist = new DetectorCollection<H2F>();
 		DetectorCollection<H1F> H1_a_Sevd = new DetectorCollection<H1F>();
@@ -743,14 +872,14 @@ public class BANDReconstructionApp extends FCApplication {
 		}
 		return chosenIdx;
 	}
-	
+
 	public int getTDCidx(int sector, int layer, int component, int order, int ADCidx) {
 		// Now with chosen idx, find the idx of TDC that matches to FADC time
 		int idxTDC = -1;
 		double minT = 1e5;
 		for( int idx = 0; idx < tdc_time.getItem(sector,layer,order,component).size(); idx++) {
 			double currTD = tdc_time.getItem(sector,layer,order,component).get(idx) - 
-								fadc_time.getItem(sector,layer,order,component).get(ADCidx);
+				fadc_time.getItem(sector,layer,order,component).get(ADCidx);
 			if( Math.abs(currTD) < minT ) {
 				minT = currTD;
 				idxTDC = idx;

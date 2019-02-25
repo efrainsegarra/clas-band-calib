@@ -2,6 +2,10 @@ package org.clas.fcmon.band;
 
 import java.awt.BorderLayout;
 import java.io.File;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +31,8 @@ import org.jlab.groot.fitter.DataFitter;
 
 public class BANDCalib_TW extends FCApplication implements CalibrationConstantsListener,ChangeListener {
 
-    
+ 
+   
 	EmbeddedCanvas c = this.getCanvas(this.getName()); 
 	CalibrationConstantsView      ccview = new CalibrationConstantsView();
 	ArrayList<CalibrationConstants> list = new ArrayList<CalibrationConstants>();
@@ -62,6 +67,9 @@ public class BANDCalib_TW extends FCApplication implements CalibrationConstantsL
         calib.setPrecision(3);
         
         list.add(calib);         
+
+
+
     }   
     public List<CalibrationConstants>  getCalibrationConstants(){
         return list;

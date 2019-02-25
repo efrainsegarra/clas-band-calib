@@ -34,6 +34,7 @@ public class BANDMon extends DetectorMonitor {
 	BANDCalib_TW				bandCalib_tw = null;
 	BANDCalib_C					bandCalib_c = null;
 	BANDCalib_Res				bandCalib_res = null;
+	BANDCalib_LayerOff			bandCalib_layerOff = null;
 	BANDCalib_Atten				bandCalib_atten = null;
     	BANDHvApp                  bandHv = null;
 
@@ -141,10 +142,16 @@ public class BANDMon extends DetectorMonitor {
 		bandCalib_source.setApplicationClass(app); 
 		bandCalib_source.init(is1,is2);
 		
-		bandCalib_res = new BANDCalib_Res("Resolution",bandPix);
+		bandCalib_res = new BANDCalib_Res("Paddle Offsets",bandPix);
 		bandCalib_res.setMonitoringClass(this);
 		bandCalib_res.setApplicationClass(app); 
 		bandCalib_res.init(is1,is2);
+	
+		bandCalib_layerOff = new BANDCalib_LayerOff("Layer Offsets",bandPix);
+		bandCalib_layerOff.setMonitoringClass(this);
+		bandCalib_layerOff.setApplicationClass(app);
+		bandCalib_layerOff.init(is1,is2);
+
 
 		bandCalib_atten = new BANDCalib_Atten("Attenuation",bandPix);        
 		bandCalib_atten.setMonitoringClass(this);
@@ -172,6 +179,7 @@ public class BANDMon extends DetectorMonitor {
 		app.addCanvas(bandCalib_source.getName(),             	bandCalib_source.getCanvas());
 		app.addCanvas(bandCalib_tw.getName(),             	bandCalib_tw.getCanvas());
 		app.addCanvas(bandCalib_res.getName(),             	bandCalib_res.getCanvas());
+		app.addCanvas(bandCalib_layerOff.getName(),		bandCalib_layerOff.getCanvas());
 		app.addCanvas(bandCalib_atten.getName(),             	bandCalib_atten.getCanvas());
 
 
@@ -247,6 +255,7 @@ public class BANDMon extends DetectorMonitor {
 					bandCalib_c.runno = app.run;
 					bandCalib_tw.runno = app.run;
 					bandCalib_res.runno = app.run;
+					bandCalib_layerOff.runno = app.run;
 					bandCalib_atten.runno = app.run;
 					for (int idet=0; idet<bandPix.length; idet++) bandRecon.makeMaps(idet); 
 					System.out.println("End of run");      
@@ -265,6 +274,7 @@ public class BANDMon extends DetectorMonitor {
 					bandCalib_source.analyze();
 					bandCalib_tw.analyze();
 					bandCalib_res.analyze();
+					bandCalib_layerOff.analyze();
 					bandCalib_atten.analyze();
 					
 					
@@ -300,7 +310,8 @@ public class BANDMon extends DetectorMonitor {
 				case "Cosmic: T.S. & S.o.L.":                bandCalib_c.updateCanvas(dd); break; 
 				case "Source: 1MeVee":			bandCalib_source.updateCanvas(dd); break; 
 				case "Time Walk":			bandCalib_tw.updateCanvas(dd); break; 
-				case "Resolution":			bandCalib_res.updateCanvas(dd); break; 
+				case "Paddle Offsets":			bandCalib_res.updateCanvas(dd); break; 
+				case "Layer Offsets":			bandCalib_layerOff.updateCanvas(dd); break;
 				case "Attenuation":                   bandCalib_atten.updateCanvas(dd); break; 
         			case "HV":                              bandHv.updateCanvas(dd); break;
 
